@@ -1,0 +1,133 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #18bc9c;
+    --danger-color: #e74c3c;
+    --light-color: #ecf0f1;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--light-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: var(--primary-color);
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    border-bottom: 3px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+.dashboard-grid {
+    display: block;
+}
+
+/* Simulación de columnas limpias sin flex/grid complejos para compatibilidad */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+/* Diseño responsivo básico para pantallas anchas */
+@media (min-width: 768px) {
+    .dashboard-grid {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+        border-spacing: 20px 0;
+    }
+    .card {
+        display: table-cell;
+        vertical-align: top;
+        margin-bottom: 0;
+    }
+    .card:first-child {
+        width: 35%;
+    }
+    .card:last-child {
+        width: 65%;
+    }
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-submit { background-color: var(--secondary-color); }
+.btn-submit:hover { background-color: #128f76; }
+.btn-cancel { background-color: #7f8c8d; margin-top: 5px; }
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+tr:hover { background-color: #f5f5f5; }
+
+.actions-btns {
+    display: block;
+}
+
+.btn-edit { background-color: #3498db; width: auto; padding: 5px 10px; margin-right: 5px; }
+.btn-delete { background-color: var(--danger-color); width: auto; padding: 5px 10px; }
+
+.loading {
+    text-align: center;
+    font-style: italic;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
