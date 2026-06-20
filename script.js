@@ -22,11 +22,19 @@ const btnCancelGra = document.getElementById('btn-cancel-gra');
 const formTitleGra = document.getElementById('form-title-gra');
 const btnSaveGra = document.getElementById('btn-save-gra');
 
+// Selectores Función
+const formFunco = document.getElementById('form-funcion');
+const tableBodyFunco = document.getElementById('table-body-funcion');
+const btnCancelFunco = document.getElementById('btn-cancel-funco');
+const formTitleFunco = document.getElementById('form-title-funco');
+const btnSaveFunco = document.getElementById('btn-save-funco');
+
 const loadingText = document.getElementById('loading-text');
 
 let isEditingMun = false;
 let isEditingArm = false;
 let isEditingGra = false;
+let isEditingFunco = false;
 
 document.addEventListener('DOMContentLoaded', loadAllData);
 
@@ -36,6 +44,7 @@ async function loadAllData() {
     tableBodyMun.innerHTML = "";
     tableBodyArm.innerHTML = "";
     tableBodyGra.innerHTML = "";
+    tableBodyFunco.innerHTML = "";
     try {
         const response = await fetch(WEB_APP_URL);
         const data = await response.json();
@@ -84,6 +93,19 @@ async function loadAllData() {
             tableBodyGra.appendChild(tr);
         });
 
+        // Renderizar Función
+        data.funcion.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.funcion}</td>
+                <td>
+                    <button class="btn-edit" onclick="setupEditFunco('${item.id}', '${item.funcion}')">Editar</button>
+                    <button class="btn-delete" onclick="deleteItem('${item.id}', 'funcion')">Eliminar</button>
+                </td>
+            `;
+            tableBodyFunco.appendChild(tr);
+        });
+
     } catch (error) {
         console.error("Error sincronizando los inventarios globales:", error);
     } finally {
@@ -91,7 +113,7 @@ async function loadAllData() {
     }
 }
 
-// POST: Envío Munición
+// POST: Envíos de Formulario
 formMun.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
@@ -99,14 +121,12 @@ formMun.addEventListener('submit', async (e) => {
         action: isEditingMun ? "update" : "create",
         id: document.getElementById('mun-id').value,
         calibre: document.getElementById('mun-calibre').value,
-        text_id: "",
         cantidad: parseInt(document.getElementById('mun-cantidad').value),
         lote: document.getElementById('mun-lote').value
     };
     sendData(payload, resetFormMunicion);
 });
 
-// POST: Envío Armamento
 formArm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
@@ -120,7 +140,6 @@ formArm.addEventListener('submit', async (e) => {
     sendData(payload, resetFormArmamento);
 });
 
-// POST: Envío Grado
 formGra.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
@@ -133,7 +152,18 @@ formGra.addEventListener('submit', async (e) => {
     sendData(payload, resetFormGrado);
 });
 
-// Despachador Global asíncrono
+formFunco.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        target: "funcion",
+        action: isEditingFunco ? "update" : "create",
+        id: document.getElementById('funco-id').value,
+        funcion: document.getElementById('funco-nombre').value
+    };
+    sendData(payload, resetFormFuncion);
+});
+
+// Despachador Global POST
 async function sendData(payload, callbackReset) {
     loadingText.style.display = "block";
     try {
@@ -148,12 +178,12 @@ async function sendData(payload, callbackReset) {
             loadAllData();
         }, 1200);
     } catch (error) {
-        console.error("Error de red en operación remota:", error);
+        console.error("Error en operación remota:", error);
         loadingText.style.display = "none";
     }
 }
 
-// Interfases de Edición
+// Interfaces de Edición
 function setupEditMun(id, calibre, cantidad, lote) {
     isEditingMun = true;
     formTitleMun.innerText = "Modificar Munición";
@@ -186,6 +216,16 @@ function setupEditGra(id, grado, gradoCompleto) {
     document.getElementById('gra-completo').value = gradoCompleto;
 }
 
+function setupEditFunco(id, funcion) {
+    isEditingFunco = true;
+    formTitleFunco.innerText = "Modificar Función";
+    btnSaveFunco.innerText = "Actualizar Función";
+    btnCancelFunco.style.display = "block";
+    document.getElementById('funco-id').value = id;
+    document.getElementById('funco-nombre').value = funcion;
+}
+
+// Resets de Formulario
 function resetFormMunicion() {
     isEditingMun = false;
     formTitleMun.innerText = "Ingresar Munición";
@@ -208,6 +248,14 @@ function resetFormGrado() {
     btnSaveGra.innerText = "Guardar Grado";
     btnCancelGra.style.display = "none";
     formGra.reset();
+}
+
+function resetFormFuncion() {
+    isEditingFunco = false;
+    formTitleFunco.innerText = "Ingresar Función";
+    btnSaveFunco.innerText = "Guardar Función";
+    btnCancelFunco.style.display = "none";
+    formFunco.reset();
 }
 
 // DELETE unificado

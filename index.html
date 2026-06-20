@@ -135,6 +135,38 @@
             </div>
         </div>
     </div>
+    <div class="panel-section section-funcion">
+        <h2>Sección de Funciones / Cargos (Pestaña: FUNCION)</h2>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 id="form-title-funco">Ingresar Función</h3>
+                <form id="form-funcion">
+                    <input type="hidden" id="funco-id">
+                    <div class="form-group">
+                        <label for="funco-nombre">Nombre de la Función / Cargo</label>
+                        <input type="text" id="funco-nombre" required placeholder="Ej. Comandante / Operador / Centinela">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-save-funco">Guardar Función</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-funco" style="display:none;" onclick="resetFormFuncion()">Cancelar Edición</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Funciones Registradas</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Función / Cargo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-funcion"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 <script src="script.js"></script>
 </body>
 </html>

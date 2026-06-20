@@ -175,3 +175,6 @@ tr:hover {
 .panel-section.section-grado {
     border-top: 5px solid #9b59b6; /* Tono morado/púrpura institucional para Grados */
 }
+.panel-section.section-funcion {
+    border-top: 5px solid #e67e22; /* Tono naranja/ocre para diferenciar Funciones */
+}
