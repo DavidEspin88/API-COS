@@ -45,25 +45,29 @@ function poblarDesplegablesPersonal() {
     selectEspecialidad.value = currentEsp;
 }
 
-// 2. Renderizar Tabla de Personal
+// 2. Renderizar Tabla de Personal (Versión corregida y unificada)
 function renderPersonalTable(personalData) {
     tableBodyPer.innerHTML = "";
     if (!personalData) return;
 
     personalData.forEach(item => {
+        // Si el valor es null o vacío, muestra un guión elegante en la tabla
+        const antMostrar = (item.ant === null || item.ant === "") ? '<span style="color:#7f8c8d;">-</span>' : item.ant;
+        const antPasarParametro = (item.ant === null) ? "" : item.ant;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><span class="badge-ord">${item.ord}</span></td>
             <td><strong>${item.cedula}</strong></td>
             <td>${item.grado}</td>
             <td>${item.especialidad}</td>
-            <td>${item.ant}</td>
+            <td>${antMostrar}</td>
             <td>${item.apellidos_nombres}</td>
             <td>${item.fecha_nacimiento}</td>
             <td>${item.contacto}</td>
             <td>${item.nombre_contacto}</td>
             <td>
-                <button class="btn-edit" onclick="setupEditPer('${item.cedula}', '${item.grado}', '${item.especialidad}', ${item.ant}, '${item.apellidos_nombres}', '${item.fecha_nacimiento}', '${item.contacto}', '${item.nombre_contacto}')">Editar</button>
+                <button class="btn-edit" onclick="setupEditPer('${item.cedula}', '${item.grado}', '${item.especialidad}', '${antPasarParametro}', '${item.apellidos_nombres}', '${item.fecha_nacimiento}', '${item.contacto}', '${item.nombre_contacto}')">Editar</button>
                 <button class="btn-delete" onclick="deletePersonal('${item.cedula}')">Eliminar</button>
             </td>
         `;
@@ -75,20 +79,23 @@ function renderPersonalTable(personalData) {
 formPer.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    const antInput = document.getElementById('per-ant').value;
+    // Si está vacío, se envía como una cadena vacía para que el script de Sheets lo detecte como null
+    const antiguedadPayload = antInput === "" ? "" : parseInt(antInput);
+
     const payload = {
         target: "personal",
         action: isEditingPer ? "update" : "create",
         cedula: document.getElementById('per-cedula').value,
         grado: selectGrado.value,
         especialidad: selectEspecialidad.value,
-        ant: parseInt(document.getElementById('per-ant').value),
-        apellidos_nombres: document.getElementById('per-nombres').value.toUpperCase(), // Estandarización militar
+        ant: antiguedadPayload, 
+        apellidos_nombres: document.getElementById('per-nombres').value.toUpperCase(),
         fecha_nacimiento: document.getElementById('per-fecha').value,
         contacto: document.getElementById('per-contacto').value,
         nombre_contacto: document.getElementById('per-nombre-contacto').value
     };
 
-    // La función sendData global está definida en script.js
     if (typeof sendData === 'function') {
         sendData(payload, resetFormPersonal);
     }
@@ -99,7 +106,9 @@ function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, fechaN
     isEditingPer = true;
     formTitlePer.innerText = "Modificar Datos de Personal";
     btnSavePer.innerText = "Actualizar Registro";
-    btnCancelPer.style.style.display = "block";
+    
+    // Corregido: removido el .style duplicado que causaba el Uncaught TypeError
+    btnCancelPer.style.display = "block"; 
     
     // Bloquear la Cédula (Clave Primaria No Modificable)
     const cedulaInput = document.getElementById('per-cedula');
@@ -107,7 +116,7 @@ function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, fechaN
     cedulaInput.readOnly = true;
     cedulaInput.style.background = "#e0e0e0";
 
-    // Asignación de campos sobrantes
+    // Asignación de campos restantes
     document.getElementById('per-ant').value = ant;
     selectGrado.value = grado;
     selectEspecialidad.value = especialidad;
