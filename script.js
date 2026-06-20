@@ -33,8 +33,15 @@ const btnSaveFunco = document.getElementById('btn-save-funco');
 const formLug = document.getElementById('form-lugar');
 const tableBodyLug = document.getElementById('table-body-lugar');
 const btnCancelLug = document.getElementById('btn-cancel-lug');
-const formTitleLug = document.getElementById('form-title-lug');
+const formTitleLug = document.getElementById('form-title-lugar'); // se ajusta a coincidencia visual estándar si aplica
 const btnSaveLug = document.getElementById('btn-save-lug');
+
+// Selectores Especialidad
+const formEsp = document.getElementById('form-especialidad');
+const tableBodyEsp = document.getElementById('table-body-especialidad');
+const btnCancelEsp = document.getElementById('btn-cancel-esp');
+const formTitleEsp = document.getElementById('form-title-esp');
+const btnSaveEsp = document.getElementById('btn-save-esp');
 
 const loadingText = document.getElementById('loading-text');
 
@@ -43,6 +50,7 @@ let isEditingArm = false;
 let isEditingGra = false;
 let isEditingFunco = false;
 let isEditingLug = false;
+let isEditingEsp = false;
 
 document.addEventListener('DOMContentLoaded', loadAllData);
 
@@ -54,6 +62,7 @@ async function loadAllData() {
     tableBodyGra.innerHTML = "";
     tableBodyFunco.innerHTML = "";
     tableBodyLug.innerHTML = "";
+    tableBodyEsp.innerHTML = "";
     try {
         const response = await fetch(WEB_APP_URL);
         const data = await response.json();
@@ -128,6 +137,19 @@ async function loadAllData() {
             tableBodyLug.appendChild(tr);
         });
 
+        // Renderizar Especialidad
+        data.especialidad.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.especialidad}</td>
+                <td>
+                    <button class="btn-edit" onclick="setupEditEsp('${item.id}', '${item.especialidad}')">Editar</button>
+                    <button class="btn-delete" onclick="deleteItem('${item.id}', 'especialidad')">Eliminar</button>
+                </td>
+            `;
+            tableBodyEsp.appendChild(tr);
+        });
+
     } catch (error) {
         console.error("Error sincronizando inventarios globales:", error);
     } finally {
@@ -196,6 +218,17 @@ formLug.addEventListener('submit', async (e) => {
     sendData(payload, resetFormLugar);
 });
 
+formEsp.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        target: "especialidad",
+        action: isEditingEsp ? "update" : "create",
+        id: document.getElementById('esp-id').value,
+        valor_unico: document.getElementById('esp-nombre').value
+    };
+    sendData(payload, resetFormEspecialidad);
+});
+
 // Despachador Global POST
 async function sendData(payload, callbackReset) {
     loadingText.style.display = "block";
@@ -260,11 +293,21 @@ function setupEditFunco(id, funcion) {
 
 function setupEditLug(id, lugar) {
     isEditingLug = true;
-    formTitleLug.innerText = "Modificar Lugar";
+    const formTitleLugarElement = document.getElementById('form-title-lug');
+    if (formTitleLugarElement) formTitleLugarElement.innerText = "Modificar Lugar";
     btnSaveLug.innerText = "Actualizar Lugar";
     btnCancelLug.style.display = "block";
     document.getElementById('lug-id').value = id;
     document.getElementById('lug-nombre').value = lugar;
+}
+
+function setupEditEsp(id, especialidad) {
+    isEditingEsp = true;
+    formTitleEsp.innerText = "Modificar Especialidad";
+    btnSaveEsp.innerText = "Actualizar Especialidad";
+    btnCancelEsp.style.display = "block";
+    document.getElementById('esp-id').value = id;
+    document.getElementById('esp-nombre').value = especialidad;
 }
 
 // Resets de Formulario
@@ -302,10 +345,19 @@ function resetFormFuncion() {
 
 function resetFormLugar() {
     isEditingLug = false;
-    formTitleLug.innerText = "Ingresar Lugar";
+    const formTitleLugarElement = document.getElementById('form-title-lug');
+    if (formTitleLugarElement) formTitleLugarElement.innerText = "Ingresar Lugar";
     btnSaveLug.innerText = "Guardar Lugar";
     btnCancelLug.style.display = "none";
     formLug.reset();
+}
+
+function resetFormEspecialidad() {
+    isEditingEsp = false;
+    formTitleEsp.innerText = "Ingresar Especialidad";
+    btnSaveEsp.innerText = "Guardar Especialidad";
+    btnCancelEsp.style.display = "none";
+    formEsp.reset();
 }
 
 // DELETE unificado

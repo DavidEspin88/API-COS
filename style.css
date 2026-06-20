@@ -181,3 +181,6 @@ tr:hover {
 .panel-section.section-lugar {
     border-top: 5px solid #16a085; /* Tono verde esmeralda/teal para identificar Lugares */
 }
+.panel-section.section-especialidad {
+    border-top: 5px solid #d35400; /* Tono naranja oscuro/óxido para identificar Especialidades */
+}

@@ -199,6 +199,38 @@
             </div>
         </div>
     </div>
+    <div class="panel-section section-especialidad">
+        <h2>Sección de Especialidades (Pestaña: ESPECIALIDAD)</h2>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 id="form-title-esp">Ingresar Especialidad</h3>
+                <form id="form-especialidad">
+                    <input type="hidden" id="esp-id">
+                    <div class="form-group">
+                        <label for="esp-nombre">Nombre de la Especialidad Técnico-Militar</label>
+                        <input type="text" id="esp-nombre" required placeholder="Ej. Armamento / Electrónica / Defensa Aérea / Infantería">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-save-esp">Guardar Especialidad</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-esp" style="display:none;" onclick="resetFormEspecialidad()">Cancelar Edición</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Especialidades Registradas</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Especialidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-especialidad"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 <script src="script.js"></script>
 </body>
 </html>
