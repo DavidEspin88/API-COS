@@ -203,3 +203,6 @@ tr:hover {
     flex-direction: column;
     gap: 20px;
 }
+.panel-section.section-estado {
+    border-top: 5px solid #7f8c8d; /* Gris plomo institucional para Estados */
+}

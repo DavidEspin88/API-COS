@@ -316,7 +316,38 @@
 
         </div>
     </div>
-
+<div class="panel-section section-estado">
+        <h2>Sección de Estados Operativos (Pestaña: ESTADO)</h2>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 id="form-title-est">Ingresar Estado</h3>
+                <form id="form-estado">
+                    <input type="hidden" id="est-id">
+                    <div class="form-group">
+                        <label for="est-nombre">Nombre del Estado / Condición</label>
+                        <input type="text" id="est-nombre" required placeholder="Ej. Disponible / Comisión / Permiso">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-save-est">Guardar Estado</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-est" style="display:none;" onclick="resetFormEstado()">Cancelar Edición</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Estados Registrados</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-estado"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
     <script src="personal.js"></script>
 </body>

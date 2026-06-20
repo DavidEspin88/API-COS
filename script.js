@@ -42,6 +42,15 @@ const btnCancelEsp = document.getElementById('btn-cancel-esp');
 const formTitleEsp = document.getElementById('form-title-esp');
 const btnSaveEsp = document.getElementById('btn-save-esp');
 
+// Selectores Estado
+const formEst = document.getElementById('form-estado');
+const tableBodyEst = document.getElementById('table-body-estado');
+const btnCancelEst = document.getElementById('btn-cancel-est');
+const formTitleEst = document.getElementById('form-title-est');
+const btnSaveEst = document.getElementById('btn-save-est');
+
+
+
 const loadingText = document.getElementById('loading-text');
 
 let isEditingMun = false;
@@ -50,6 +59,7 @@ let isEditingGra = false;
 let isEditingFunco = false;
 let isEditingLug = false;
 let isEditingEsp = false;
+let isEditingEst = false;
 
 document.addEventListener('DOMContentLoaded', loadAllData);
 
@@ -151,6 +161,20 @@ async function loadAllData() {
             tableBodyEsp.appendChild(tr);
         });
 
+        // Renderizar Estado
+        tableBodyEst.innerHTML = "";
+        data.estado.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.estado}</td>
+                <td>
+                    <button class="btn-edit" onclick="setupEditEst('${item.id}', '${item.estado}')">Editar</button>
+                    <button class="btn-delete" onclick="deleteItem('${item.id}', 'estado')">Eliminar</button>
+                </td>
+            `;
+            tableBodyEst.appendChild(tr);
+        });
+
         // INTEGRACIÓN SEGURA DE PERSONAL (Dentro del bloque try con datos disponibles)
         if (typeof renderPersonalTable === 'function') {
             renderPersonalTable(data.personal);
@@ -236,6 +260,19 @@ formEsp.addEventListener('submit', async (e) => {
     sendData(payload, resetFormEspecialidad);
 });
 
+// POST: Envío de Formulario Estado
+formEst.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        target: "estado",
+        action: isEditingEst ? "update" : "create",
+        id: document.getElementById('est-id').value,
+        valor_unico: document.getElementById('est-nombre').value
+    };
+    sendData(payload, resetFormEstado);
+});
+
+
 // Despachador Global POST
 async function sendData(payload, callbackReset) {
     loadingText.style.display = "block";
@@ -267,8 +304,6 @@ function setupEditMun(id, calibre, cantidad, lote) {
     document.getElementById('mun-cantidad').value = cantidad;
     document.getElementById('mun-lote').value = lote;
 }
-
-// ... Las demás funciones de configuración de interfaz permanecen idénticas ...
 
 function setupEditArm(id, tipo, serie, cantidad) {
     isEditingArm = true;
@@ -318,6 +353,16 @@ function setupEditEsp(id, especialidad) {
     document.getElementById('esp-nombre').value = especialidad;
 }
 
+// Interfaces de Edición para Estado
+function setupEditEst(id, estado) {
+    isEditingEst = true;
+    formTitleEst.innerText = "Modificar Estado";
+    btnSaveEst.innerText = "Actualizar Estado";
+    btnCancelEst.style.display = "block";
+    document.getElementById('est-id').value = id;
+    document.getElementById('est-nombre').value = estado;
+}
+
 // Resets de Formulario
 function resetFormMunicion() {
     isEditingMun = false;
@@ -365,6 +410,16 @@ function resetFormEspecialidad() {
     btnSaveEsp.innerText = "Guardar Especialidad";
     btnCancelEsp.style.display = "none";
     formEsp.reset();
+}
+
+// Reset del Formulario Estado
+function resetFormEstado() {
+    isEditingEst = false;
+    formTitleEst.innerText = "Ingresar Estado";
+    btnSaveEst.innerText = "Guardar Estado";
+    btnCancelEst.style.display = "none";
+    formEst.reset();
+    document.getElementById('est-id').value = "";
 }
 
 // DELETE unificado
