@@ -3,61 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - CRUD de Munición</title>
+    <title>Dashboard Militar - Control de Inventario</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <h1>Panel de Control - Inventario de Munición</h1>
+    <h1>Panel de Control de Logística</h1>
+    <div id="loading-text" class="loading">Sincronizando Base de Datos de Google Sheets...</div>
     
-    <div class="dashboard-grid">
-        <div class="card">
-            <h2 id="form-title">Ingresar Munición</h2>
-            <form id="crud-form">
-                <input type="hidden" id="item-id">
-                
-                <div class="form-group">
-                    <label for="calibre">Calibre</label>
-                    <input type="text" id="calibre" required placeholder="Ej. 5.56mm / 9mm / 7.62mm">
+    <div class="panel-section">
+        <h2>Sección de Munición (Pestaña: MUNICION)</h2>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 id="form-title-mun">Ingresar Munición</h3>
+                <form id="form-municion">
+                    <input type="hidden" id="mun-id">
+                    <div class="form-group">
+                        <label for="mun-calibre">Calibre</label>
+                        <input type="text" id="mun-calibre" required placeholder="Ej. 5.56mm / 9mm">
+                    </div>
+                    <div class="form-group">
+                        <label for="mun-cantidad">Cantidad</label>
+                        <input type="number" id="mun-cantidad" required min="1" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="mun-lote">Número de Lote</label>
+                        <input type="text" id="mun-lote" required placeholder="Ej. LOT-2026-A">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-save-mun">Guardar Munición</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-mun" style="display:none;" onclick="resetFormMunicion()">Cancelar Edición</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Inventario Actual de Munición</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Calibre</th>
+                                <th>Cantidad</th>
+                                <th>Lote</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-municion"></tbody>
+                    </table>
                 </div>
-                
-                <div class="form-group">
-                    <label for="cantidad">Cantidad</label>
-                    <input type="number" id="cantidad" required min="1" placeholder="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="lote">Número de Lote</label>
-                    <input type="text" id="lote" required placeholder="Ej. LOT-2026-A">
-                </div>
-                
-                <button type="submit" class="btn-submit" id="btn-save">Guardar</button>
-                <button type="button" class="btn-cancel" id="btn-cancel" style="display:none;">Cancelar Edición</button>
-            </form>
+            </div>
         </div>
+    </div>
 
-        <div class="card">
-            <h2>Inventario Actual (Pestaña MUNICION)</h2>
-            <div id="loading-text" class="loading">Cargando datos desde Google Sheets...</div>
-            <div class="table-container">
-                <table id="data-table">
-                    <thead>
-                        <tr>
-                            <th>Calibre</th>
-                            <th>Cantidad</th>
-                            <th>Lote</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        </tbody>
-                </table>
+    <div class="panel-section">
+        <h2>Sección de Armamento (Pestaña: ARMAMENTO)</h2>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 id="form-title-arm">Ingresar Armamento</h3>
+                <form id="form-armamento">
+                    <input type="hidden" id="arm-id">
+                    <div class="form-group">
+                        <label for="arm-tipo">Tipo de Armamento</label>
+                        <input type="text" id="arm-tipo" required placeholder="Ej. Fusil HK / Pistola Glock">
+                    </div>
+                    <div class="form-group">
+                        <label for="arm-serie">Número de Serie</label>
+                        <input type="text" id="arm-serie" required placeholder="Ej. SN-987654">
+                    </div>
+                    <div class="form-group">
+                        <label for="arm-cantidad">Cantidad Armamento</label>
+                        <input type="number" id="arm-cantidad" required min="1" placeholder="0">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-save-arm">Guardar Armamento</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-arm" style="display:none;" onclick="resetFormArmamento()">Cancelar Edición</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Inventario Actual de Armamento</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo de Armamento</th>
+                                <th>Serie</th>
+                                <th>Cantidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-armamento"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
+<div class="panel-section section-grado">
+        <h2>Sección de Grados Militares (Pestaña: GRADO)</h2>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 id="form-title-gra">Ingresar Grado</h3>
+                <form id="form-grado">
+                    <input type="hidden" id="gra-id">
+                    <div class="form-group">
+                        <label for="gra-sigla">Grado (Sigla/Abreviatura)</label>
+                        <input type="text" id="gra-sigla" required placeholder="Ej. Cbop. / Sgto. / Tnte.">
+                    </div>
+                    <div class="form-group">
+                        <label for="gra-completo">Grado Completo</label>
+                        <input type="text" id="gra-completo" required placeholder="Ej. Cabo Primero / Sargento / Teniente">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-save-gra">Guardar Grado</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-gra" style="display:none;" onclick="resetFormGrado()">Cancelar Edición</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Jerarquía / Grados Registrados</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Grado (Sigla)</th>
+                                <th>Grado Completo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-grado"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 <script src="script.js"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@
     --secondary-color: #18bc9c;
     --danger-color: #e74c3c;
     --light-color: #ecf0f1;
+    --accent-color: #2980b9;
 }
 
 body {
@@ -13,7 +14,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
 }
 
@@ -22,42 +23,59 @@ h1 {
     text-align: center;
     text-transform: uppercase;
     margin-bottom: 30px;
-    border-bottom: 3px solid var(--primary-color);
-    padding-bottom: 10px;
+    border-bottom: 4px solid var(--accent-color);
+    padding-bottom: 15px;
+}
+
+.panel-section {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 35px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-top: 5px solid var(--primary-color);
+}
+
+.panel-section>h2 {
+    margin-top: 0;
+    color: var(--accent-color);
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
 }
 
 .dashboard-grid {
     display: block;
 }
 
-/* Simulación de columnas limpias sin flex/grid complejos para compatibilidad */
 .card {
-    background: white;
+    background: #fafbfc;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    border-radius: 6px;
+    border: 1px solid #e1e8ed;
+    margin-bottom: 15px;
     box-sizing: border-box;
 }
 
-/* Diseño responsivo básico para pantallas anchas */
-@media (min-width: 768px) {
+@media (min-width: 850px) {
     .dashboard-grid {
         display: table;
         width: 100%;
         table-layout: fixed;
         border-spacing: 20px 0;
     }
+
     .card {
         display: table-cell;
         vertical-align: top;
         margin-bottom: 0;
     }
+
     .card:first-child {
-        width: 35%;
+        width: 33%;
     }
+
     .card:last-child {
-        width: 65%;
+        width: 67%;
     }
 }
 
@@ -74,7 +92,7 @@ h1 {
 
 .form-group input {
     width: 100%;
-    padding: 8px;
+    padding: 9px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
@@ -82,7 +100,7 @@ h1 {
 
 button {
     width: 100%;
-    padding: 10px;
+    padding: 11px;
     border: none;
     border-radius: 4px;
     color: white;
@@ -91,9 +109,18 @@ button {
     transition: background 0.3s;
 }
 
-.btn-submit { background-color: var(--secondary-color); }
-.btn-submit:hover { background-color: #128f76; }
-.btn-cancel { background-color: #7f8c8d; margin-top: 5px; }
+.btn-submit {
+    background-color: var(--secondary-color);
+}
+
+.btn-submit:hover {
+    background-color: #128f76;
+}
+
+.btn-cancel {
+    background-color: #7f8c8d;
+    margin-top: 5px;
+}
 
 .table-container {
     overflow-x: auto;
@@ -105,10 +132,12 @@ table {
     margin-top: 10px;
 }
 
-th, td {
-    padding: 12px;
+th,
+td {
+    padding: 10px 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    font-size: 14px;
 }
 
 th {
@@ -116,18 +145,33 @@ th {
     color: white;
 }
 
-tr:hover { background-color: #f5f5f5; }
-
-.actions-btns {
-    display: block;
+tr:hover {
+    background-color: #f1f4f6;
 }
 
-.btn-edit { background-color: #3498db; width: auto; padding: 5px 10px; margin-right: 5px; }
-.btn-delete { background-color: var(--danger-color); width: auto; padding: 5px 10px; }
+.btn-edit {
+    background-color: #3498db;
+    width: auto;
+    padding: 4px 8px;
+    margin-right: 4px;
+    font-size: 12px;
+}
+
+.btn-delete {
+    background-color: var(--danger-color);
+    width: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+}
 
 .loading {
     text-align: center;
     font-style: italic;
-    color: #7f8c8d;
-    margin-bottom: 10px;
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: none;
+}
+.panel-section.section-grado {
+    border-top: 5px solid #9b59b6; /* Tono morado/púrpura institucional para Grados */
 }
