@@ -167,6 +167,38 @@
             </div>
         </div>
     </div>
+    <div class="panel-section section-lugar">
+        <h2>Sección de Lugares / Repartos (Pestaña: LUGAR)</h2>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 id="form-title-lug">Ingresar Lugar</h3>
+                <form id="form-lugar">
+                    <input type="hidden" id="lug-id">
+                    <div class="form-group">
+                        <label for="lug-nombre">Nombre del Lugar / Reparto / Base</label>
+                        <input type="text" id="lug-nombre" required placeholder="Ej. Base Manta / Ala Nro 21 / Polvorín">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-save-lug">Guardar Lugar</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-lug" style="display:none;" onclick="resetFormLugar()">Cancelar Edición</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Lugares Registrados</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Lugar / Distribución</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-lugar"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 <script src="script.js"></script>
 </body>
 </html>

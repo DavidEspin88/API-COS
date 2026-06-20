@@ -178,3 +178,6 @@ tr:hover {
 .panel-section.section-funcion {
     border-top: 5px solid #e67e22; /* Tono naranja/ocre para diferenciar Funciones */
 }
+.panel-section.section-lugar {
+    border-top: 5px solid #16a085; /* Tono verde esmeralda/teal para identificar Lugares */
+}

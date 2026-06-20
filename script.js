@@ -29,12 +29,20 @@ const btnCancelFunco = document.getElementById('btn-cancel-funco');
 const formTitleFunco = document.getElementById('form-title-funco');
 const btnSaveFunco = document.getElementById('btn-save-funco');
 
+// Selectores Lugar
+const formLug = document.getElementById('form-lugar');
+const tableBodyLug = document.getElementById('table-body-lugar');
+const btnCancelLug = document.getElementById('btn-cancel-lug');
+const formTitleLug = document.getElementById('form-title-lug');
+const btnSaveLug = document.getElementById('btn-save-lug');
+
 const loadingText = document.getElementById('loading-text');
 
 let isEditingMun = false;
 let isEditingArm = false;
 let isEditingGra = false;
 let isEditingFunco = false;
+let isEditingLug = false;
 
 document.addEventListener('DOMContentLoaded', loadAllData);
 
@@ -45,6 +53,7 @@ async function loadAllData() {
     tableBodyArm.innerHTML = "";
     tableBodyGra.innerHTML = "";
     tableBodyFunco.innerHTML = "";
+    tableBodyLug.innerHTML = "";
     try {
         const response = await fetch(WEB_APP_URL);
         const data = await response.json();
@@ -106,8 +115,21 @@ async function loadAllData() {
             tableBodyFunco.appendChild(tr);
         });
 
+        // Renderizar Lugar
+        data.lugar.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.lugar}</td>
+                <td>
+                    <button class="btn-edit" onclick="setupEditLug('${item.id}', '${item.lugar}')">Editar</button>
+                    <button class="btn-delete" onclick="deleteItem('${item.id}', 'lugar')">Eliminar</button>
+                </td>
+            `;
+            tableBodyLug.appendChild(tr);
+        });
+
     } catch (error) {
-        console.error("Error sincronizando los inventarios globales:", error);
+        console.error("Error sincronizando inventarios globales:", error);
     } finally {
         loadingText.style.display = "none";
     }
@@ -158,9 +180,20 @@ formFunco.addEventListener('submit', async (e) => {
         target: "funcion",
         action: isEditingFunco ? "update" : "create",
         id: document.getElementById('funco-id').value,
-        funcion: document.getElementById('funco-nombre').value
+        valor_unico: document.getElementById('funco-nombre').value
     };
     sendData(payload, resetFormFuncion);
+});
+
+formLug.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        target: "lugar",
+        action: isEditingLug ? "update" : "create",
+        id: document.getElementById('lug-id').value,
+        valor_unico: document.getElementById('lug-nombre').value
+    };
+    sendData(payload, resetFormLugar);
 });
 
 // Despachador Global POST
@@ -225,6 +258,15 @@ function setupEditFunco(id, funcion) {
     document.getElementById('funco-nombre').value = funcion;
 }
 
+function setupEditLug(id, lugar) {
+    isEditingLug = true;
+    formTitleLug.innerText = "Modificar Lugar";
+    btnSaveLug.innerText = "Actualizar Lugar";
+    btnCancelLug.style.display = "block";
+    document.getElementById('lug-id').value = id;
+    document.getElementById('lug-nombre').value = lugar;
+}
+
 // Resets de Formulario
 function resetFormMunicion() {
     isEditingMun = false;
@@ -256,6 +298,14 @@ function resetFormFuncion() {
     btnSaveFunco.innerText = "Guardar Función";
     btnCancelFunco.style.display = "none";
     formFunco.reset();
+}
+
+function resetFormLugar() {
+    isEditingLug = false;
+    formTitleLug.innerText = "Ingresar Lugar";
+    btnSaveLug.innerText = "Guardar Lugar";
+    btnCancelLug.style.display = "none";
+    formLug.reset();
 }
 
 // DELETE unificado
