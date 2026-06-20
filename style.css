@@ -184,3 +184,22 @@ tr:hover {
 .panel-section.section-especialidad {
     border-top: 5px solid #d35400; /* Tono naranja oscuro/óxido para identificar Especialidades */
 }
+.panel-section.section-personal {
+    border-top: 5px solid #2980b9; /* Azul institucional para el Personal */
+}
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+.form-row .form-group {
+    flex: 1;
+}
+.card.full-width {
+    grid-column: 1 / -1;
+}
+.vertical-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

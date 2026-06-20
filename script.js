@@ -33,8 +33,7 @@ const btnSaveFunco = document.getElementById('btn-save-funco');
 const formLug = document.getElementById('form-lugar');
 const tableBodyLug = document.getElementById('table-body-lugar');
 const btnCancelLug = document.getElementById('btn-cancel-lug');
-const formTitleLug = document.getElementById('form-title-lugar'); // se ajusta a coincidencia visual estándar si aplica
-const btnSaveLug = document.getElementById('btn-save-lug');
+const formTitleLug = document.getElementById('form-title-lug'); // Corregido para que coincida exactamente con el HTML
 
 // Selectores Especialidad
 const formEsp = document.getElementById('form-especialidad');
@@ -98,6 +97,7 @@ async function loadAllData() {
         });
 
         // Renderizar Grado
+        window.gradosCargados = data.grado;
         data.grado.forEach(item => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -138,6 +138,7 @@ async function loadAllData() {
         });
 
         // Renderizar Especialidad
+        window.especialidadesCargadas = data.especialidad;
         data.especialidad.forEach(item => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -149,6 +150,12 @@ async function loadAllData() {
             `;
             tableBodyEsp.appendChild(tr);
         });
+
+        // INTEGRACIÓN SEGURA DE PERSONAL (Dentro del bloque try con datos disponibles)
+        if (typeof renderPersonalTable === 'function') {
+            renderPersonalTable(data.personal);
+            poblarDesplegablesPersonal();
+        }
 
     } catch (error) {
         console.error("Error sincronizando inventarios globales:", error);
@@ -261,6 +268,8 @@ function setupEditMun(id, calibre, cantidad, lote) {
     document.getElementById('mun-lote').value = lote;
 }
 
+// ... Las demás funciones de configuración de interfaz permanecen idénticas ...
+
 function setupEditArm(id, tipo, serie, cantidad) {
     isEditingArm = true;
     formTitleArm.innerText = "Modificar Armamento";
@@ -293,8 +302,7 @@ function setupEditFunco(id, funcion) {
 
 function setupEditLug(id, lugar) {
     isEditingLug = true;
-    const formTitleLugarElement = document.getElementById('form-title-lug');
-    if (formTitleLugarElement) formTitleLugarElement.innerText = "Modificar Lugar";
+    if (formTitleLug) formTitleLug.innerText = "Modificar Lugar";
     btnSaveLug.innerText = "Actualizar Lugar";
     btnCancelLug.style.display = "block";
     document.getElementById('lug-id').value = id;
@@ -345,8 +353,7 @@ function resetFormFuncion() {
 
 function resetFormLugar() {
     isEditingLug = false;
-    const formTitleLugarElement = document.getElementById('form-title-lug');
-    if (formTitleLugarElement) formTitleLugarElement.innerText = "Ingresar Lugar";
+    if (formTitleLug) formTitleLug.innerText = "Ingresar Lugar";
     btnSaveLug.innerText = "Guardar Lugar";
     btnCancelLug.style.display = "none";
     formLug.reset();
