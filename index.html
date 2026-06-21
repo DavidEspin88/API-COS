@@ -246,70 +246,83 @@
         <div class="panel-section section-personal">
             <h2>Sección de Control de Personal (Pestaña: REGISTRO_PERSONAL)</h2>
             <div class="dashboard-grid vertical-layout">
+                
                 <div class="card">
                     <h3 id="form-title-per">Registrar Nuevo Personal</h3>
-                    <form id="form-personal">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="per-cedula">Cédula de Identidad</label>
-                                <input type="text" id="per-cedula" required placeholder="Ej. 1723456789">
-                            </div>
-                            <div class="form-group">
-                                <label for="per-ant">Antigüedad (Opcional)</label>
-                                <input type="number" id="per-ant" placeholder="Ej. 1, 2, 3...">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="per-grado">Grado Militar</label>
-                                <select id="per-grado" required>
-                                    <option value="">-- Seleccione un Grado --</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="per-especialidad">Especialidad</label>
-                                <select id="per-especialidad" required>
-                                    <option value="">-- Seleccione Especialidad --</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="per-funcion">Función / Cargo</label>
-                                <select id="per-funcion" required>
-                                    <option value="">-- Seleccione Función --</option>
-                                </select>
+                    <form id="form-personal" class="form-militar">
+                        
+                        <div class="form-section-block">
+                            <h4><span class="step-num">1</span> Datos de Identidad</h4>
+                            <div class="form-row">
+                                <div class="form-group flex-2">
+                                    <label for="per-nombres">Apellidos y Nombres Completos</label>
+                                    <input type="text" id="per-nombres" required placeholder="Ej. CARLOSAMA LIMA JUAN DAVID">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label for="per-cedula">Cédula de Identidad</label>
+                                    <input type="text" id="per-cedula" required placeholder="Ej. 1723456789">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label for="per-fecha">Fecha de Nacimiento</label>
+                                    <input type="date" id="per-fecha" required>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="per-nombres">Apellidos y Nombres Completos</label>
-                            <input type="text" id="per-nombres" required placeholder="Ej. CARLOSAMA LIMA JUAN DAVID">
+                        <div class="form-section-block">
+                            <h4><span class="step-num">2</span> Situación Militar</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="per-grado">Grado Militar</label>
+                                    <select id="per-grado" required>
+                                        <option value="">-- Seleccione un Grado --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="per-especialidad">Especialidad</label>
+                                    <select id="per-especialidad" required>
+                                        <option value="">-- Seleccione Especialidad --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="per-funcion">Función / Cargo</label>
+                                    <select id="per-funcion" required>
+                                        <option value="">-- Seleccione Función --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="per-ant">Antigüedad (Opcional)</label>
+                                    <input type="number" id="per-ant" placeholder="Ej. 1, 2, 3...">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="per-fecha">Fecha de Nacimiento</label>
-                                <input type="date" id="per-fecha" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="per-contacto">Teléfono de Contacto</label>
-                                <input type="tel" id="per-contacto" required placeholder="Ej. 0998765432">
-                            </div>
-                            <div class="form-group">
-                                <label for="per-nombre-contacto">Nombre de Contacto</label>
-                                <input type="text" id="per-nombre-contacto" required placeholder="Ej. Madre / Esposa (Nombre)">
+                        <div class="form-section-block">
+                            <h4><span class="step-num">3</span> Información de Contacto</h4>
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label for="per-contacto">Teléfono de Contacto</label>
+                                    <input type="tel" id="per-contacto" required placeholder="Ej. 0998765432">
+                                </div>
+                                <div class="form-group flex-2">
+                                    <label for="per-nombre-contacto">Nombre de Contacto de Emergencia</label>
+                                    <input type="text" id="per-nombre-contacto" required placeholder="Ej. Madre / Esposa (Nombre Completo)">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-buttons">
+                        <div class="form-buttons militar-actions">
                             <button type="submit" class="btn-submit" id="btn-save-per">Guardar Registro</button>
                             <button type="button" class="btn-cancel" id="btn-cancel-per" style="display:none;" onclick="resetFormPersonal()">Cancelar Edición</button>
                         </div>
                     </form>
                 </div>
-
+                
                 <div class="card full-width">
-                    <h3>Base de Datos de Personal Fuerza Aérea</h3>
+                    <div class="table-header-flex">
+                        <h3>Base de Datos de Personal Fuerza Aérea</h3>
+                        <div class="pagination-info" id="pagination-text">Mostrando 0-0 de 0 registros</div>
+                    </div>
                     <div class="table-container">
                         <table>
                             <thead>
@@ -329,6 +342,10 @@
                             </thead>
                             <tbody id="table-body-personal"></tbody>
                         </table>
+                    </div>
+                    <div class="pagination-controls">
+                        <button type="button" id="btn-prev-page" class="btn-page" disabled>◀ Anterior</button>
+                        <button type="button" id="btn-next-page" class="btn-page" disabled>Siguiente ▶</button>
                     </div>
                 </div>
             </div>

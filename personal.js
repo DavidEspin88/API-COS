@@ -9,7 +9,36 @@ const selectGrado = document.getElementById("per-grado");
 const selectEspecialidad = document.getElementById("per-especialidad");
 const selectFuncion = document.getElementById("per-funcion");
 
+// Selectores de Paginación añadidos
+const btnPrevPage = document.getElementById("btn-prev-page");
+const btnNextPage = document.getElementById("btn-next-page");
+const paginationText = document.getElementById("pagination-text");
+
+// Variables de Estado de Paginación
 let isEditingPer = false;
+let datosPersonalGlobal = []; // Guarda el set completo de personal enviado por la base de datos
+let currentPage = 1;
+const rowsPerPage = 10;
+
+// Inicializar Listeners para las Flechas de navegación de la tabla
+document.addEventListener("DOMContentLoaded", () => {
+  if (btnPrevPage && btnNextPage) {
+    btnPrevPage.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        mostrarPaginaActual();
+      }
+    });
+
+    btnNextPage.addEventListener("click", () => {
+      const maxPage = Math.ceil(datosPersonalGlobal.length / rowsPerPage);
+      if (currentPage < maxPage) {
+        currentPage++;
+        mostrarPaginaActual();
+      }
+    });
+  }
+});
 
 // 1. Población Dinámica de Menús Desplegables
 function poblarDesplegablesPersonal() {
@@ -18,10 +47,8 @@ function poblarDesplegablesPersonal() {
   const currentFun = selectFuncion.value;
 
   selectGrado.innerHTML = '<option value="">-- Seleccione un Grado --</option>';
-  selectEspecialidad.innerHTML =
-    '<option value="">-- Seleccione Especialidad --</option>';
-  selectFuncion.innerHTML =
-    '<option value="">-- Seleccione Función --</option>';
+  selectEspecialidad.innerHTML = '<option value="">-- Seleccione Especialidad --</option>';
+  selectFuncion.innerHTML = '<option value="">-- Seleccione Función --</option>';
 
   if (window.gradosCargados) {
     window.gradosCargados.forEach((item) => {
@@ -55,23 +82,38 @@ function poblarDesplegablesPersonal() {
   selectFuncion.value = currentFun;
 }
 
-// 2. Renderizar Tabla de Personal
-// CORRECCIÓN #2: Se reemplazó interpolación directa en onclick por dataset para evitar
-// que nombres con comillas simples (ej: O'BRIEN) rompan el HTML generado.
+// 2. Interceptor de la Carga de Datos de Personal
 function renderPersonalTable(personalData) {
-  tableBodyPer.innerHTML = "";
-  if (!personalData) return;
+  // Almacenar los datos globales y reiniciar a la primera página tras cada sincronización
+  datosPersonalGlobal = personalData || [];
+  currentPage = 1; 
+  mostrarPaginaActual();
+}
 
-  personalData.forEach((item) => {
-    const antMostrar =
-      item.ant === null || item.ant === ""
-        ? '<span style="color:#7f8c8d;">-</span>'
-        : item.ant;
+// 2.1 Dividir y renderizar el segmento de 10 registros correspondientes
+function mostrarPaginaActual() {
+  tableBodyPer.innerHTML = "";
+  const totalRegistros = datosPersonalGlobal.length;
+
+  if (totalRegistros === 0) {
+    tableBodyPer.innerHTML = `<tr><td colspan="11" style="text-align:center; color:#7f8c8d;">No hay personal registrado</td></tr>`;
+    paginationText.textContent = "Mostrando 0-0 de 0 registros";
+    btnPrevPage.disabled = true;
+    btnNextPage.disabled = true;
+    return;
+  }
+
+  // Calcular índices de corte matemático de la página
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, totalRegistros);
+  const paginatedItems = datosPersonalGlobal.slice(startIndex, endIndex);
+
+  // Renderizar las 10 filas del corte actual
+  paginatedItems.forEach((item) => {
+    const antMostrar = item.ant === null || item.ant === "" ? '<span style="color:#7f8c8d;">-</span>' : item.ant;
     const antPasarParametro = item.ant === null ? "" : String(item.ant);
 
     const tr = document.createElement("tr");
-
-    // Construir la fila de datos con innerHTML (datos de solo lectura, sin riesgo)
     tr.innerHTML = `
       <td><span class="badge-ord">${item.ord}</span></td>
       <td><strong>${item.cedula}</strong></td>
@@ -89,7 +131,7 @@ function renderPersonalTable(personalData) {
       </td>
     `;
 
-    // Pasar los datos a través de dataset para evitar problemas con caracteres especiales
+    // Dataset seguro contra caracteres especiales (Comillas, Apóstrofes)
     const btnEdit = tr.querySelector(".btn-edit-per");
     btnEdit.dataset.cedula = item.cedula;
     btnEdit.dataset.grado = item.grado;
@@ -101,7 +143,6 @@ function renderPersonalTable(personalData) {
     btnEdit.dataset.contacto = item.contacto;
     btnEdit.dataset.nombreContacto = item.nombre_contacto;
 
-    // Listener del botón Editar: lee del dataset (seguro ante cualquier carácter)
     btnEdit.addEventListener("click", function () {
       setupEditPer(
         this.dataset.cedula,
@@ -116,7 +157,6 @@ function renderPersonalTable(personalData) {
       );
     });
 
-    // Listener del botón Eliminar
     const btnDelete = tr.querySelector(".btn-delete-per");
     btnDelete.dataset.cedula = item.cedula;
     btnDelete.addEventListener("click", function () {
@@ -125,6 +165,13 @@ function renderPersonalTable(personalData) {
 
     tableBodyPer.appendChild(tr);
   });
+
+  // Actualizar metadatos informativos y estado de botones
+  paginationText.textContent = `Mostrando ${startIndex + 1}-${endIndex} de ${totalRegistros} registros`;
+  
+  const maxPage = Math.ceil(totalRegistros / rowsPerPage);
+  btnPrevPage.disabled = currentPage === 1;
+  btnNextPage.disabled = currentPage === maxPage || maxPage === 0;
 }
 
 // 3. Envío de Formulario
@@ -138,9 +185,7 @@ formPer.addEventListener("submit", async (e) => {
     grado: selectGrado.value,
     especialidad: selectEspecialidad.value,
     ant: antInput === "" ? "" : parseInt(antInput),
-    apellidos_nombres: document
-      .getElementById("per-nombres")
-      .value.toUpperCase(),
+    apellidos_nombres: document.getElementById("per-nombres").value.toUpperCase(),
     funcion: selectFuncion.value,
     fecha_nacimiento: document.getElementById("per-fecha").value,
     contacto: document.getElementById("per-contacto").value,
@@ -168,19 +213,16 @@ function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, funcio
   selectFuncion.value = funcion;
   document.getElementById("per-nombres").value = apellidosNombres;
 
-  // Conversión de formato "dd/mmm/aaaa" a "aaaa-mm-dd" para el input html
-  // CORRECCIÓN #5: Validación robusta para fechas vacías, con guion o en formato incorrecto
+  // Conversión robusta de formato de fechas
   const fechaLimpia = (fechaNacimiento && fechaNacimiento !== "-") ? fechaNacimiento.trim() : "";
   if (fechaLimpia && fechaLimpia.includes("/")) {
-    const partes = fechaLimpia.split("/"); // [dd, mmm, aaaa]
+    const partes = fechaLimpia.split("/");
     const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
     const indiceMes = meses.indexOf(partes[1].toUpperCase());
 
     if (indiceMes !== -1 && partes.length === 3) {
       const mesNumero = String(indiceMes + 1).padStart(2, "0");
-      const anio = partes[2];
-      const dia = partes[0];
-      document.getElementById("per-fecha").value = `${anio}-${mesNumero}-${dia}`;
+      document.getElementById("per-fecha").value = `${partes[2]}-${mesNumero}-${partes[0]}`;
     } else {
       document.getElementById("per-fecha").value = "";
     }
@@ -190,6 +232,9 @@ function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, funcio
 
   document.getElementById("per-contacto").value = contacto;
   document.getElementById("per-nombre-contacto").value = nombreContacto;
+  
+  // Hacer scroll suave hacia el formulario al editar para comodidad del operador
+  formPer.scrollIntoView({ behavior: 'smooth' });
 }
 
 // 5. Limpieza del Formulario
@@ -205,7 +250,7 @@ function resetFormPersonal() {
 
 // 6. Eliminar Personal
 async function deletePersonal(cedulaId) {
-  if (!confirm(`¿Eliminar permanentemente cédula: ${cedulaId}?`)) return;
+  if (!confirm(`¿Eliminar permanentemente al personal con cédula: ${cedulaId}?`)) return;
   if (typeof sendData === "function")
     sendData({ action: "delete", id: cedulaId, target: "personal" }, () => {});
 }
