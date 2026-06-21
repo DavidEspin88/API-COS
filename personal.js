@@ -56,15 +56,13 @@ function poblarDesplegablesPersonal() {
 }
 
 // 2. Renderizar Tabla de Personal
+// 2. Renderizar Tabla de Personal (Formato dd/mmm/aaaa en pantalla)
 function renderPersonalTable(personalData) {
   tableBodyPer.innerHTML = "";
   if (!personalData) return;
 
   personalData.forEach((item) => {
-    const antMostrar =
-      item.ant === null || item.ant === ""
-        ? '<span style="color:#7f8c8d;">-</span>'
-        : item.ant;
+    const antMostrar = item.ant === null || item.ant === "" ? '<span style="color:#7f8c8d;">-</span>' : item.ant;
     const antPasarParametro = item.ant === null ? "" : item.ant;
 
     const tr = document.createElement("tr");
@@ -76,8 +74,7 @@ function renderPersonalTable(personalData) {
             <td>${antMostrar}</td>
             <td>${item.apellidos_nombres}</td>
             <td>${item.funcion || "-"}</td>
-            <td>${item.fecha_nacimiento}</td>
-            <td>${item.contacto}</td>
+            <td>${item.fecha_nacimiento || "-"}</td> <td>${item.contacto}</td>
             <td>${item.nombre_contacto}</td>
             <td>
                 <button class="btn-edit" onclick="setupEditPer('${item.cedula}', '${item.grado}', '${item.especialidad}', '${antPasarParametro}', '${item.apellidos_nombres}', '${item.funcion || ""}', '${item.fecha_nacimiento}', '${item.contacto}', '${item.nombre_contacto}')">Editar</button>
@@ -112,17 +109,7 @@ formPer.addEventListener("submit", async (e) => {
 });
 
 // 4. Configurar Interfaz para Edición
-function setupEditPer(
-  cedula,
-  grado,
-  especialidad,
-  ant,
-  apellidosNombres,
-  funcion,
-  fechaNacimiento,
-  contacto,
-  nombreContacto,
-) {
+function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, funcion, fechaNacimiento, contacto, nombreContacto) {
   isEditingPer = true;
   formTitlePer.innerText = "Modificar Datos de Personal";
   btnSavePer.innerText = "Actualizar Registro";
@@ -138,7 +125,23 @@ function setupEditPer(
   selectEspecialidad.value = especialidad;
   selectFuncion.value = funcion;
   document.getElementById("per-nombres").value = apellidosNombres;
-  document.getElementById("per-fecha").value = fechaNacimiento;
+  
+  // --- Conversión de formato "dd/mmm/aaaa" a "aaaa-mm-dd" para el input html ---
+  if (fechaNacimiento && fechaNacimiento.includes("/")) {
+    const partes = fechaNacimiento.split("/"); // [dd, mmm, aaaa]
+    const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+    const indiceMes = meses.indexOf(partes[1].toUpperCase());
+    
+    if (indiceMes !== -1) {
+      const mesNumero = String(indiceMes + 1).padStart(2, '0');
+      const anio = partes[2];
+      const dia = partes[0];
+      document.getElementById("per-fecha").value = `${anio}-${mesNumero}-${dia}`;
+    }
+  } else {
+    document.getElementById("per-fecha").value = "";
+  }
+  
   document.getElementById("per-contacto").value = contacto;
   document.getElementById("per-nombre-contacto").value = nombreContacto;
 }

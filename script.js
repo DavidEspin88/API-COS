@@ -89,17 +89,20 @@ async function loadAllData() {
     });
 
     // Renderizar Armamento
-    data.armamento.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-            <td>${item.tipo}</td>
-            <td>${item.serie}</td>
-            <td>${item.cantidad_armamento}</td>
-
-                <td><button class="btn-edit" onclick="setupEditArm('${item.id}', '${item.tipo}', '${item.serie}', ${item.cantidad_armamento})">Editar</button>
-                <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento')">Eliminar</button></td>`;
-      tableBodyArm.appendChild(tr);
-    });
+data.armamento.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td>${item.tipo}</td>
+        <td>${item.marca || '-'}</td>
+        <td>${item.serie}</td>
+        <td>${item.cantidad_armamento}</td>
+        <td>
+            <button class="btn-edit" onclick="setupEditArm('${item.id}', '${item.tipo}', '${item.marca || ''}', '${item.serie}', ${item.cantidad_armamento})">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento')">Eliminar</button>
+        </td>
+    `;
+    tableBodyArm.appendChild(tr);
+});
 
     // Renderizar Grado
     window.gradosCargados = data.grado;
@@ -215,6 +218,7 @@ formArm.addEventListener("submit", (e) => {
       action: isEditingArm ? "update" : "create",
       id: document.getElementById("arm-id").value,
       tipo: document.getElementById("arm-tipo").value,
+      marca: document.getElementById('arm-marca').value,
       serie: document.getElementById("arm-serie").value,
       cantidad_armamento: parseInt(
         document.getElementById("arm-cantidad").value,
@@ -296,15 +300,16 @@ function setupEditMun(id, calibre, cantidad, lote) {
   document.getElementById("mun-cantidad").value = cantidad;
   document.getElementById("mun-lote").value = lote;
 }
-function setupEditArm(id, tipo, serie, cantidad) {
-  isEditingArm = true;
-  formTitleArm.innerText = "Modificar Armamento";
-  btnSaveArm.innerText = "Actualizar";
-  btnCancelArm.style.display = "block";
-  document.getElementById("arm-id").value = id;
-  document.getElementById("arm-tipo").value = tipo;
-  document.getElementById("arm-serie").value = serie;
-  document.getElementById("arm-cantidad").value = cantidad;
+function setupEditArm(id, tipo, marca, serie, cantidad) { 
+    isEditingArm = true; 
+    formTitleArm.innerText = "Modificar Armamento"; 
+    btnSaveArm.innerText = "Actualizar"; 
+    btnCancelArm.style.display = "block"; 
+    document.getElementById('arm-id').value = id; 
+    document.getElementById('arm-tipo').value = tipo; 
+    document.getElementById('arm-marca').value = marca; 
+    document.getElementById('arm-serie').value = serie; 
+    document.getElementById('arm-cantidad').value = cantidad; 
 }
 function setupEditGra(id, grado, completo) {
   isEditingGra = true;
