@@ -109,14 +109,13 @@ function mostrarPaginaActual() {
   const paginatedItems = datosPersonalGlobal.slice(startIndex, endIndex);
 
   // Renderizar las 10 filas del corte actual
-  paginatedItems.forEach((item) => {
+paginatedItems.forEach((item) => {
     const antMostrar = item.ant === null || item.ant === "" ? '<span style="color:#7f8c8d;">-</span>' : item.ant;
     const antPasarParametro = item.ant === null ? "" : String(item.ant);
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="badge-ord">${item.ord}</span></td>
-      <td><strong>${item.cedula}</strong></td>
+      <td><span class="badge-ord">${item.ord}</span></td> <td><strong>${item.cedula}</strong></td>
       <td>${item.grado}</td>
       <td>${item.especialidad}</td>
       <td>${antMostrar}</td>
