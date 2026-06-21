@@ -1,354 +1,384 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Militar - Control de Inventario</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="container">
-    <h1>Panel de Control de Logística</h1>
-    <div id="loading-text" class="loading">Sincronizando Base de Datos de Google Sheets...</div>
-    
-    <div class="panel-section">
-        <h2>Sección de Munición (Pestaña: MUNICION)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 id="form-title-mun">Ingresar Munición</h3>
-                <form id="form-municion">
-                    <input type="hidden" id="mun-id">
-                    <div class="form-group">
-                        <label for="mun-calibre">Calibre</label>
-                        <input type="text" id="mun-calibre" required placeholder="Ej. 5.56mm / 9mm">
+    <div class="container">
+        <h1>Panel de Control de Logística</h1>
+        <div id="loading-text" class="loading">Sincronizando Base de Datos de Google Sheets...</div>
+
+        <div class="panel-section">
+            <h2>Sección de Munición (Pestaña: MUNICION)</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="form-title-mun">Ingresar Munición</h3>
+                    <form id="form-municion">
+                        <input type="hidden" id="mun-id">
+                        <div class="form-group">
+                            <label for="mun-calibre">Calibre</label>
+                            <input type="text" id="mun-calibre" required placeholder="Ej. 5.56mm / 9mm">
+                        </div>
+                        <div class="form-group">
+                            <label for="mun-cantidad">Cantidad</label>
+                            <input type="number" id="mun-cantidad" required min="1" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="mun-lote">Número de Lote</label>
+                            <input type="text" id="mun-lote" required placeholder="Ej. LOT-2026-A">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-save-mun">Guardar Munición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-mun" style="display:none;"
+                            onclick="resetFormMunicion()">Cancelar Edición</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Inventario Actual de Munición</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Calibre</th>
+                                    <th>Cantidad</th>
+                                    <th>Lote</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-municion"></tbody>
+                        </table>
                     </div>
-                    <div class="form-group">
-                        <label for="mun-cantidad">Cantidad</label>
-                        <input type="number" id="mun-cantidad" required min="1" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="mun-lote">Número de Lote</label>
-                        <input type="text" id="mun-lote" required placeholder="Ej. LOT-2026-A">
-                    </div>
-                    <button type="submit" class="btn-submit" id="btn-save-mun">Guardar Munición</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel-mun" style="display:none;" onclick="resetFormMunicion()">Cancelar Edición</button>
-                </form>
+                </div>
             </div>
-            
-            <div class="card">
-                <h3>Inventario Actual de Munición</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Calibre</th>
-                                <th>Cantidad</th>
-                                <th>Lote</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-municion"></tbody>
-                    </table>
+        </div>
+
+        <div class="panel-section">
+            <h2>Sección de Armamento (Pestaña: ARMAMENTO)</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="form-title-arm">Ingresar Armamento</h3>
+                    <form id="form-armamento">
+                        <input type="hidden" id="arm-id">
+                        <div class="form-group">
+                            <label for="arm-tipo">Tipo de Armamento</label>
+                            <input type="text" id="arm-tipo" required placeholder="Ej. Fusil HK / Pistola Glock">
+                        </div>
+                        <div class="form-group">
+                            <label for="arm-serie">Número de Serie</label>
+                            <input type="text" id="arm-serie" required placeholder="Ej. SN-987654">
+                        </div>
+                        <div class="form-group">
+                            <label for="arm-cantidad">Cantidad Armamento</label>
+                            <input type="number" id="arm-cantidad" required min="1" placeholder="0">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-save-arm">Guardar Armamento</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-arm" style="display:none;"
+                            onclick="resetFormArmamento()">Cancelar Edición</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Inventario Actual de Armamento</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Armamento</th>
+                                    <th>Serie</th>
+                                    <th>Cantidad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-armamento"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section section-grado">
+            <h2>Sección de Grados Militares (Pestaña: GRADO)</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="form-title-gra">Ingresar Grado</h3>
+                    <form id="form-grado">
+                        <input type="hidden" id="gra-id">
+                        <div class="form-group">
+                            <label for="gra-sigla">Grado (Sigla/Abreviatura)</label>
+                            <input type="text" id="gra-sigla" required placeholder="Ej. Cbop. / Sgto. / Tnte.">
+                        </div>
+                        <div class="form-group">
+                            <label for="gra-completo">Grado Completo</label>
+                            <input type="text" id="gra-completo" required
+                                placeholder="Ej. Cabo Primero / Sargento / Teniente">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-save-gra">Guardar Grado</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-gra" style="display:none;"
+                            onclick="resetFormGrado()">Cancelar Edición</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Jerarquía / Grados Registrados</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Grado (Sigla)</th>
+                                    <th>Grado Completo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-grado"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section section-funcion">
+            <h2>Sección de Funciones / Cargos (Pestaña: FUNCION)</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="form-title-funco">Ingresar Función</h3>
+                    <form id="form-funcion">
+                        <input type="hidden" id="funco-id">
+                        <div class="form-group">
+                            <label for="funco-nombre">Nombre de la Función / Cargo</label>
+                            <input type="text" id="funco-nombre" required
+                                placeholder="Ej. Comandante / Operador / Centinela">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-save-funco">Guardar Función</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-funco" style="display:none;"
+                            onclick="resetFormFuncion()">Cancelar Edición</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Funciones Registradas</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Función / Cargo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-funcion"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section section-lugar">
+            <h2>Sección de Lugares / Repartos (Pestaña: LUGAR)</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="form-title-lug">Ingresar Lugar</h3>
+                    <form id="form-lugar">
+                        <input type="hidden" id="lug-id">
+                        <div class="form-group">
+                            <label for="lug-nombre">Nombre del Lugar / Reparto / Base</label>
+                            <input type="text" id="lug-nombre" required
+                                placeholder="Ej. Base Manta / Ala Nro 21 / Polvorín">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-save-lug">Guardar Lugar</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-lug" style="display:none;"
+                            onclick="resetFormLugar()">Cancelar Edición</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Lugares Registrados</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Lugar / Distribución</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-lugar"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section section-especialidad">
+            <h2>Sección de Especialidades (Pestaña: ESPECIALIDAD)</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="form-title-esp">Ingresar Especialidad</h3>
+                    <form id="form-especialidad">
+                        <input type="hidden" id="esp-id">
+                        <div class="form-group">
+                            <label for="esp-nombre">Nombre de la Especialidad Técnico-Militar</label>
+                            <input type="text" id="esp-nombre" required
+                                placeholder="Ej. Armamento / Electrónica / Infantería">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-save-esp">Guardar Especialidad</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-esp" style="display:none;"
+                            onclick="resetFormEspecialidad()">Cancelar Edición</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Especialidades Registradas</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Especialidad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-especialidad"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section section-personal">
+            <h2>Sección de Control de Personal (Pestaña: REGISTRO_PERSONAL)</h2>
+            <div class="dashboard-grid vertical-layout">
+                <div class="card">
+                    <h3 id="form-title-per">Registrar Nuevo Personal</h3>
+                    <form id="form-personal">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="per-cedula">Cédula de Identidad</label>
+                                <input type="text" id="per-cedula" required placeholder="Ej. 1723456789">
+                            </div>
+                            <div class="form-group">
+                                <label for="per-ant">Antigüedad (Opcional)</label>
+                                <input type="number" id="per-ant" placeholder="Ej. 1, 2, 3...">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="per-grado">Grado Militar</label>
+                                <select id="per-grado" required>
+                                    <option value="">-- Seleccione un Grado --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="per-especialidad">Especialidad</label>
+                                <select id="per-especialidad" required>
+                                    <option value="">-- Seleccione Especialidad --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="per-nombres">Apellidos y Nombres Completos</label>
+                                <input type="text" id="per-nombres" required
+                                    placeholder="Ej. CARLOSAMA LIMA JUAN DAVID">
+                            </div>
+                            <div class="form-group">
+                                <label for="per-funcion">Función / Cargo</label>
+                                <select id="per-funcion" required>
+                                    <option value="">-- Seleccione Función --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="per-fecha">Fecha de Nacimiento</label>
+                                <input type="date" id="per-fecha" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="per-contacto">Teléfono de Contacto</label>
+                                <input type="tel" id="per-contacto" required placeholder="Ej. 0998765432">
+                            </div>
+                            <div class="form-group">
+                                <label for="per-nombre-contacto">Nombre de Contacto</label>
+                                <input type="text" id="per-nombre-contacto" required
+                                    placeholder="Ej. Madre / Esposa (Nombre)">
+                            </div>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn-submit" id="btn-save-per">Guardar Registro</button>
+                            <button type="button" class="btn-cancel" id="btn-cancel-per" style="display:none;"
+                                onclick="resetFormPersonal()">Cancelar Edición</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card full-width">
+                    <h3>Base de Datos de Personal Fuerza Aérea</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ORD</th>
+                                    <th>Cédula</th>
+                                    <th>Grado</th>
+                                    <th>Especialidad</th>
+                                    <th>Antigüedad</th>
+                                    <th>Apellidos y Nombres</th>
+                                    <th>Función</th>
+                                    <th>F. Nacimiento</th>
+                                    <th>Contacto</th>
+                                    <th>Contacto Emergencia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-personal"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section section-estado">
+            <h2>Sección de Estados Operativos (Pestaña: ESTADO)</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="form-title-est">Ingresar Estado</h3>
+                    <form id="form-estado">
+                        <input type="hidden" id="est-id">
+                        <div class="form-group">
+                            <label for="est-nombre">Nombre del Estado / Condición</label>
+                            <input type="text" id="est-nombre" required
+                                placeholder="Ej. Disponible / Comisión / Permiso">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-save-est">Guardar Estado</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-est" style="display:none;"
+                            onclick="resetFormEstado()">Cancelar Edición</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Estados Registrados</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-estado"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="panel-section">
-        <h2>Sección de Armamento (Pestaña: ARMAMENTO)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 id="form-title-arm">Ingresar Armamento</h3>
-                <form id="form-armamento">
-                    <input type="hidden" id="arm-id">
-                    <div class="form-group">
-                        <label for="arm-tipo">Tipo de Armamento</label>
-                        <input type="text" id="arm-tipo" required placeholder="Ej. Fusil HK / Pistola Glock">
-                    </div>
-                    <div class="form-group">
-                        <label for="arm-serie">Número de Serie</label>
-                        <input type="text" id="arm-serie" required placeholder="Ej. SN-987654">
-                    </div>
-                    <div class="form-group">
-                        <label for="arm-cantidad">Cantidad Armamento</label>
-                        <input type="number" id="arm-cantidad" required min="1" placeholder="0">
-                    </div>
-                    <button type="submit" class="btn-submit" id="btn-save-arm">Guardar Armamento</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel-arm" style="display:none;" onclick="resetFormArmamento()">Cancelar Edición</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3>Inventario Actual de Armamento</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tipo de Armamento</th>
-                                <th>Serie</th>
-                                <th>Cantidad</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-armamento"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="panel-section section-grado">
-        <h2>Sección de Grados Militares (Pestaña: GRADO)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 id="form-title-gra">Ingresar Grado</h3>
-                <form id="form-grado">
-                    <input type="hidden" id="gra-id">
-                    <div class="form-group">
-                        <label for="gra-sigla">Grado (Sigla/Abreviatura)</label>
-                        <input type="text" id="gra-sigla" required placeholder="Ej. Cbop. / Sgto. / Tnte.">
-                    </div>
-                    <div class="form-group">
-                        <label for="gra-completo">Grado Completo</label>
-                        <input type="text" id="gra-completo" required placeholder="Ej. Cabo Primero / Sargento / Teniente">
-                    </div>
-                    <button type="submit" class="btn-submit" id="btn-save-gra">Guardar Grado</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel-gra" style="display:none;" onclick="resetFormGrado()">Cancelar Edición</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3>Jerarquía / Grados Registrados</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Grado (Sigla)</th>
-                                <th>Grado Completo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-grado"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel-section section-funcion">
-        <h2>Sección de Funciones / Cargos (Pestaña: FUNCION)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 id="form-title-funco">Ingresar Función</h3>
-                <form id="form-funcion">
-                    <input type="hidden" id="funco-id">
-                    <div class="form-group">
-                        <label for="funco-nombre">Nombre de la Función / Cargo</label>
-                        <input type="text" id="funco-nombre" required placeholder="Ej. Comandante / Operador / Centinela">
-                    </div>
-                    <button type="submit" class="btn-submit" id="btn-save-funco">Guardar Función</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel-funco" style="display:none;" onclick="resetFormFuncion()">Cancelar Edición</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3>Funciones Registradas</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Función / Cargo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-funcion"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel-section section-lugar">
-        <h2>Sección de Lugares / Repartos (Pestaña: LUGAR)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 id="form-title-lug">Ingresar Lugar</h3>
-                <form id="form-lugar">
-                    <input type="hidden" id="lug-id">
-                    <div class="form-group">
-                        <label for="lug-nombre">Nombre del Lugar / Reparto / Base</label>
-                        <input type="text" id="lug-nombre" required placeholder="Ej. Base Manta / Ala Nro 21 / Polvorín">
-                    </div>
-                    <button type="submit" class="btn-submit" id="btn-save-lug">Guardar Lugar</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel-lug" style="display:none;" onclick="resetFormLugar()">Cancelar Edición</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3>Lugares Registrados</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Lugar / Distribución</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-lugar"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel-section section-especialidad">
-        <h2>Sección de Especialidades (Pestaña: ESPECIALIDAD)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 id="form-title-esp">Ingresar Especialidad</h3>
-                <form id="form-especialidad">
-                    <input type="hidden" id="esp-id">
-                    <div class="form-group">
-                        <label for="esp-nombre">Nombre de la Especialidad Técnico-Militar</label>
-                        <input type="text" id="esp-nombre" required placeholder="Ej. Armamento / Electrónica / Defensa Aérea / Infantería">
-                    </div>
-                    <button type="submit" class="btn-submit" id="btn-save-esp">Guardar Especialidad</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel-esp" style="display:none;" onclick="resetFormEspecialidad()">Cancelar Edición</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3>Especialidades Registradas</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Especialidad</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-especialidad"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel-section section-personal">
-        <h2>Sección de Control de Personal (Pestaña: REGISTRO_PERSONAL)</h2>
-        <div class="dashboard-grid vertical-layout">
-            
-            <div class="card">
-                <h3 id="form-title-per">Registrar Nuevo Personal</h3>
-                <form id="form-personal">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="per-cedula">Cédula de Identidad</label>
-                            <input type="text" id="per-cedula" required placeholder="Ej. 1723456789">
-                        </div>
-                        <div class="form-group">
-                            <label for="per-ant">Antigüedad (Nro. Entero)</label>
-                            <input type="number" id="per-ant" placeholder="Ej. 1, 2, 3...">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="per-grado">Grado Militar</label>
-                            <select id="per-grado" required>
-                                <option value="">-- Seleccione un Grado --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="per-especialidad">Especialidad</label>
-                            <select id="per-especialidad" required>
-                                <option value="">-- Seleccione Especialidad --</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="per-nombres">Apellidos y Nombres Completos</label>
-                        <input type="text" id="per-nombres" required placeholder="Ej. CARLOSAMA LIMA JUAN DAVID">
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="per-fecha">Fecha de Nacimiento</label>
-                            <input type="date" id="per-fecha" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="per-contacto">Teléfono de Contacto</label>
-                            <input type="tel" id="per-contacto" required placeholder="Ej. 0998765432">
-                        </div>
-                        <div class="form-group">
-                            <label for="per-nombre-contacto">Nombre de Contacto de Emergencia</label>
-                            <input type="text" id="per-nombre-contacto" required placeholder="Ej. Madre / Esposa (Nombre)">
-                        </div>
-                    </div>
-
-                    <div class="form-buttons">
-                        <button type="submit" class="btn-submit" id="btn-save-per">Guardar Registro</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-per" style="display:none;" onclick="resetFormPersonal()">Cancelar Edición</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="card full-width">
-                <h3>Base de Datos de Personal Fuerza Aérea</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ORD</th>
-                                <th>Cédula</th>
-                                <th>Grado</th>
-                                <th>Especialidad</th>
-                                <th>Antigüedad</th>
-                                <th>Apellidos y Nombres</th>
-                                <th>F. Nacimiento</th>
-                                <th>Contacto</th>
-                                <th>Contacto Emergencia</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-personal"></tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </div>
-<div class="panel-section section-estado">
-        <h2>Sección de Estados Operativos (Pestaña: ESTADO)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3 id="form-title-est">Ingresar Estado</h3>
-                <form id="form-estado">
-                    <input type="hidden" id="est-id">
-                    <div class="form-group">
-                        <label for="est-nombre">Nombre del Estado / Condición</label>
-                        <input type="text" id="est-nombre" required placeholder="Ej. Disponible / Comisión / Permiso">
-                    </div>
-                    <button type="submit" class="btn-submit" id="btn-save-est">Guardar Estado</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel-est" style="display:none;" onclick="resetFormEstado()">Cancelar Edición</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3>Estados Registrados</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body-estado"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
     <script src="script.js"></script>
     <script src="personal.js"></script>
 </body>
+
 </html>
