@@ -35,6 +35,8 @@ const formLug = document.getElementById("form-lugar");
 const tableBodyLug = document.getElementById("table-body-lugar");
 const btnCancelLug = document.getElementById("btn-cancel-lug");
 const formTitleLug = document.getElementById("form-title-lug");
+// CORRECCIÓN #1: Declarado btnSaveLug que faltaba y causaba ReferenceError al editar un Lugar
+const btnSaveLug = document.getElementById("btn-save-lug");
 
 // Selectores Especialidad
 const formEsp = document.getElementById("form-especialidad");
@@ -82,16 +84,15 @@ async function loadAllData() {
             <td>${item.calibre}</td>
             <td>${item.cantidad}</td>
             <td>${item.lote}</td>
-
                 <td><button class="btn-edit" onclick="setupEditMun('${item.id}', '${item.calibre}', ${item.cantidad}, '${item.lote}')">Editar</button>
                 <button class="btn-delete" onclick="deleteItem('${item.id}', 'municion')">Eliminar</button></td>`;
       tableBodyMun.appendChild(tr);
     });
 
     // Renderizar Armamento
-data.armamento.forEach(item => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
+    data.armamento.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
         <td>${item.tipo}</td>
         <td>${item.marca || '-'}</td>
         <td>${item.serie}</td>
@@ -100,9 +101,9 @@ data.armamento.forEach(item => {
             <button class="btn-edit" onclick="setupEditArm('${item.id}', '${item.tipo}', '${item.marca || ''}', '${item.serie}', ${item.cantidad_armamento})">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento')">Eliminar</button>
         </td>
-    `;
-    tableBodyArm.appendChild(tr);
-});
+      `;
+      tableBodyArm.appendChild(tr);
+    });
 
     // Renderizar Grado
     window.gradosCargados = data.grado;
@@ -111,7 +112,6 @@ data.armamento.forEach(item => {
       tr.innerHTML = `
             <td><strong>${item.grado}</strong></td>
             <td>${item.grado_completo}</td>
-
                 <td><button class="btn-edit" onclick="setupEditGra('${item.id}', '${item.grado}', '${item.grado_completo}')">Editar</button>
                 <button class="btn-delete" onclick="deleteItem('${item.id}', 'grado')">Eliminar</button></td>`;
       tableBodyGra.appendChild(tr);
@@ -123,7 +123,6 @@ data.armamento.forEach(item => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.funcion}</td>
-
                 <td><button class="btn-edit" onclick="setupEditFunco('${item.id}', '${item.funcion}')">Editar</button>
                 <button class="btn-delete" onclick="deleteItem('${item.id}', 'funcion')">Eliminar</button></td>`;
       tableBodyFunco.appendChild(tr);
@@ -134,7 +133,6 @@ data.armamento.forEach(item => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.lugar}</td>
-
                 <td><button class="btn-edit" onclick="setupEditLug('${item.id}', '${item.lugar}')">Editar</button>
                 <button class="btn-delete" onclick="deleteItem('${item.id}', 'lugar')">Eliminar</button></td>`;
       tableBodyLug.appendChild(tr);
@@ -146,7 +144,6 @@ data.armamento.forEach(item => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.especialidad}</td>
-
                 <td><button class="btn-edit" onclick="setupEditEsp('${item.id}', '${item.especialidad}')">Editar</button>
                 <button class="btn-delete" onclick="deleteItem('${item.id}', 'especialidad')">Eliminar</button></td>`;
       tableBodyEsp.appendChild(tr);
@@ -157,7 +154,6 @@ data.armamento.forEach(item => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.estado}</td>
-
                 <td><button class="btn-edit" onclick="setupEditEst('${item.id}', '${item.estado}')">Editar</button>
                 <button class="btn-delete" onclick="deleteItem('${item.id}', 'estado')">Eliminar</button></td>`;
       tableBodyEst.appendChild(tr);
@@ -175,22 +171,33 @@ data.armamento.forEach(item => {
   }
 }
 
-// Envío unificado por POST
+// CORRECCIÓN #3: Eliminado mode: "no-cors" para poder leer la respuesta del servidor
+// y detectar errores como cédula duplicada. El despliegue del Apps Script debe estar
+// configurado con acceso "Cualquier persona" para que el CORS funcione correctamente.
 async function sendData(payload, callbackReset) {
   loadingText.style.display = "block";
   try {
-    await fetch(WEB_APP_URL, {
+    const response = await fetch(WEB_APP_URL, {
       method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain" }, // text/plain evita preflight CORS en Apps Script
       body: JSON.stringify(payload),
     });
+
+    // Ahora sí podemos leer y manejar la respuesta del servidor
+    const result = await response.json();
+
+    if (result.status === "error") {
+      alert("Error del servidor: " + result.message);
+      loadingText.style.display = "none";
+      return;
+    }
+
     setTimeout(() => {
       callbackReset();
       loadAllData();
     }, 1200);
   } catch (error) {
-    console.error("Error remotos:", error);
+    console.error("Error remoto:", error);
     loadingText.style.display = "none";
   }
 }
@@ -218,7 +225,7 @@ formArm.addEventListener("submit", (e) => {
       action: isEditingArm ? "update" : "create",
       id: document.getElementById("arm-id").value,
       tipo: document.getElementById("arm-tipo").value,
-      marca: document.getElementById('arm-marca').value,
+      marca: document.getElementById("arm-marca").value,
       serie: document.getElementById("arm-serie").value,
       cantidad_armamento: parseInt(
         document.getElementById("arm-cantidad").value,
@@ -300,16 +307,16 @@ function setupEditMun(id, calibre, cantidad, lote) {
   document.getElementById("mun-cantidad").value = cantidad;
   document.getElementById("mun-lote").value = lote;
 }
-function setupEditArm(id, tipo, marca, serie, cantidad) { 
-    isEditingArm = true; 
-    formTitleArm.innerText = "Modificar Armamento"; 
-    btnSaveArm.innerText = "Actualizar"; 
-    btnCancelArm.style.display = "block"; 
-    document.getElementById('arm-id').value = id; 
-    document.getElementById('arm-tipo').value = tipo; 
-    document.getElementById('arm-marca').value = marca; 
-    document.getElementById('arm-serie').value = serie; 
-    document.getElementById('arm-cantidad').value = cantidad; 
+function setupEditArm(id, tipo, marca, serie, cantidad) {
+  isEditingArm = true;
+  formTitleArm.innerText = "Modificar Armamento";
+  btnSaveArm.innerText = "Actualizar";
+  btnCancelArm.style.display = "block";
+  document.getElementById("arm-id").value = id;
+  document.getElementById("arm-tipo").value = tipo;
+  document.getElementById("arm-marca").value = marca;
+  document.getElementById("arm-serie").value = serie;
+  document.getElementById("arm-cantidad").value = cantidad;
 }
 function setupEditGra(id, grado, completo) {
   isEditingGra = true;
@@ -331,6 +338,7 @@ function setupEditFunco(id, funcion) {
 function setupEditLug(id, lugar) {
   isEditingLug = true;
   if (formTitleLug) formTitleLug.innerText = "Modificar Lugar";
+  // CORRECCIÓN #1: btnSaveLug ahora está declarado arriba y no causa ReferenceError
   btnSaveLug.innerText = "Actualizar";
   btnCancelLug.style.display = "block";
   document.getElementById("lug-id").value = id;
@@ -366,7 +374,6 @@ function resetFormArmamento() {
   btnCancelArm.style.display = "none";
   formArm.reset();
 }
-// ... los resets restantes limpian campos y ocultan botones mediante el método estándar .reset() ...
 function resetFormGrado() {
   isEditingGra = false;
   formTitleGra.innerText = "Ingresar Grado";

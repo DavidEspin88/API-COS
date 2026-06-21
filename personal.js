@@ -56,31 +56,73 @@ function poblarDesplegablesPersonal() {
 }
 
 // 2. Renderizar Tabla de Personal
-// 2. Renderizar Tabla de Personal (Formato dd/mmm/aaaa en pantalla)
+// CORRECCIÓN #2: Se reemplazó interpolación directa en onclick por dataset para evitar
+// que nombres con comillas simples (ej: O'BRIEN) rompan el HTML generado.
 function renderPersonalTable(personalData) {
   tableBodyPer.innerHTML = "";
   if (!personalData) return;
 
   personalData.forEach((item) => {
-    const antMostrar = item.ant === null || item.ant === "" ? '<span style="color:#7f8c8d;">-</span>' : item.ant;
-    const antPasarParametro = item.ant === null ? "" : item.ant;
+    const antMostrar =
+      item.ant === null || item.ant === ""
+        ? '<span style="color:#7f8c8d;">-</span>'
+        : item.ant;
+    const antPasarParametro = item.ant === null ? "" : String(item.ant);
 
     const tr = document.createElement("tr");
+
+    // Construir la fila de datos con innerHTML (datos de solo lectura, sin riesgo)
     tr.innerHTML = `
-            <td><span class="badge-ord">${item.ord}</span></td>
-            <td><strong>${item.cedula}</strong></td>
-            <td>${item.grado}</td>
-            <td>${item.especialidad}</td>
-            <td>${antMostrar}</td>
-            <td>${item.apellidos_nombres}</td>
-            <td>${item.funcion || "-"}</td>
-            <td>${item.fecha_nacimiento || "-"}</td> <td>${item.contacto}</td>
-            <td>${item.nombre_contacto}</td>
-            <td>
-                <button class="btn-edit" onclick="setupEditPer('${item.cedula}', '${item.grado}', '${item.especialidad}', '${antPasarParametro}', '${item.apellidos_nombres}', '${item.funcion || ""}', '${item.fecha_nacimiento}', '${item.contacto}', '${item.nombre_contacto}')">Editar</button>
-                <button class="btn-delete" onclick="deletePersonal('${item.cedula}')">Eliminar</button>
-            </td>
-        `;
+      <td><span class="badge-ord">${item.ord}</span></td>
+      <td><strong>${item.cedula}</strong></td>
+      <td>${item.grado}</td>
+      <td>${item.especialidad}</td>
+      <td>${antMostrar}</td>
+      <td>${item.apellidos_nombres}</td>
+      <td>${item.funcion || "-"}</td>
+      <td>${item.fecha_nacimiento || "-"}</td>
+      <td>${item.contacto}</td>
+      <td>${item.nombre_contacto}</td>
+      <td>
+        <button class="btn-edit btn-edit-per" type="button">Editar</button>
+        <button class="btn-delete btn-delete-per" type="button">Eliminar</button>
+      </td>
+    `;
+
+    // Pasar los datos a través de dataset para evitar problemas con caracteres especiales
+    const btnEdit = tr.querySelector(".btn-edit-per");
+    btnEdit.dataset.cedula = item.cedula;
+    btnEdit.dataset.grado = item.grado;
+    btnEdit.dataset.especialidad = item.especialidad;
+    btnEdit.dataset.ant = antPasarParametro;
+    btnEdit.dataset.nombres = item.apellidos_nombres;
+    btnEdit.dataset.funcion = item.funcion || "";
+    btnEdit.dataset.fecha = item.fecha_nacimiento || "";
+    btnEdit.dataset.contacto = item.contacto;
+    btnEdit.dataset.nombreContacto = item.nombre_contacto;
+
+    // Listener del botón Editar: lee del dataset (seguro ante cualquier carácter)
+    btnEdit.addEventListener("click", function () {
+      setupEditPer(
+        this.dataset.cedula,
+        this.dataset.grado,
+        this.dataset.especialidad,
+        this.dataset.ant,
+        this.dataset.nombres,
+        this.dataset.funcion,
+        this.dataset.fecha,
+        this.dataset.contacto,
+        this.dataset.nombreContacto
+      );
+    });
+
+    // Listener del botón Eliminar
+    const btnDelete = tr.querySelector(".btn-delete-per");
+    btnDelete.dataset.cedula = item.cedula;
+    btnDelete.addEventListener("click", function () {
+      deletePersonal(this.dataset.cedula);
+    });
+
     tableBodyPer.appendChild(tr);
   });
 }
@@ -125,23 +167,27 @@ function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, funcio
   selectEspecialidad.value = especialidad;
   selectFuncion.value = funcion;
   document.getElementById("per-nombres").value = apellidosNombres;
-  
-  // --- Conversión de formato "dd/mmm/aaaa" a "aaaa-mm-dd" para el input html ---
-  if (fechaNacimiento && fechaNacimiento.includes("/")) {
-    const partes = fechaNacimiento.split("/"); // [dd, mmm, aaaa]
+
+  // Conversión de formato "dd/mmm/aaaa" a "aaaa-mm-dd" para el input html
+  // CORRECCIÓN #5: Validación robusta para fechas vacías, con guion o en formato incorrecto
+  const fechaLimpia = (fechaNacimiento && fechaNacimiento !== "-") ? fechaNacimiento.trim() : "";
+  if (fechaLimpia && fechaLimpia.includes("/")) {
+    const partes = fechaLimpia.split("/"); // [dd, mmm, aaaa]
     const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
     const indiceMes = meses.indexOf(partes[1].toUpperCase());
-    
-    if (indiceMes !== -1) {
-      const mesNumero = String(indiceMes + 1).padStart(2, '0');
+
+    if (indiceMes !== -1 && partes.length === 3) {
+      const mesNumero = String(indiceMes + 1).padStart(2, "0");
       const anio = partes[2];
       const dia = partes[0];
       document.getElementById("per-fecha").value = `${anio}-${mesNumero}-${dia}`;
+    } else {
+      document.getElementById("per-fecha").value = "";
     }
   } else {
     document.getElementById("per-fecha").value = "";
   }
-  
+
   document.getElementById("per-contacto").value = contacto;
   document.getElementById("per-nombre-contacto").value = nombreContacto;
 }
