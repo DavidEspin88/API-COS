@@ -16,7 +16,7 @@ const paginationText = document.getElementById("pagination-text");
 
 // Variables de Estado de Paginación
 let isEditingPer = false;
-let datosPersonalGlobal = []; // Guarda el set completo de personal enviado por la base de datos
+let datosPersonalGlobal = [];
 let currentPage = 1;
 const rowsPerPage = 10;
 
@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarPaginaActual();
       }
     });
-
     btnNextPage.addEventListener("click", () => {
       const maxPage = Math.ceil(datosPersonalGlobal.length / rowsPerPage);
       if (currentPage < maxPage) {
@@ -47,8 +46,10 @@ function poblarDesplegablesPersonal() {
   const currentFun = selectFuncion.value;
 
   selectGrado.innerHTML = '<option value="">-- Seleccione un Grado --</option>';
-  selectEspecialidad.innerHTML = '<option value="">-- Seleccione Especialidad --</option>';
-  selectFuncion.innerHTML = '<option value="">-- Seleccione Función --</option>';
+  selectEspecialidad.innerHTML =
+    '<option value="">-- Seleccione Especialidad --</option>';
+  selectFuncion.innerHTML =
+    '<option value="">-- Seleccione Función --</option>';
 
   if (window.gradosCargados) {
     window.gradosCargados.forEach((item) => {
@@ -58,7 +59,6 @@ function poblarDesplegablesPersonal() {
       selectGrado.appendChild(opt);
     });
   }
-
   if (window.especialidadesCargadas) {
     window.especialidadesCargadas.forEach((item) => {
       const opt = document.createElement("option");
@@ -67,7 +67,6 @@ function poblarDesplegablesPersonal() {
       selectEspecialidad.appendChild(opt);
     });
   }
-
   if (window.funcionesCargadas) {
     window.funcionesCargadas.forEach((item) => {
       const opt = document.createElement("option");
@@ -84,9 +83,9 @@ function poblarDesplegablesPersonal() {
 
 // 2. Interceptor de la Carga de Datos de Personal
 function renderPersonalTable(personalData) {
-  // Almacenar los datos globales y reiniciar a la primera página tras cada sincronización
   datosPersonalGlobal = personalData || [];
-  currentPage = 1; 
+  window.datosPersonalGlobal = datosPersonalGlobal; // Compartir en ventana para control_operacional.js
+  currentPage = 1;
   mostrarPaginaActual();
 }
 
@@ -103,34 +102,28 @@ function mostrarPaginaActual() {
     return;
   }
 
-  // Calcular índices de corte matemático de la página
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = Math.min(startIndex + rowsPerPage, totalRegistros);
   const paginatedItems = datosPersonalGlobal.slice(startIndex, endIndex);
 
-  // Renderizar las 10 filas del corte actual
-paginatedItems.forEach((item) => {
-    const antMostrar = item.ant === null || item.ant === "" ? '<span style="color:#7f8c8d;">-</span>' : item.ant;
+  paginatedItems.forEach((item) => {
+    const antMostrar =
+      item.ant === null || item.ant === ""
+        ? '<span style="color:#7f8c8d;">-</span>'
+        : item.ant;
     const antPasarParametro = item.ant === null ? "" : String(item.ant);
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="badge-ord">${item.ord}</span></td> <td><strong>${item.cedula}</strong></td>
-      <td>${item.grado}</td>
-      <td>${item.especialidad}</td>
-      <td>${antMostrar}</td>
-      <td>${item.apellidos_nombres}</td>
-      <td>${item.funcion || "-"}</td>
-      <td>${item.fecha_nacimiento || "-"}</td>
-      <td>${item.contacto}</td>
-      <td>${item.nombre_contacto}</td>
+      <td><span class="badge-ord">${item.ord}</span></td><td><strong>${item.cedula}</strong></td>
+      <td>${item.grado}</td><td>${item.especialidad}</td><td>${antMostrar}</td>
+      <td>${item.apellidos_nombres}</td><td>${item.funcion || "-"}</td><td>${item.fecha_nacimiento || "-"}</td>
+      <td>${item.contacto}</td><td>${item.nombre_contacto}</td>
       <td>
         <button class="btn-edit btn-edit-per" type="button">Editar</button>
         <button class="btn-delete btn-delete-per" type="button">Eliminar</button>
-      </td>
-    `;
+      </td>`;
 
-    // Dataset seguro contra caracteres especiales (Comillas, Apóstrofes)
     const btnEdit = tr.querySelector(".btn-edit-per");
     btnEdit.dataset.cedula = item.cedula;
     btnEdit.dataset.grado = item.grado;
@@ -152,7 +145,7 @@ paginatedItems.forEach((item) => {
         this.dataset.funcion,
         this.dataset.fecha,
         this.dataset.contacto,
-        this.dataset.nombreContacto
+        this.dataset.nombreContacto,
       );
     });
 
@@ -165,9 +158,7 @@ paginatedItems.forEach((item) => {
     tableBodyPer.appendChild(tr);
   });
 
-  // Actualizar metadatos informativos y estado de botones
   paginationText.textContent = `Mostrando ${startIndex + 1}-${endIndex} de ${totalRegistros} registros`;
-  
   const maxPage = Math.ceil(totalRegistros / rowsPerPage);
   btnPrevPage.disabled = currentPage === 1;
   btnNextPage.disabled = currentPage === maxPage || maxPage === 0;
@@ -184,7 +175,9 @@ formPer.addEventListener("submit", async (e) => {
     grado: selectGrado.value,
     especialidad: selectEspecialidad.value,
     ant: antInput === "" ? "" : parseInt(antInput),
-    apellidos_nombres: document.getElementById("per-nombres").value.toUpperCase(),
+    apellidos_nombres: document
+      .getElementById("per-nombres")
+      .value.toUpperCase(),
     funcion: selectFuncion.value,
     fecha_nacimiento: document.getElementById("per-fecha").value,
     contacto: document.getElementById("per-contacto").value,
@@ -195,7 +188,17 @@ formPer.addEventListener("submit", async (e) => {
 });
 
 // 4. Configurar Interfaz para Edición
-function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, funcion, fechaNacimiento, contacto, nombreContacto) {
+function setupEditPer(
+  cedula,
+  grado,
+  especialidad,
+  ant,
+  apellidosNombres,
+  funcion,
+  fechaNacimiento,
+  contacto,
+  nombreContacto,
+) {
   isEditingPer = true;
   formTitlePer.innerText = "Modificar Datos de Personal";
   btnSavePer.innerText = "Actualizar Registro";
@@ -212,16 +215,28 @@ function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, funcio
   selectFuncion.value = funcion;
   document.getElementById("per-nombres").value = apellidosNombres;
 
-  // Conversión robusta de formato de fechas
-  const fechaLimpia = (fechaNacimiento && fechaNacimiento !== "-") ? fechaNacimiento.trim() : "";
+  const fechaLimpia =
+    fechaNacimiento && fechaNacimiento !== "-" ? fechaNacimiento.trim() : "";
   if (fechaLimpia && fechaLimpia.includes("/")) {
     const partes = fechaLimpia.split("/");
-    const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+    const meses = [
+      "ENE",
+      "FEB",
+      "MAR",
+      "ABR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AGO",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DIC",
+    ];
     const indiceMes = meses.indexOf(partes[1].toUpperCase());
-
     if (indiceMes !== -1 && partes.length === 3) {
-      const mesNumero = String(indiceMes + 1).padStart(2, "0");
-      document.getElementById("per-fecha").value = `${partes[2]}-${mesNumero}-${partes[0]}`;
+      document.getElementById("per-fecha").value =
+        `${partes[2]}-${String(indiceMes + 1).padStart(2, "0")}-${partes[0]}`;
     } else {
       document.getElementById("per-fecha").value = "";
     }
@@ -231,9 +246,7 @@ function setupEditPer(cedula, grado, especialidad, ant, apellidosNombres, funcio
 
   document.getElementById("per-contacto").value = contacto;
   document.getElementById("per-nombre-contacto").value = nombreContacto;
-  
-  // Hacer scroll suave hacia el formulario al editar para comodidad del operador
-  formPer.scrollIntoView({ behavior: 'smooth' });
+  formPer.scrollIntoView({ behavior: "smooth" });
 }
 
 // 5. Limpieza del Formulario
@@ -249,7 +262,10 @@ function resetFormPersonal() {
 
 // 6. Eliminar Personal
 async function deletePersonal(cedulaId) {
-  if (!confirm(`¿Eliminar permanentemente al personal con cédula: ${cedulaId}?`)) return;
+  if (
+    !confirm(`¿Eliminar permanentemente al personal con cédula: ${cedulaId}?`)
+  )
+    return;
   if (typeof sendData === "function")
     sendData({ action: "delete", id: cedulaId, target: "personal" }, () => {});
 }

@@ -187,7 +187,6 @@
                             <label for="lug-nombre">Nombre del Lugar / Reparto / Base</label>
                             <input type="text" id="lug-nombre" required placeholder="Ej. Base Manta / Ala Nro 21 / Polvorín">
                         </div>
-                        <!-- CORRECCIÓN #6: Agregado id="btn-save-lug" que faltaba -->
                         <button type="submit" class="btn-submit" id="btn-save-lug">Guardar Lugar</button>
                         <button type="button" class="btn-cancel" id="btn-cancel-lug" style="display:none;" onclick="resetFormLugar()">Cancelar Edición</button>
                     </form>
@@ -383,10 +382,70 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="panel-section section-operacional">
+            <h2>Módulo de Estadísticas y Control Operacional (Pestaña: CONTROL_ESTADO_PERSONAL)</h2>
+            
+            <div class="stats-cards-container" id="stats-cards-live"></div>
+
+            <div class="dashboard-grid vertical-layout">
+                
+                <div class="matrices-top-row">
+                    
+                    <div class="card card-control-asignacion">
+                        <h3>Asignación y Control Operacional de Estados</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Grado</th>
+                                        <th>Apellidos y Nombres</th>
+                                        <th>Cédula</th>
+                                        <th>Función</th>
+                                        <th>Estado Operacional Actual</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-control-operacional"></tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="matrix-action-bar">
+                            <div class="validation-badge" id="validation-status-badge">Sincronizando...</div>
+                            <button type="button" class="btn-submit" id="btn-guardar-control-operacional" onclick="guardarControlOperacional()">Guardar Control Operacional</button>
+                        </div>
+                    </div>
+
+                    <div class="card card-matriz-resumen">
+                        <h3>Matriz Resumen de Estados</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Estado</th>
+                                        <th>Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-matriz-resumen"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div> <div class="card card-matriz-cruzada-full shadow-sm">
+                    <h3>Matriz de Distribución por Grado y Situación</h3>
+                    <div class="table-container">
+                        <table class="matrix-cruzada">
+                            <thead id="thead-matriz-cruzada"></thead>
+                            <tbody id="table-body-matriz-cruzada"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
     <script src="script.js"></script>
     <script src="personal.js"></script>
+    <script src="control_operacional.js"></script>
 </body>
 
 </html>

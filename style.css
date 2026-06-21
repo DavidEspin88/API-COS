@@ -495,3 +495,116 @@ tbody tr:hover {
 .panel-section.section-personal td:nth-child(2) { font-family: monospace; font-size: 14px; } /* Cédula */
 .panel-section.section-personal td:nth-child(6) { font-weight: 600; min-width: 220px; } /* Nombres */
 .panel-section.section-personal td:nth-child(7) { min-width: 150px; } /* Función */
+
+/* ============================================================
+   REORGANIZACIÓN ESTRUCTURAL DEL MÓDULO OPERACIONAL
+   ============================================================ */
+.panel-section.section-operacional {
+    border-top: 5px solid #1abc9c;
+    max-width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    border-radius: 0; 
+    padding: 30px;
+}
+
+/* Forzar el contenedor a ser un bloque vertical puro */
+.panel-section.section-operacional .dashboard-grid.vertical-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 25px !important;
+}
+
+/* FILA SUPERIOR: Tabla Asignación al lado de Matriz Resumen */
+.matrices-top-row {
+    display: flex !important;
+    gap: 20px !important;
+    width: 100% !important;
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+}
+
+/* Proporciones de la fila superior */
+.card.card-control-asignacion {
+    flex: 1 1 0% !important; /* Toma todo el espacio dinámico disponible a la izquierda */
+    min-width: 450px !important;
+    background: #ffffff;
+    padding: 20px !important;
+}
+
+.card.card-matriz-resumen {
+    flex: 0 0 350px !important; /* Ancho fijo y seguro a la derecha para que no sufra desbordes */
+    width: 350px !important;
+    background: #ffffff;
+    padding: 20px !important;
+}
+
+/* FILA INFERIOR: Matriz Cruzada ocupando el total de la ventana */
+.card.card-matriz-cruzada-full {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff;
+    padding: 24px !important;
+    box-sizing: border-box;
+}
+
+/* Contenedores de tablas con scroll horizontal seguro */
+.panel-section.section-operacional .table-container {
+    width: 100% !important;
+    overflow-x: auto !important; 
+    border: 1px solid #e1e8ed;
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+}
+
+/* Autoajuste dinámico de anchos basado en el texto de las columnas */
+.panel-section.section-operacional table {
+    width: 100% !important;
+    table-layout: auto !important; 
+}
+
+/* Estilos de celdas militares compactos */
+.panel-section.section-operacional th,
+.panel-section.section-operacional td {
+    padding: 8px 12px !important;   
+    text-align: center !important;  
+    font-size: 12.5px !important;   
+    white-space: nowrap !important; 
+}
+
+/* Fijar columna de Grado a la izquierda en la matriz inferior */
+.panel-section.section-operacional .matrix-cruzada th:first-child,
+.panel-section.section-operacional .matrix-cruzada td:first-child {
+    font-weight: bold;
+    background: #f8fafc;
+    position: sticky; 
+    left: 0;
+    z-index: 2;
+    border-right: 2px solid #e1e8ed;
+}
+
+/* Columna de Estados alineada a la izquierda en la Matriz Resumen */
+.card.card-matriz-resumen tbody td:first-child {
+    text-align: left !important;
+    font-weight: 600;
+    padding-left: 14px !important;
+}
+
+.card.card-matriz-resumen tbody tr:last-child {
+    background: #e2e8f0;
+    font-weight: bold;
+}
+
+/* Adaptación responsiva para monitores medianos o laptops */
+@media (max-width: 1100px) {
+    .matrices-top-row {
+        flex-direction: column !important;
+    }
+    .card.card-control-asignacion, 
+    .card.card-matriz-resumen {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+}

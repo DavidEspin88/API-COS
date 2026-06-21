@@ -35,7 +35,6 @@ const formLug = document.getElementById("form-lugar");
 const tableBodyLug = document.getElementById("table-body-lugar");
 const btnCancelLug = document.getElementById("btn-cancel-lug");
 const formTitleLug = document.getElementById("form-title-lug");
-// CORRECCIÓN #1: Declarado btnSaveLug que faltaba y causaba ReferenceError al editar un Lugar
 const btnSaveLug = document.getElementById("btn-save-lug");
 
 // Selectores Especialidad
@@ -81,27 +80,21 @@ async function loadAllData() {
     data.municion.forEach((item) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-            <td>${item.calibre}</td>
-            <td>${item.cantidad}</td>
-            <td>${item.lote}</td>
-                <td><button class="btn-edit" onclick="setupEditMun('${item.id}', '${item.calibre}', ${item.cantidad}, '${item.lote}')">Editar</button>
-                <button class="btn-delete" onclick="deleteItem('${item.id}', 'municion')">Eliminar</button></td>`;
+            <td>${item.calibre}</td><td>${item.cantidad}</td><td>${item.lote}</td>
+            <td><button class="btn-edit" onclick="setupEditMun('${item.id}', '${item.calibre}', ${item.cantidad}, '${item.lote}')">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id}', 'municion')">Eliminar</button></td>`;
       tableBodyMun.appendChild(tr);
     });
 
     // Renderizar Armamento
-    data.armamento.forEach(item => {
-      const tr = document.createElement('tr');
+    data.armamento.forEach((item) => {
+      const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${item.tipo}</td>
-        <td>${item.marca || '-'}</td>
-        <td>${item.serie}</td>
-        <td>${item.cantidad_armamento}</td>
+        <td>${item.tipo}</td><td>${item.marca || "-"}</td><td>${item.serie}</td><td>${item.cantidad_armamento}</td>
         <td>
-            <button class="btn-edit" onclick="setupEditArm('${item.id}', '${item.tipo}', '${item.marca || ''}', '${item.serie}', ${item.cantidad_armamento})">Editar</button>
+            <button class="btn-edit" onclick="setupEditArm('${item.id}', '${item.tipo}', '${item.marca || ""}', '${item.serie}', ${item.cantidad_armamento})">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento')">Eliminar</button>
-        </td>
-      `;
+        </td>`;
       tableBodyArm.appendChild(tr);
     });
 
@@ -110,10 +103,9 @@ async function loadAllData() {
     data.grado.forEach((item) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-            <td><strong>${item.grado}</strong></td>
-            <td>${item.grado_completo}</td>
-                <td><button class="btn-edit" onclick="setupEditGra('${item.id}', '${item.grado}', '${item.grado_completo}')">Editar</button>
-                <button class="btn-delete" onclick="deleteItem('${item.id}', 'grado')">Eliminar</button></td>`;
+            <td><strong>${item.grado}</strong></td><td>${item.grado_completo}</td>
+            <td><button class="btn-edit" onclick="setupEditGra('${item.id}', '${item.grado}', '${item.grado_completo}')">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id}', 'grado')">Eliminar</button></td>`;
       tableBodyGra.appendChild(tr);
     });
 
@@ -123,8 +115,8 @@ async function loadAllData() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.funcion}</td>
-                <td><button class="btn-edit" onclick="setupEditFunco('${item.id}', '${item.funcion}')">Editar</button>
-                <button class="btn-delete" onclick="deleteItem('${item.id}', 'funcion')">Eliminar</button></td>`;
+            <td><button class="btn-edit" onclick="setupEditFunco('${item.id}', '${item.funcion}')">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id}', 'funcion')">Eliminar</button></td>`;
       tableBodyFunco.appendChild(tr);
     });
 
@@ -133,8 +125,8 @@ async function loadAllData() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.lugar}</td>
-                <td><button class="btn-edit" onclick="setupEditLug('${item.id}', '${item.lugar}')">Editar</button>
-                <button class="btn-delete" onclick="deleteItem('${item.id}', 'lugar')">Eliminar</button></td>`;
+            <td><button class="btn-edit" onclick="setupEditLug('${item.id}', '${item.lugar}')">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id}', 'lugar')">Eliminar</button></td>`;
       tableBodyLug.appendChild(tr);
     });
 
@@ -144,8 +136,8 @@ async function loadAllData() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.especialidad}</td>
-                <td><button class="btn-edit" onclick="setupEditEsp('${item.id}', '${item.especialidad}')">Editar</button>
-                <button class="btn-delete" onclick="deleteItem('${item.id}', 'especialidad')">Eliminar</button></td>`;
+            <td><button class="btn-edit" onclick="setupEditEsp('${item.id}', '${item.especialidad}')">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id}', 'especialidad')">Eliminar</button></td>`;
       tableBodyEsp.appendChild(tr);
     });
 
@@ -154,8 +146,8 @@ async function loadAllData() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
             <td>${item.estado}</td>
-                <td><button class="btn-edit" onclick="setupEditEst('${item.id}', '${item.estado}')">Editar</button>
-                <button class="btn-delete" onclick="deleteItem('${item.id}', 'estado')">Eliminar</button></td>`;
+            <td><button class="btn-edit" onclick="setupEditEst('${item.id}', '${item.estado}')">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id}', 'estado')">Eliminar</button></td>`;
       tableBodyEst.appendChild(tr);
     });
 
@@ -164,6 +156,11 @@ async function loadAllData() {
       renderPersonalTable(data.personal);
       poblarDesplegablesPersonal();
     }
+
+    // Inyección de Control Estadístico Operacional
+    if (typeof inicializarControlOperacional === "function") {
+      inicializarControlOperacional(data);
+    }
   } catch (error) {
     console.error("Error cargando inventarios:", error);
   } finally {
@@ -171,21 +168,16 @@ async function loadAllData() {
   }
 }
 
-// CORRECCIÓN #3: Eliminado mode: "no-cors" para poder leer la respuesta del servidor
-// y detectar errores como cédula duplicada. El despliegue del Apps Script debe estar
-// configurado con acceso "Cualquier persona" para que el CORS funcione correctamente.
 async function sendData(payload, callbackReset) {
   loadingText.style.display = "block";
   try {
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
-      headers: { "Content-Type": "text/plain" }, // text/plain evita preflight CORS en Apps Script
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(payload),
     });
 
-    // Ahora sí podemos leer y manejar la respuesta del servidor
     const result = await response.json();
-
     if (result.status === "error") {
       alert("Error del servidor: " + result.message);
       loadingText.style.display = "none";
@@ -338,7 +330,6 @@ function setupEditFunco(id, funcion) {
 function setupEditLug(id, lugar) {
   isEditingLug = true;
   if (formTitleLug) formTitleLug.innerText = "Modificar Lugar";
-  // CORRECCIÓN #1: btnSaveLug ahora está declarado arriba y no causa ReferenceError
   btnSaveLug.innerText = "Actualizar";
   btnCancelLug.style.display = "block";
   document.getElementById("lug-id").value = id;
