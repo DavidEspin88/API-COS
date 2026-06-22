@@ -560,20 +560,27 @@ tbody tr:hover {
 }
 
 /* --- CONTROL DE TRUNCADO Y AJUSTE DE CELDAS DINÁMICAS --- */
-.card.card-control-asignacion td:nth-child(2),
-.card.card-control-asignacion td:nth-child(4) {
-    white-space: normal !important;
-    /* Rompe la línea para comprimir horizontalmente el tamaño de la tabla */
-    text-align: left !important;
-    min-width: 180px !important;
-    max-width: 250px !important;
+/* --- CONTROL DE TRUNCADO Y AJUSTE DE CELDAS DINÁMICAS (NUEVO ORDEN) --- */
+.card.card-control-asignacion td:nth-child(3) {
+    white-space: normal !important;  
+    text-align: left !important;     
+    min-width: 180px !important;     
+    max-width: 240px !important;     
+}
+
+.card.card-control-asignacion td:nth-child(7) {
+    white-space: normal !important;  
+    text-align: center !important;     
+    min-width: 160px !important;     
+    max-width: 220px !important;     
 }
 
 .card.card-control-asignacion td:nth-child(1),
-.card.card-control-asignacion td:nth-child(3),
+.card.card-control-asignacion td:nth-child(2),
+.card.card-control-asignacion td:nth-child(4),
 .card.card-control-asignacion td:nth-child(5),
 .card.card-control-asignacion td:nth-child(6),
-.card.card-control-asignacion td:nth-child(7) {
+.card.card-control-asignacion td:nth-child(8) {
     white-space: nowrap !important;
 }
 

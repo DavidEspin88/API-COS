@@ -35,7 +35,8 @@
                             <input type="text" id="mun-lote" required placeholder="Ej. LOT-2026-A">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-save-mun">Guardar Munición</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-mun" style="display:none;" onclick="resetFormMunicion()">Cancelar Edición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-mun" style="display:none;"
+                            onclick="resetFormMunicion()">Cancelar Edición</button>
                     </form>
                 </div>
 
@@ -83,7 +84,8 @@
                             <input type="number" id="arm-cantidad" required min="1" placeholder="0">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-save-arm">Guardar Armamento</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-arm" style="display:none;" onclick="resetFormArmamento()">Cancelar Edición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-arm" style="display:none;"
+                            onclick="resetFormArmamento()">Cancelar Edición</button>
                     </form>
                 </div>
 
@@ -121,10 +123,12 @@
                         </div>
                         <div class="form-group">
                             <label for="gra-completo">Grado Completo</label>
-                            <input type="text" id="gra-completo" required placeholder="Ej. Cabo Primero / Sargento / Teniente">
+                            <input type="text" id="gra-completo" required
+                                placeholder="Ej. Cabo Primero / Sargento / Teniente">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-save-gra">Guardar Grado</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-gra" style="display:none;" onclick="resetFormGrado()">Cancelar Edición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-gra" style="display:none;"
+                            onclick="resetFormGrado()">Cancelar Edición</button>
                     </form>
                 </div>
 
@@ -156,10 +160,12 @@
                         <input type="hidden" id="funco-id">
                         <div class="form-group">
                             <label for="funco-nombre">Nombre de la Función / Cargo</label>
-                            <input type="text" id="funco-nombre" required placeholder="Ej. Comandante / Operador / Centinela">
+                            <input type="text" id="funco-nombre" required
+                                placeholder="Ej. Comandante / Operador / Centinela">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-save-funco">Guardar Función</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-funco" style="display:none;" onclick="resetFormFuncion()">Cancelar Edición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-funco" style="display:none;"
+                            onclick="resetFormFuncion()">Cancelar Edición</button>
                     </form>
                 </div>
 
@@ -190,10 +196,12 @@
                         <input type="hidden" id="lug-id">
                         <div class="form-group">
                             <label for="lug-nombre">Nombre del Lugar / Reparto / Base</label>
-                            <input type="text" id="lug-nombre" required placeholder="Ej. Base Manta / Ala Nro 21 / Polvorín">
+                            <input type="text" id="lug-nombre" required
+                                placeholder="Ej. Base Manta / Ala Nro 21 / Polvorín">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-save-lug">Guardar Lugar</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-lug" style="display:none;" onclick="resetFormLugar()">Cancelar Edición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-lug" style="display:none;"
+                            onclick="resetFormLugar()">Cancelar Edición</button>
                     </form>
                 </div>
 
@@ -224,10 +232,12 @@
                         <input type="hidden" id="esp-id">
                         <div class="form-group">
                             <label for="esp-nombre">Nombre de la Especialidad Técnico-Militar</label>
-                            <input type="text" id="esp-nombre" required placeholder="Ej. Armamento / Electrónica / Infantería">
+                            <input type="text" id="esp-nombre" required
+                                placeholder="Ej. Armamento / Electrónica / Infantería">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-save-esp">Guardar Especialidad</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-esp" style="display:none;" onclick="resetFormEspecialidad()">Cancelar Edición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-esp" style="display:none;"
+                            onclick="resetFormEspecialidad()">Cancelar Edición</button>
                     </form>
                 </div>
 
@@ -252,17 +262,18 @@
         <div class="panel-section section-personal">
             <h2>Sección de Control de Personal (Pestaña: REGISTRO_PERSONAL)</h2>
             <div class="dashboard-grid vertical-layout">
-                
+
                 <div class="card-militar">
                     <h3 id="form-title-per">Registrar Nuevo Personal</h3>
                     <form id="form-personal" class="form-militar">
-                        
+
                         <div class="form-section-block">
                             <h4><span class="step-num">1</span> Datos de Identidad</h4>
                             <div class="form-row">
                                 <div class="form-group flex-2">
                                     <label for="per-nombres">Apellidos y Nombres Completos</label>
-                                    <input type="text" id="per-nombres" required placeholder="Ej. CARLOSAMA LIMA JUAN DAVID">
+                                    <input type="text" id="per-nombres" required
+                                        placeholder="Ej. CARLOSAMA LIMA JUAN DAVID">
                                 </div>
                                 <div class="form-group flex-1">
                                     <label for="per-cedula">Cédula de Identidad</label>
@@ -312,18 +323,20 @@
                                 </div>
                                 <div class="form-group flex-2">
                                     <label for="per-nombre-contacto">Nombre de Contacto</label>
-                                    <input type="text" id="per-nombre-contacto" required placeholder="Ej. Madre / Esposa (Nombre Completo)">
+                                    <input type="text" id="per-nombre-contacto" required
+                                        placeholder="Ej. Madre / Esposa (Nombre Completo)">
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-buttons militar-actions">
                             <button type="submit" class="btn-submit" id="btn-save-per">Guardar Registro</button>
-                            <button type="button" class="btn-cancel" id="btn-cancel-per" style="display:none;" onclick="resetFormPersonal()">Cancelar Edición</button>
+                            <button type="button" class="btn-cancel" id="btn-cancel-per" style="display:none;"
+                                onclick="resetFormPersonal()">Cancelar Edición</button>
                         </div>
                     </form>
                 </div>
-                
+
                 <div class="card full-width">
                     <div class="table-header-flex">
                         <h3>Base de Datos de Personal Fuerza Aérea</h3>
@@ -367,10 +380,12 @@
                         <input type="hidden" id="est-id">
                         <div class="form-group">
                             <label for="est-nombre">Nombre del Estado / Condición</label>
-                            <input type="text" id="est-nombre" required placeholder="Ej. Disponible / Comisión / Permiso">
+                            <input type="text" id="est-nombre" required
+                                placeholder="Ej. Disponible / Comisión / Permiso">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-save-est">Guardar Estado</button>
-                        <button type="button" class="btn-cancel" id="btn-cancel-est" style="display:none;" onclick="resetFormEstado()">Cancelar Edición</button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-est" style="display:none;"
+                            onclick="resetFormEstado()">Cancelar Edición</button>
                     </form>
                 </div>
 
@@ -392,13 +407,13 @@
         </div>
 
         <!-- MÓDULO DE ESTADÍSTICAS Y CONTROL OPERACIONAL -->
-<div class="panel-section section-operacional">
+        <div class="panel-section section-operacional">
             <h2>Módulo de Estadísticas y Control Operacional (Pestaña: PARTE_DIARIO)</h2>
 
             <div class="dashboard-grid vertical-layout">
-                
+
                 <div class="matrices-top-row">
-                    
+
                     <div class="card card-control-asignacion">
                         <h3>Asignación y Control Operacional de Estados</h3>
                         <div class="table-container">
@@ -408,19 +423,22 @@
                                         <th>Cédula</th>
                                         <th>Grado</th>
                                         <th>Apellidos y Nombres</th>
-                                        <th>Estado Operacional Actual</th>
-                                        <th>Fecha Inicio (09:00 AM)</th>
+                                        <th>Estado</th>
+                                        <th>Fecha Inicio</th>
                                         <th>Fecha Final</th>
-                                        <th>Observación / Alertas</th>
+                                        <th>Total Lapso</th>
+                                        <th>Observación / Novedad</th>
+                                        <th>Acción de Seguridad</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-body-control-operacional"></tbody>
                             </table>
                         </div>
-                        
+
                         <div class="matrix-action-bar">
                             <div class="validation-badge" id="validation-status-badge">Sincronizando...</div>
-                            <button type="button" class="btn-submit" id="btn-guardar-control-operacional" onclick="guardarControlOperacional()">Guardar Control Operacional</button>
+                            <button type="button" class="btn-submit" id="btn-guardar-control-operacional"
+                                onclick="guardarControlOperacional()">Guardar Control Operacional</button>
                         </div>
                     </div>
 
@@ -454,9 +472,9 @@
             </div>
         </div>
 
-    <script src="script.js"></script>
-    <script src="personal.js"></script>
-    <script src="control_operacional.js"></script>
+        <script src="script.js"></script>
+        <script src="personal.js"></script>
+        <script src="control_operacional.js"></script>
 </body>
 
 </html>

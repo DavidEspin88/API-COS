@@ -186,7 +186,7 @@ async function sendData(payload, callbackReset) {
 
     setTimeout(() => {
       callbackReset();
-      loadAllData();
+   
     }, 1200);
   } catch (error) {
     console.error("Error remoto:", error);
