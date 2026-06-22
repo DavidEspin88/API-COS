@@ -168,8 +168,13 @@ async function loadAllData() {
   }
 }
 
+// ============================================================
+// FUNCIÓN CENTRAL PARA ENVIAR DATOS (POST) CON AUTO-REFRESCO
+// ============================================================
 async function sendData(payload, callbackReset) {
   loadingText.style.display = "block";
+  loadingText.innerText = "Sincronizando cambios con Google Sheets...";
+  
   try {
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
@@ -185,11 +190,20 @@ async function sendData(payload, callbackReset) {
     }
 
     setTimeout(() => {
+      // Ejecuta la limpieza o congelamiento del formulario web correspondiente
       callbackReset();
-   
+      
+      // --- REGLA DE LOGÍSTICA SINCRO: NO RESETEAR LA VISTA SI SOLO SE GUARDA EL PARTE ---
+      if (payload.target !== "control_operacional") {
+        // Si creamos, editamos o eliminamos personal, munición o armamento, recarga TODO en caliente
+        loadAllData();
+      } else {
+        loadingText.style.display = "none"; // Si es el parte diario, solo apaga el indicador y mantiene tus datos en pantalla
+      }
     }, 1200);
   } catch (error) {
     console.error("Error remoto:", error);
+    alert("❌ Error de comunicación con el servidor de Google Sheets.");
     loadingText.style.display = "none";
   }
 }
