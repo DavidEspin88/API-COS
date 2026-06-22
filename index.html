@@ -14,6 +14,7 @@
         <h1>Panel de Control de Logística</h1>
         <div id="loading-text" class="loading">Sincronizando Base de Datos de Google Sheets...</div>
 
+        <!-- SECCIÓN 1: MUNICIÓN -->
         <div class="panel-section">
             <h2>Sección de Munición (Pestaña: MUNICION)</h2>
             <div class="dashboard-grid">
@@ -57,6 +58,7 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 2: ARMAMENTO -->
         <div class="panel-section">
             <h2>Sección de Armamento (Pestaña: ARMAMENTO)</h2>
             <div class="dashboard-grid">
@@ -105,6 +107,7 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 3: GRADO -->
         <div class="panel-section section-grado">
             <h2>Sección de Grados Militares (Pestaña: GRADO)</h2>
             <div class="dashboard-grid">
@@ -143,6 +146,7 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 4: FUNCIÓN -->
         <div class="panel-section section-funcion">
             <h2>Sección de Funciones / Cargos (Pestaña: FUNCION)</h2>
             <div class="dashboard-grid">
@@ -176,6 +180,7 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 5: LUGAR -->
         <div class="panel-section section-lugar">
             <h2>Sección de Lugares / Repartos (Pestaña: LUGAR)</h2>
             <div class="dashboard-grid">
@@ -209,6 +214,7 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 6: ESPECIALIDAD -->
         <div class="panel-section section-especialidad">
             <h2>Sección de Especialidades (Pestaña: ESPECIALIDAD)</h2>
             <div class="dashboard-grid">
@@ -242,6 +248,7 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 7: CONTROL DE PERSONAL -->
         <div class="panel-section section-personal">
             <h2>Sección de Control de Personal (Pestaña: REGISTRO_PERSONAL)</h2>
             <div class="dashboard-grid vertical-layout">
@@ -350,6 +357,7 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 8: ESTADO OPERATIVO -->
         <div class="panel-section section-estado">
             <h2>Sección de Estados Operativos (Pestaña: ESTADO)</h2>
             <div class="dashboard-grid">
@@ -383,10 +391,9 @@
             </div>
         </div>
 
-        <div class="panel-section section-operacional">
-            <h2>Módulo de Estadísticas y Control Operacional (Pestaña: CONTROL_ESTADO_PERSONAL)</h2>
-            
-            <div class="stats-cards-container" id="stats-cards-live"></div>
+        <!-- MÓDULO DE ESTADÍSTICAS Y CONTROL OPERACIONAL -->
+<div class="panel-section section-operacional">
+            <h2>Módulo de Estadísticas y Control Operacional (Pestaña: PARTE_DIARIO)</h2>
 
             <div class="dashboard-grid vertical-layout">
                 
@@ -398,11 +405,13 @@
                             <table>
                                 <thead>
                                     <tr>
+                                        <th>Cédula</th>
                                         <th>Grado</th>
                                         <th>Apellidos y Nombres</th>
-                                        <th>Cédula</th>
-                                        <th>Función</th>
                                         <th>Estado Operacional Actual</th>
+                                        <th>Fecha Inicio (09:00 AM)</th>
+                                        <th>Fecha Final</th>
+                                        <th>Observación / Alertas</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-body-control-operacional"></tbody>
@@ -430,7 +439,9 @@
                         </div>
                     </div>
 
-                </div> <div class="card card-matriz-cruzada-full shadow-sm">
+                </div>
+
+                <div class="card card-matriz-cruzada-full shadow-sm">
                     <h3>Matriz de Distribución por Grado y Situación</h3>
                     <div class="table-container">
                         <table class="matrix-cruzada">

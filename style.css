@@ -185,7 +185,6 @@ h1 {
     letter-spacing: 0.04em;
 }
 
-/* Layout vertical para la sección de Personal */
 .vertical-layout {
     display: flex;
     flex-direction: column;
@@ -239,7 +238,6 @@ h1 {
     cursor: not-allowed;
 }
 
-/* Fila de formulario en columnas */
 .form-row {
     display: flex;
     gap: 14px;
@@ -250,7 +248,6 @@ h1 {
     flex: 1;
 }
 
-/* Contenedor de botones del formulario */
 .form-buttons {
     margin-top: 6px;
 }
@@ -277,7 +274,6 @@ button:active {
     transform: scale(0.98);
 }
 
-/* Guardar / Enviar */
 .btn-submit {
     background-color: var(--secondary-color);
 }
@@ -286,7 +282,6 @@ button:active {
     background-color: #128f76;
 }
 
-/* Cancelar edición */
 .btn-cancel {
     background-color: #7f8c8d;
     margin-top: 6px;
@@ -296,7 +291,6 @@ button:active {
     background-color: #636e72;
 }
 
-/* Editar (en tabla) */
 .btn-edit {
     background-color: var(--accent-color);
     width: auto;
@@ -310,7 +304,6 @@ button:active {
     background-color: #1f6fa3;
 }
 
-/* Eliminar (en tabla) */
 .btn-delete {
     background-color: var(--danger-color);
     width: auto;
@@ -366,7 +359,6 @@ tbody tr:hover {
     background-color: #f4f7f9;
 }
 
-/* Insignia de número de orden */
 .badge-ord {
     display: inline-block;
     min-width: 24px;
@@ -399,17 +391,14 @@ tbody tr:hover {
 /* ============================================================
    REDISEÑO DE ALTA VISIBILIDAD PARA LA SECCIÓN DE PERSONAL
    ============================================================ */
-
-/* Forzar a que la sección de personal rompa el contenedor de 1300px y use todo el ancho disponible */
 .panel-section.section-personal {
     max-width: 100vw;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
-    border-radius: 0; /* Un diseño plano de borde a borde se ve más profesional para pantallas anchas */
+    border-radius: 0;
     padding: 30px;
 }
 
-/* Reestructurar el Grid de Personal de vertical a un layout ancho */
 .panel-section.section-personal .dashboard-grid.vertical-layout {
     display: flex;
     flex-direction: column;
@@ -417,7 +406,6 @@ tbody tr:hover {
     width: 100%;
 }
 
-/* Optimización de los bloques internos del formulario */
 .form-militar {
     display: flex;
     flex-direction: column;
@@ -430,7 +418,7 @@ tbody tr:hover {
     border: 1px solid #e2e8f0;
     border-radius: var(--radius-lg);
     padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .form-section-block h4 {
@@ -443,19 +431,17 @@ tbody tr:hover {
     padding-bottom: 6px;
 }
 
-/* Ajuste de filas para que los inputs ocupen el ancho de forma simétrica */
 .form-militar .form-row {
     display: flex;
-    flex-wrap: wrap; /* Permite adaptarse perfectamente si la pantalla se reduce */
+    flex-wrap: wrap;
     gap: 20px;
     width: 100%;
 }
 
 .form-militar .form-group {
-    margin-bottom: 0; /* Eliminamos el margen inferior individual ya que la fila maneja el gap */
+    margin-bottom: 0;
 }
 
-/* Forzar que los botones de acción se alineen limpiamente a la derecha */
 .militar-actions {
     display: flex;
     justify-content: flex-end;
@@ -470,45 +456,50 @@ tbody tr:hover {
     padding: 12px 24px;
 }
 
-/* ============================================================
-   TABLA DE PERSONAL EXPANDIDA
-   ============================================================ */
 .panel-section.section-personal .card.full-width {
     width: 100%;
     padding: 24px;
     background: #ffffff;
 }
 
-/* Forzar a la tabla a no comprimir los datos militares críticos */
 .panel-section.section-personal table {
     width: 100%;
     table-layout: auto;
 }
 
-.panel-section.section-personal th, 
+.panel-section.section-personal th,
 .panel-section.section-personal td {
-    padding: 12px 14px; /* Más espacio interno para facilitar la lectura de registros */
+    padding: 12px 14px;
     font-size: 13px;
 }
 
-/* Ajustes específicos de columnas para evitar saltos */
-.panel-section.section-personal td:nth-child(2) { font-family: monospace; font-size: 14px; } /* Cédula */
-.panel-section.section-personal td:nth-child(6) { font-weight: 600; min-width: 220px; } /* Nombres */
-.panel-section.section-personal td:nth-child(7) { min-width: 150px; } /* Función */
+.panel-section.section-personal td:nth-child(2) {
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.panel-section.section-personal td:nth-child(6) {
+    font-weight: 600;
+    min-width: 220px;
+}
+
+.panel-section.section-personal td:nth-child(7) {
+    min-width: 150px;
+}
+
 
 /* ============================================================
-   REORGANIZACIÓN ESTRUCTURAL DEL MÓDULO OPERACIONAL
+   REORGANIZACIÓN ESTRUCTURAL DEL MÓDULO OPERACIONAL Y CONTROL DE FALTAS
    ============================================================ */
 .panel-section.section-operacional {
     border-top: 5px solid #1abc9c;
     max-width: 100vw;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
-    border-radius: 0; 
+    border-radius: 0;
     padding: 30px;
 }
 
-/* Forzar el contenedor a ser un bloque vertical puro */
 .panel-section.section-operacional .dashboard-grid.vertical-layout {
     display: flex !important;
     flex-direction: column !important;
@@ -516,7 +507,6 @@ tbody tr:hover {
     gap: 25px !important;
 }
 
-/* FILA SUPERIOR: Tabla Asignación al lado de Matriz Resumen */
 .matrices-top-row {
     display: flex !important;
     gap: 20px !important;
@@ -525,22 +515,20 @@ tbody tr:hover {
     flex-wrap: wrap !important;
 }
 
-/* Proporciones de la fila superior */
 .card.card-control-asignacion {
-    flex: 1 1 0% !important; /* Toma todo el espacio dinámico disponible a la izquierda */
+    flex: 1 1 0% !important;
     min-width: 450px !important;
     background: #ffffff;
     padding: 20px !important;
 }
 
 .card.card-matriz-resumen {
-    flex: 0 0 350px !important; /* Ancho fijo y seguro a la derecha para que no sufra desbordes */
+    flex: 0 0 350px !important;
     width: 350px !important;
     background: #ffffff;
     padding: 20px !important;
 }
 
-/* FILA INFERIOR: Matriz Cruzada ocupando el total de la ventana */
 .card.card-matriz-cruzada-full {
     display: block !important;
     width: 100% !important;
@@ -550,46 +538,65 @@ tbody tr:hover {
     box-sizing: border-box;
 }
 
-/* Contenedores de tablas con scroll horizontal seguro */
 .panel-section.section-operacional .table-container {
     width: 100% !important;
-    overflow-x: auto !important; 
+    overflow-x: auto !important;
     border: 1px solid #e1e8ed;
     border-radius: var(--radius-sm);
     background: #ffffff;
 }
 
-/* Autoajuste dinámico de anchos basado en el texto de las columnas */
 .panel-section.section-operacional table {
     width: 100% !important;
-    table-layout: auto !important; 
+    table-layout: auto !important;
 }
 
-/* Estilos de celdas militares compactos */
 .panel-section.section-operacional th,
 .panel-section.section-operacional td {
-    padding: 8px 12px !important;   
-    text-align: center !important;  
-    font-size: 12.5px !important;   
-    white-space: nowrap !important; 
+    padding: 8px 12px !important;
+    text-align: center !important;
+    font-size: 12.5px !important;
+    vertical-align: middle !important;
 }
 
-/* Fijar columna de Grado a la izquierda en la matriz inferior */
+/* --- CONTROL DE TRUNCADO Y AJUSTE DE CELDAS DINÁMICAS --- */
+.card.card-control-asignacion td:nth-child(2),
+.card.card-control-asignacion td:nth-child(4) {
+    white-space: normal !important;
+    /* Rompe la línea para comprimir horizontalmente el tamaño de la tabla */
+    text-align: left !important;
+    min-width: 180px !important;
+    max-width: 250px !important;
+}
+
+.card.card-control-asignacion td:nth-child(1),
+.card.card-control-asignacion td:nth-child(3),
+.card.card-control-asignacion td:nth-child(5),
+.card.card-control-asignacion td:nth-child(6),
+.card.card-control-asignacion td:nth-child(7) {
+    white-space: nowrap !important;
+}
+
+.matrix-cruzada th,
+.matrix-cruzada td {
+    white-space: nowrap !important;
+}
+
 .panel-section.section-operacional .matrix-cruzada th:first-child,
 .panel-section.section-operacional .matrix-cruzada td:first-child {
     font-weight: bold;
     background: #f8fafc;
-    position: sticky; 
+    position: sticky;
     left: 0;
     z-index: 2;
     border-right: 2px solid #e1e8ed;
 }
 
-/* Columna de Estados alineada a la izquierda en la Matriz Resumen */
 .card.card-matriz-resumen tbody td:first-child {
     text-align: left !important;
     font-weight: 600;
     padding-left: 14px !important;
+    white-space: nowrap !important;
 }
 
 .card.card-matriz-resumen tbody tr:last-child {
@@ -597,12 +604,56 @@ tbody tr:hover {
     font-weight: bold;
 }
 
-/* Adaptación responsiva para monitores medianos o laptops */
+tr.row-funcionario-falto {
+    background-color: #fce8e6 !important;
+    color: #a81c1c !important;
+}
+
+tr.row-funcionario-falto td {
+    color: #a81c1c !important;
+    font-weight: 500;
+}
+
+.resaltado-presentacion-vencida {
+    background: #e74c3c;
+    color: #ffffff;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+}
+
+.alerta-pendiente-reincorporacion {
+    background-color: #c0392b;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+    animation: pulse-alerta 2s infinite;
+}
+
+@keyframes pulse-alerta {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 @media (max-width: 1100px) {
     .matrices-top-row {
         flex-direction: column !important;
     }
-    .card.card-control-asignacion, 
+
+    .card.card-control-asignacion,
     .card.card-matriz-resumen {
         width: 100% !important;
         flex: 1 1 100% !important;
