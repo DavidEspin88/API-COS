@@ -666,3 +666,192 @@ tr.row-funcionario-falto td {
         flex: 1 1 100% !important;
     }
 }
+/* ============================================================
+   ARQUITECTURA DE CONTENEDORES SPA (MENÚ LATERAL)
+   ============================================================ */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #F5F6FA;
+    color: #2C3E50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+/* MENÚ LATERAL INTERACTIVO */
+.sidebar {
+    width: 260px;
+    background-color: #2C3E50;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo-placeholder {
+    width: 50px;
+    height: 50px;
+    background: #1ABC9C;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0 auto 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+}
+
+.sidebar-header p {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    color: #1ABC9C;
+    font-weight: 500;
+}
+
+.sidebar-menu {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+/* BOTONES TABS DE LA SPA */
+.menu-tab {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 12px 24px;
+    color: #cbd5e1;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+    border-radius: 0;
+    margin: 2px 0;
+}
+
+.menu-tab:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.menu-tab.active {
+    background-color: rgba(26, 188, 156, 0.15);
+    color: #1ABC9C;
+    font-weight: 600;
+    border-left-color: #1ABC9C;
+}
+
+.menu-tab .icon {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ÁREA CENTRAL TRABAJO */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Previene deformación en tablas */
+}
+
+.main-header {
+    background: #ffffff;
+    padding: 15px 30px;
+    border-bottom: 1px solid #e1e8ed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #2C3E50;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-transform: uppercase;
+}
+
+.content-wrapper {
+    padding: 30px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* --- CLASES DE INTERRUPTOR SPA DE VISIBILIDAD --- */
+.tab-content {
+    display: none;
+    animation: fadeIn SPA 0.25s ease-in-out;
+}
+
+.tab-content.active {
+    display: block !important;
+}
+
+@keyframes fadeInSPA {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE RETROALIMENTACIÓN */
+@media (max-width: 900px) {
+    .app-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .sidebar-menu {
+        display: flex;
+        overflow-x: auto;
+        padding: 10px;
+    }
+    .menu-tab {
+        width: auto;
+        white-space: nowrap;
+        padding: 8px 16px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+    }
+    .menu-tab.active {
+        border-bottom-color: #1ABC9C;
+        border-left-color: transparent;
+    }
+}

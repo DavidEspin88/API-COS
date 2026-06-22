@@ -1,3 +1,54 @@
+// ============================================================
+// SISTEMA DE NAVEGACIÓN SPA (SINGLE PAGE APPLICATION)
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+    inicializarNavegacionSPA();
+});
+
+function inicializarNavegacionSPA() {
+    const tabs = document.querySelectorAll(".menu-tab");
+    const titleHeader = document.getElementById("current-module-title");
+
+    // 1. Cargar el último módulo visitado desde LocalStorage (Regla de persistencia opcional)
+    const ultimoModulo = localStorage.getItem("lastMilitarModule") || "municion";
+    showModule(ultimoModulo);
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const moduleId = tab.dataset.module;
+            showModule(moduleId);
+        });
+    });
+
+    function showModule(moduleId) {
+        // A. Ocultar de forma masiva todos los contenedores de módulos
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.classList.remove("active");
+            content.classList.add("hidden");
+        });
+
+        // B. Desactivar clases visuales activas en los botones de navegación
+        tabs.forEach(t => t.classList.remove("active"));
+
+        // C. Localizar y activar el módulo seleccionado
+        const targetContent = document.getElementById(`module-${moduleId}`);
+        const targetTab = document.querySelector(`.menu-tab[data-module="${moduleId}"]`);
+
+        if (targetContent && targetTab) {
+            targetContent.classList.remove("hidden");
+            targetContent.classList.add("active");
+            targetTab.classList.add("active");
+
+            // D. Actualizar el título dinámico de la cabecera general
+            titleHeader.innerText = "Sección de " + targetTab.textContent.replace(/[^\w\s\/\.ñÑáéíóúÁÉÍÓÚ]/g, '').trim();
+
+            // E. Guardar en memoria local
+            localStorage.setItem("lastMilitarModule", moduleId);
+        }
+    }
+}
+
+
 // REEMPLAZA CON TU URL DE DEPLOYMENT DE APPS SCRIPT
 const WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbxOFjWcL-NIb4HsshGL6fIdwZi9AeAX7p4xhKdP56H5Z3KcfO8m9CD3q7xGZIzRp_aTbw/exec";
