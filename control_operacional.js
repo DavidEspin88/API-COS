@@ -250,7 +250,7 @@ function renderizarPanelOperacional(personal) {
     let botonAccionHTML = "-";
     if (estadoActual !== "DISPONIBLE") {
       if (!filasDesbloqueadasSoloEstado[p.cedula]) {
-        botonAccionHTML = `<button type="button" class="btn-edit" style="padding:6px 10px; font-size:11px; margin:0; background:#9b59b6;" onclick="solicitarEdicionEstado('${p.cedula}', '${estadoActual}')">Editar Estado</button>`;
+        botonAccionHTML = `<button type="button" class="btn-edit" style="padding:6px 10px; font-size:12px; margin:0; background:#9b59b6;" onclick="solicitarEdicionEstado('${p.cedula}', '${estadoActual}')">Editar Estado</button>`;
       } else {
         botonAccionHTML = `<button type="button" class="btn-submit" style="padding:6px 10px; font-size:11px; margin:0; background:#27ae60;" onclick="cerrarEdicionEstado('${p.cedula}')">Listo</button>`;
       }
@@ -261,18 +261,18 @@ function renderizarPanelOperacional(personal) {
             <td>${p.grado}</td>
             <td>${p.apellidos_nombres}</td>
             <td>
-                <select class="select-table-embed" onchange="cambiarEstadoOperacional('${p.cedula}', this.value, '${estadoActual}')" style="padding:6px; border-radius:4px; width:100%; font-weight:bold;" ${selectEstadoDeshabilitado ? "disabled" : ""}>
+                <select class="select-table-embed" onchange="cambiarEstadoOperacional('${p.cedula}', this.value, '${estadoActual}')" style="padding:6px; border-radius:8px; width:100%;" ${selectEstadoDeshabilitado ? "disabled" : ""}>
                     ${optionsSelect}
                 </select>
             </td>
             <td>
-                <input type="date" value="${stringFechaInicio}" style="padding:6px; border-radius:4px; border:1px solid #ccc;" onchange="cambiarFechaRango('${p.cedula}', 'inicio', this.value)" ${inputsFechasDeshabilitados ? "disabled" : ""}>
+                <input type="date" value="${stringFechaInicio}" style="padding:6px; border-radius:8px; border:1px solid #ccc;" onchange="cambiarFechaRango('${p.cedula}', 'inicio', this.value)" ${inputsFechasDeshabilitados ? "disabled" : ""}>
             </td>
             <td>
                 <input type="date" value="${stringFechaFinal}" style="padding:6px; border-radius:4px; border:1px solid #ccc;" onchange="cambiarFechaRango('${p.cedula}', 'final', this.value)" ${inputsFechasDeshabilitados ? "disabled" : ""}>
             </td>
             <td>
-                <span class="${diasCalculados > 0 ? "badge-ord" : ""}" style="background:${diasCalculados > 0 ? (estadoActual === "FALTO" ? "#e74c3c" : "#2980b9") : "transparent"}; color:${diasCalculados > 0 ? "#fff" : "#000"}; font-weight:bold; padding:4px 8px; white-space: nowrap;">
+                <span class="${diasCalculados > 0 ? "badge-ord" : ""}" style="background:${diasCalculados > 0 ? (estadoActual === "FALTO" ? "#e74c3c" : "#2980b9") : "transparent"}; color:${diasCalculados > 0 ? "#fff" : "#000"};  padding:4px 8px; white-space: nowrap;">
                     ${diasCalculados} DÍAS
                 </span>
             </td>
@@ -293,7 +293,7 @@ async function solicitarEdicionEstado(cedula, estadoAnterior) {
 
   if (observacionBitacora === null || observacionBitacora.trim() === "") {
     alert(
-      "❌ Operación cancelada. Es obligatorio ingresar una autorización administrativa para auditar.",
+    ` <Operación cancelada. Es obligatorio ingresar una autorización administrativa para auditar.`,
     );
     return;
   }
@@ -489,9 +489,9 @@ function calcularYRenderizarMatrices(personal) {
   let sumaEstadosVerificacion = 0;
   estadosDisponibles.forEach((est) => {
     sumaEstadosVerificacion += conteoEstados[est];
-    tbodyResumen.innerHTML += `<tr><td><strong>${est}</strong></td><td>${conteoEstados[est]}</td></tr>`;
+    tbodyResumen.innerHTML += `<tr><td>${est}</td><td>${conteoEstados[est]}</td></tr>`;
   });
-  tbodyResumen.innerHTML += `<tr><td>TOTAL PERSONAL</td><td>${sumaEstadosVerificacion}</td></tr>`;
+  tbodyResumen.innerHTML += `<tr><td><strong>TOTAL PERSONAL</strong></td><td><strong>${sumaEstadosVerificacion}</strong></td></tr>`;
 
   const theadCruzado = document.getElementById("thead-matriz-cruzada");
   const tbodyCruzado = document.getElementById("table-body-matriz-cruzada");
