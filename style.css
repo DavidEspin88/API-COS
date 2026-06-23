@@ -63,6 +63,29 @@ h1 {
     font-size: 1.4rem;
     margin: 0;
 }
+/* ============================================================
+   IMAGEN DE FONDO ENCABEZADO
+   ============================================================ */
+/* ============================================================
+   IMAGEN DE FONDO ENCABEZADO (HERO BANNER PROPORCIONAL)
+   ============================================================ */
+.img-encabezado {
+    width: 100%;
+    height: 100px; /* Altura estricta solicitada */
+    background-color: var(--primary-color); /* Fondo oscuro de respaldo institucional */
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 -5px 15px rgba(0,0,0,0.1);
+}
+
+.img-encabezado img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Escala y justifica la imagen al 100% del ancho sin estirarla */
+    object-position: center 50%; /* Enfoca el cuadrante superior del radar indra */
+    opacity: 0.2; /* Opacidad controlada sutil sugerida */
+    display: block;
+}
 
 /* ============================================================
    BARRA LATERAL INTERACTIVA (SIDEBAR)
@@ -87,8 +110,8 @@ h1 {
 }
 
 .logo-placeholder {
-    width: 65px;
-    height: 65px;
+    width: 150px;
+    height: 150px;
     background: #ffffff;
     border-radius: 50%;
     display: flex;
@@ -110,14 +133,14 @@ h1 {
 
 .sidebar-header h2 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     letter-spacing: 0.05em;
 }
 
 .sidebar-header p {
     margin: 4px 0 0;
-    font-size: 0.8rem;
-    color: var(--secondary-color);
+    font-size: 1rem;
+    color: #ffffff;
     font-weight: 500;
 }
 
@@ -377,6 +400,10 @@ button:active {
 
 .btn-delete:hover {
     background-color: #c0392b;
+}
+
+.btn-page{
+    color:#1f6fa3;
 }
 
 /* ============================================================
