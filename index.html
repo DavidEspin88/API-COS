@@ -6,12 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Militar - Control Integrado Logístico y Operacional</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
-<div class="img-encabezado">
-    <img src="imagenes/SistemasAntidronesIndraReducida.jpg" alt="radar indra" >
-</div>
+
     <div class="app-layout">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -23,31 +22,31 @@
             </div>
             <nav class="sidebar-menu">
                 <button type="button" class="menu-tab active" data-module="municion">
-                    <span class="icon">📦</span> Munición
+                    <span class="icon"><i class="fa-solid fa-helmet-safety"></i></span> Munición
                 </button>
                 <button type="button" class="menu-tab" data-module="armamento">
-                    <span class="icon">⚔️</span> Armamento
+                    <span class="icon"><i class="fa-solid fa-gun"></i></span> Armamento
                 </button>
                 <button type="button" class="menu-tab" data-module="grado">
-                    <span class="icon">🦅</span> Grado Milit.
+                    <span class="icon"><i class="fa-solid fa-person-military-rifle"></i></span> Registrar Grado Militar
                 </button>
                 <button type="button" class="menu-tab" data-module="funcion">
-                    <span class="icon">👔</span> Función / Cargo
+                    <span class="icon"><i class="fa-solid fa-building-user"></i></span> Registrar Función / Cargo
                 </button>
                 <button type="button" class="menu-tab" data-module="lugar">
-                    <span class="icon">📍</span> Reparto / Lugar
+                    <span class="icon"><i class="fa-sharp-duotone fa-solid fa-earth-americas"></i></span> Lugar Operacion
                 </button>
                 <button type="button" class="menu-tab" data-module="especialidad">
-                    <span class="icon">🛠️</span> Especialidad
+                    <span class="icon"><i class="fa-solid fa-screwdriver-wrench"></i></span> Registrar Especialidad
                 </button>
                 <button type="button" class="menu-tab" data-module="registro_personal">
-                    <span class="icon">👥</span> Reg. Personal
+                    <span class="icon"><i class="fa-duotone fa-solid fa-circle-user"></i></span> Registrar Personal
                 </button>
                 <button type="button" class="menu-tab" data-module="estado">
-                    <span class="icon">⚙️</span> Estados Catál.
+                    <span class="icon"><i class="fa-solid fa-gear"></i></span> Registrar Estados
                 </button>
                 <button type="button" class="menu-tab" data-module="parte_diario">
-                    <span class="icon">📊</span> Parte Diario
+                    <span class="icon"><i class="fa-solid fa-chart-line"></i></span> Parte Diario
                 </button>
             </nav>
             <div class="sidebar-footer">
@@ -56,13 +55,17 @@
         </aside>
 
         <main class="main-content">
+            
+            <div class="img-encabezado">
+                <img src="imagenes/SistemasAntidronesIndraReducida.jpg" alt="radar indra">
+            </div>
+
             <header class="main-header">
                 <h1 id="current-module-title">Sección de Munición</h1>
                 <div id="loading-text" class="loading">Sincronizando Base de Datos de Google Sheets...</div>
             </header>
 
             <div class="content-wrapper">
-
                 <section id="module-municion" class="tab-content active">
                     <div class="dashboard-grid">
                         <div class="card">
