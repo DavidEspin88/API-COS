@@ -427,14 +427,18 @@ function calcularYRenderizarMatrices(personal) {
     const reg = mapaEstadosPersonal[p.cedula];
     const est = reg ? reg.id_estado : estadosDisponibles[0];
     if (conteoEstados[est] !== undefined) conteoEstados[est]++;
-    if (!conteoCruzado[p.grado]) {
-      conteoCruzado[p.grado] = {};
-      estadosDisponibles.forEach((e) => (conteoCruzado[p.grado][e] = 0));
+
+    const gradoLimpio = p.grado ? String(p.grado).trim().toUpperCase() : "SIN GRADO";
+
+    if (!conteoCruzado[gradoLimpio]) {
+      conteoCruzado[gradoLimpio] = {};
+      estadosDisponibles.forEach((e) => (conteoCruzado[gradoLimpio][e] = 0));
     }
-    if (conteoCruzado[p.grado][est] !== undefined)
-      conteoCruzado[p.grado][est]++;
+    if (conteoCruzado[gradoLimpio][est] !== undefined)
+      conteoCruzado[gradoLimpio][est]++;
   });
 
+  // 1. Renderizar Matriz Resumen de Estados
   const tbodyResumen = document.getElementById("table-body-matriz-resumen");
   tbodyResumen.innerHTML = "";
   let sumaEstadosVerificacion = 0;
@@ -444,23 +448,52 @@ function calcularYRenderizarMatrices(personal) {
   });
   tbodyResumen.innerHTML += `<tr><td>TOTAL PERSONAL</td><td>${sumaEstadosVerificacion}</td></tr>`;
 
+  // 2. Renderizar Matriz Cruzada de Distribución con Fila de Totales de Alta Visibilidad
   const theadCruzado = document.getElementById("thead-matriz-cruzada");
   const tbodyCruzado = document.getElementById("table-body-matriz-cruzada");
+
   theadCruzado.innerHTML = `<tr><th>Grado</th>${estadosDisponibles.map((e) => `<th>${e}</th>`).join("")}<th>Total</th></tr>`;
   tbodyCruzado.innerHTML = "";
 
+  // --- ARREGLOS DE ACUMULACIÓN VERTICAL (NUEVA REGLA LOGÍSTICA) ---
+  let totalesColumnas = {};
+  estadosDisponibles.forEach((est) => (totalesColumnas[est] = 0));
+  let granTotalGeneral = 0;
+
+  // Renderizar filas por cada grado militar
   Object.keys(conteoCruzado).forEach((grado) => {
     let totalFilaGrado = 0;
     let celdasResultantes = estadosDisponibles
       .map((est) => {
-        const val = conteoCruzado[grado][est];
+        const val = conteoCruzado[grado][est] || 0;
         totalFilaGrado += val;
+        totalesColumnas[est] += val; // Suma acumulativa vertical por columna
         return `<td>${val}</td>`;
       })
       .join("");
+
+    granTotalGeneral += totalFilaGrado;
     tbodyCruzado.innerHTML += `<tr><td><strong>${grado}</strong></td>${celdasResultantes}<td style="font-weight:bold; background:#f8fafc;">${totalFilaGrado}</td></tr>`;
   });
 
+  // --- CONSTRUCCIÓN E INYECCIÓN DE LA FILA FINAL DE TOTALES ---
+  let celdasTotalesVerticales = estadosDisponibles
+    .map((est) => {
+      const sumaColumna = totalesColumnas[est];
+      return `<td style="font-weight: bold; background-color: #e2e8f0; color: #2c3e50;">${sumaColumna}</td>`;
+    })
+    .join("");
+
+  // Fila de cierre idéntica al Parte Diario de Google Sheets
+  tbodyCruzado.innerHTML += `
+    <tr style="background-color: #e2e8f0; font-weight: bold; border-top: 2px solid #cbd5e1;">
+      <td style="background: #e2e8f0; color: #2c3e50; font-weight: bold; position: sticky; left: 0; z-index: 2;">TOTAL</td>
+      ${celdasTotalesVerticales}
+      <td style="background-color: #cbd5e1; color: #2c3e50; font-weight: bold;">${granTotalGeneral}</td>
+    </tr>
+  `;
+
+  // 3. Validación de Sincronización del Badge
   const badge = document.getElementById("validation-status-badge");
   if (sumaEstadosVerificacion === totalPersonal) {
     badge.className = "validation-badge success";

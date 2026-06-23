@@ -26,7 +26,6 @@
     --transition: 0.25s ease;
 }
 
-
 /* ============================================================
    RESET Y BASE
    ============================================================ */
@@ -41,110 +40,186 @@ body {
     font-size: 14px;
     line-height: 1.5;
     margin: 0;
-    padding: 24px 20px;
+    padding: 0;
+    /* Ajustado a 0 debido al layout SPA del menú lateral */
     background-color: var(--light-color);
     color: var(--primary-color);
+    overflow-x: hidden;
 }
 
-
 /* ============================================================
-   LAYOUT PRINCIPAL
+   LAYOUT PRINCIPAL SPA
    ============================================================ */
-.container {
-    max-width: 1300px;
-    margin: 0 auto;
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
 }
 
 h1 {
     color: var(--primary-color);
-    text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 1.5rem;
-    margin: 0 0 32px;
-    padding-bottom: 16px;
-    border-bottom: 4px solid var(--accent-color);
+    font-size: 1.4rem;
+    margin: 0;
 }
 
-
 /* ============================================================
-   PANEL / SECCIÓN
+   BARRA LATERAL INTERACTIVA (SIDEBAR)
    ============================================================ */
-.panel-section {
+.sidebar {
+    width: 260px;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-placeholder {
+    width: 65px;
+    height: 65px;
     background: #ffffff;
-    padding: 24px;
-    border-radius: var(--radius-lg);
-    margin-bottom: 32px;
-    box-shadow: var(--shadow-card);
-    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border: 2px solid var(--secondary-color);
 }
 
-.panel-section>h2 {
-    margin: 0 0 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--accent-color);
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e8ecef;
-}
-
-/* Colores de borde superior por sección */
-.panel-section.section-grado {
-    border-top-color: var(--color-grado);
-}
-
-.panel-section.section-grado>h2 {
-    color: var(--color-grado);
-}
-
-.panel-section.section-funcion {
-    border-top-color: var(--color-funcion);
-}
-
-.panel-section.section-funcion>h2 {
-    color: var(--color-funcion);
-}
-
-.panel-section.section-lugar {
-    border-top-color: var(--color-lugar);
-}
-
-.panel-section.section-lugar>h2 {
-    color: var(--color-lugar);
-}
-
-.panel-section.section-especialidad {
-    border-top-color: var(--color-especialidad);
-}
-
-.panel-section.section-especialidad>h2 {
-    color: var(--color-especialidad);
-}
-
-.panel-section.section-personal {
-    border-top-color: var(--color-personal);
-}
-
-.panel-section.section-personal>h2 {
-    color: var(--color-personal);
-}
-
-.panel-section.section-estado {
-    border-top-color: var(--color-estado);
-}
-
-.panel-section.section-estado>h2 {
-    color: var(--color-estado);
-}
-
-
-/* ============================================================
-   GRID DE TARJETAS (formulario + tabla)
-   ============================================================ */
-.dashboard-grid {
+.logo-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
     display: block;
 }
 
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+}
+
+.sidebar-header p {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.sidebar-menu {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+/* BOTONES PESTAÑAS (TABS NAVEGACIÓN) */
+.menu-tab {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 12px 24px;
+    color: #cbd5e1;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+    border-radius: 0;
+    margin: 2px 0;
+}
+
+.menu-tab:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.menu-tab.active {
+    background-color: rgba(24, 188, 156, 0.15);
+    color: var(--secondary-color);
+    font-weight: 600;
+    border-left-color: var(--secondary-color);
+}
+
+.menu-tab .icon {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   MAIN CONTENT AREA
+   ============================================================ */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.main-header {
+    background: #ffffff;
+    padding: 15px 30px;
+    border-bottom: 1px solid #e1e8ed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content-wrapper {
+    padding: 30px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* INTERRUPTORES DE VISIBILIDAD SPA */
+.tab-content {
+    display: none;
+    animation: fadeInSPA 0.25s ease-in-out;
+}
+
+.tab-content.active {
+    display: block !important;
+}
+
+@keyframes fadeInSPA {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   GRID DE TARJETAS Y CONTENEDORES MÓDULOS
+   ============================================================ */
 @media (min-width: 850px) {
     .dashboard-grid {
         display: table;
@@ -156,7 +231,6 @@ h1 {
     .dashboard-grid .card {
         display: table-cell;
         vertical-align: top;
-        margin-bottom: 0;
     }
 
     .dashboard-grid .card:first-child {
@@ -190,11 +264,6 @@ h1 {
     flex-direction: column;
     gap: 20px;
 }
-
-.card.full-width {
-    grid-column: 1 / -1;
-}
-
 
 /* ============================================================
    FORMULARIOS
@@ -241,20 +310,14 @@ h1 {
 .form-row {
     display: flex;
     gap: 14px;
-    margin-bottom: 0;
 }
 
 .form-row .form-group {
     flex: 1;
 }
 
-.form-buttons {
-    margin-top: 6px;
-}
-
-
 /* ============================================================
-   BOTONES
+   BOTONES Y ACCIONES
    ============================================================ */
 button {
     display: inline-block;
@@ -316,14 +379,13 @@ button:active {
     background-color: #c0392b;
 }
 
-
 /* ============================================================
-   TABLAS
+   TABLAS Y MATRICES
    ============================================================ */
 .table-container {
     overflow-x: auto;
-    border-radius: var(--radius-sm);
     border: 1px solid #e1e8ed;
+    border-radius: var(--radius-sm);
 }
 
 table {
@@ -351,10 +413,6 @@ tbody td {
     color: var(--primary-color);
 }
 
-tbody tr:last-child td {
-    border-bottom: none;
-}
-
 tbody tr:hover {
     background-color: #f4f7f9;
 }
@@ -371,208 +429,47 @@ tbody tr:hover {
     text-align: center;
 }
 
-
 /* ============================================================
-   INDICADOR DE CARGA
+   MÓDULO OPERACIONAL Y REPORTES DIARIOS
    ============================================================ */
-.loading {
-    display: none;
-    text-align: center;
-    font-style: italic;
-    font-weight: 600;
-    color: var(--accent-color);
-    margin-bottom: 16px;
-    padding: 10px;
-    background: rgba(41, 128, 185, 0.07);
-    border-radius: var(--radius-sm);
-    border-left: 3px solid var(--accent-color);
-}
-
-/* ============================================================
-   REDISEÑO DE ALTA VISIBILIDAD PARA LA SECCIÓN DE PERSONAL
-   ============================================================ */
-.panel-section.section-personal {
-    max-width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    border-radius: 0;
-    padding: 30px;
-}
-
-.panel-section.section-personal .dashboard-grid.vertical-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    width: 100%;
-}
-
-.form-militar {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-}
-
-.form-section-block {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-}
-
-.form-section-block h4 {
-    margin: 0 0 16px 0;
-    font-size: 13px;
-    color: var(--accent-color);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 6px;
-}
-
-.form-militar .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    width: 100%;
-}
-
-.form-militar .form-group {
-    margin-bottom: 0;
-}
-
-.militar-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    max-width: none;
-    align-self: stretch;
-}
-
-.militar-actions button {
-    width: auto;
-    min-width: 180px;
-    padding: 12px 24px;
-}
-
-.panel-section.section-personal .card.full-width {
-    width: 100%;
-    padding: 24px;
-    background: #ffffff;
-}
-
-.panel-section.section-personal table {
-    width: 100%;
-    table-layout: auto;
-}
-
-.panel-section.section-personal th,
-.panel-section.section-personal td {
-    padding: 12px 14px;
-    font-size: 13px;
-}
-
-.panel-section.section-personal td:nth-child(2) {
-    font-family: monospace;
-    font-size: 14px;
-}
-
-.panel-section.section-personal td:nth-child(6) {
-    font-weight: 600;
-    min-width: 220px;
-}
-
-.panel-section.section-personal td:nth-child(7) {
-    min-width: 150px;
-}
-
-
-/* ============================================================
-   REORGANIZACIÓN ESTRUCTURAL DEL MÓDULO OPERACIONAL Y CONTROL DE FALTAS
-   ============================================================ */
-.panel-section.section-operacional {
-    border-top: 5px solid #1abc9c;
-    max-width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    border-radius: 0;
-    padding: 30px;
-}
-
-.panel-section.section-operacional .dashboard-grid.vertical-layout {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 25px !important;
-}
-
 .matrices-top-row {
-    display: flex !important;
-    gap: 20px !important;
-    width: 100% !important;
-    align-items: flex-start !important;
-    flex-wrap: wrap !important;
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .card.card-control-asignacion {
-    flex: 1 1 0% !important;
-    min-width: 450px !important;
+    flex: 1 1 0%;
+    min-width: 450px;
     background: #ffffff;
-    padding: 20px !important;
 }
 
 .card.card-matriz-resumen {
-    flex: 0 0 350px !important;
-    width: 350px !important;
+    flex: 0 0 350px;
+    width: 350px;
     background: #ffffff;
-    padding: 20px !important;
 }
 
 .card.card-matriz-cruzada-full {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
     background: #ffffff;
-    padding: 24px !important;
-    box-sizing: border-box;
+    padding: 24px;
 }
 
-.panel-section.section-operacional .table-container {
-    width: 100% !important;
-    overflow-x: auto !important;
-    border: 1px solid #e1e8ed;
-    border-radius: var(--radius-sm);
-    background: #ffffff;
-}
-
-.panel-section.section-operacional table {
-    width: 100% !important;
-    table-layout: auto !important;
-}
-
-.panel-section.section-operacional th,
-.panel-section.section-operacional td {
-    padding: 8px 12px !important;
-    text-align: center !important;
-    font-size: 12.5px !important;
-    vertical-align: middle !important;
-}
-
-/* --- CONTROL DE TRUNCADO Y AJUSTE DE CELDAS DINÁMICAS --- */
-/* --- CONTROL DE TRUNCADO Y AJUSTE DE CELDAS DINÁMICAS (NUEVO ORDEN) --- */
 .card.card-control-asignacion td:nth-child(3) {
-    white-space: normal !important;  
-    text-align: left !important;     
-    min-width: 180px !important;     
-    max-width: 240px !important;     
+    white-space: normal !important;
+    text-align: left !important;
+    min-width: 180px !important;
+    max-width: 240px !important;
 }
 
-.card.card-control-asignacion td:nth-child(7) {
-    white-space: normal !important;  
-    text-align: center !important;     
-    min-width: 160px !important;     
-    max-width: 220px !important;     
+.card.card-control-asignacion td:nth-child(8) {
+    white-space: normal !important;
+    text-align: center !important;
+    min-width: 160px !important;
+    max-width: 220px !important;
 }
 
 .card.card-control-asignacion td:nth-child(1),
@@ -580,17 +477,19 @@ tbody tr:hover {
 .card.card-control-asignacion td:nth-child(4),
 .card.card-control-asignacion td:nth-child(5),
 .card.card-control-asignacion td:nth-child(6),
-.card.card-control-asignacion td:nth-child(8) {
+.card.card-control-asignacion td:nth-child(7),
+.card.card-control-asignacion td:nth-child(9) {
     white-space: nowrap !important;
 }
 
 .matrix-cruzada th,
 .matrix-cruzada td {
     white-space: nowrap !important;
+    text-align: center;
 }
 
-.panel-section.section-operacional .matrix-cruzada th:first-child,
-.panel-section.section-operacional .matrix-cruzada td:first-child {
+.matrix-cruzada th:first-child,
+.matrix-cruzada td:first-child {
     font-weight: bold;
     background: #f8fafc;
     position: sticky;
@@ -600,10 +499,9 @@ tbody tr:hover {
 }
 
 .card.card-matriz-resumen tbody td:first-child {
-    text-align: left !important;
+    text-align: left;
     font-weight: 600;
-    padding-left: 14px !important;
-    white-space: nowrap !important;
+    white-space: nowrap;
 }
 
 .card.card-matriz-resumen tbody tr:last-child {
@@ -613,7 +511,6 @@ tbody tr:hover {
 
 tr.row-funcionario-falto {
     background-color: #fce8e6 !important;
-    color: #a81c1c !important;
 }
 
 tr.row-funcionario-falto td {
@@ -621,16 +518,8 @@ tr.row-funcionario-falto td {
     font-weight: 500;
 }
 
-.resaltado-presentacion-vencida {
-    background: #e74c3c;
-    color: #ffffff;
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-    font-weight: bold;
-}
-
 .alerta-pendiente-reincorporacion {
-    background-color: #c0392b;
+    background-color: var(--danger-color);
     color: white;
     padding: 3px 8px;
     border-radius: 12px;
@@ -655,194 +544,47 @@ tr.row-funcionario-falto td {
     }
 }
 
+.loading {
+    display: none;
+    text-align: center;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--accent-color);
+    padding: 10px;
+    background: rgba(41, 128, 185, 0.07);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent-color);
+}
+
 @media (max-width: 1100px) {
     .matrices-top-row {
-        flex-direction: column !important;
+        flex-direction: column;
     }
 
     .card.card-control-asignacion,
     .card.card-matriz-resumen {
-        width: 100% !important;
-        flex: 1 1 100% !important;
+        width: 100%;
+        flex: 1 1 100%;
     }
 }
-/* ============================================================
-   ARQUITECTURA DE CONTENEDORES SPA (MENÚ LATERAL)
-   ============================================================ */
-body {
-    margin: 0;
-    padding: 0;
-    background-color: #F5F6FA;
-    color: #2C3E50;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden;
-}
 
-.app-layout {
-    display: flex;
-    min-height: 100vh;
-    width: 100vw;
-}
-
-/* MENÚ LATERAL INTERACTIVO */
-.sidebar {
-    width: 260px;
-    background-color: #2C3E50;
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-    z-index: 100;
-}
-
-.sidebar-header {
-    padding: 24px 20px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.logo-placeholder {
-    width: 50px;
-    height: 50px;
-    background: #1ABC9C;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin: 0 auto 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-.sidebar-header h2 {
-    margin: 0;
-    font-size: 1.1rem;
-    letter-spacing: 0.05em;
-}
-
-.sidebar-header p {
-    margin: 4px 0 0;
-    font-size: 0.8rem;
-    color: #1ABC9C;
-    font-weight: 500;
-}
-
-.sidebar-menu {
-    flex: 1;
-    padding: 20px 0;
-    overflow-y: auto;
-}
-
-/* BOTONES TABS DE LA SPA */
-.menu-tab {
-    width: 100%;
-    background: transparent;
-    border: none;
-    padding: 12px 24px;
-    color: #cbd5e1;
-    text-align: left;
-    font-size: 0.9rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    border-left: 4px solid transparent;
-    transition: all 0.2s ease;
-    border-radius: 0;
-    margin: 2px 0;
-}
-
-.menu-tab:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
-}
-
-.menu-tab.active {
-    background-color: rgba(26, 188, 156, 0.15);
-    color: #1ABC9C;
-    font-weight: 600;
-    border-left-color: #1ABC9C;
-}
-
-.menu-tab .icon {
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-}
-
-.sidebar-footer {
-    padding: 15px 20px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-/* ÁREA CENTRAL TRABAJO */
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0; /* Previene deformación en tablas */
-}
-
-.main-header {
-    background: #ffffff;
-    padding: 15px 30px;
-    border-bottom: 1px solid #e1e8ed;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.main-header h1 {
-    margin: 0;
-    font-size: 1.3rem;
-    color: #2C3E50;
-    border-bottom: none;
-    padding-bottom: 0;
-    text-transform: uppercase;
-}
-
-.content-wrapper {
-    padding: 30px;
-    flex: 1;
-    overflow-y: auto;
-}
-
-/* --- CLASES DE INTERRUPTOR SPA DE VISIBILIDAD --- */
-.tab-content {
-    display: none;
-    animation: fadeIn SPA 0.25s ease-in-out;
-}
-
-.tab-content.active {
-    display: block !important;
-}
-
-@keyframes fadeInSPA {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* RESPONSIVE RETROALIMENTACIÓN */
 @media (max-width: 900px) {
     .app-layout {
         flex-direction: column;
     }
+
     .sidebar {
         width: 100%;
         height: auto;
         position: relative;
     }
+
     .sidebar-menu {
         display: flex;
         overflow-x: auto;
         padding: 10px;
     }
+
     .menu-tab {
         width: auto;
         white-space: nowrap;
@@ -850,8 +592,8 @@ body {
         border-left: none;
         border-bottom: 3px solid transparent;
     }
+
     .menu-tab.active {
-        border-bottom-color: #1ABC9C;
-        border-left-color: transparent;
+        border-bottom-color: var(--secondary-color);
     }
 }
