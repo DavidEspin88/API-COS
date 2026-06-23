@@ -94,7 +94,7 @@ function renderizarPanelOperacional(personal) {
           const anioF = parseInt(partes[2]);
 
           if (mesF !== -1 && !isNaN(diaF) && !isNaN(anioF)) {
-            const fechaLimiteFalto = new Date(anioF, mesF, diaF, 9, 0, 0);
+            const fechaLimiteFalto = new Date(anioF, mesF, diaF + 1, 9, 0, 0);
 
             if (ahora >= fechaLimiteFalto) {
               const d1 = new Date(
@@ -102,7 +102,7 @@ function renderizarPanelOperacional(personal) {
                 ahora.getMonth(),
                 ahora.getDate(),
               );
-              const d2 = new Date(anioF, mesF, diaF);
+              const d2 = new Date(anioF, mesF, diaF + 1);
 
               const diferenciaTiempo = d1.getTime() - d2.getTime();
               const diasDiferencia = Math.floor(
@@ -239,8 +239,6 @@ function renderizarPanelOperacional(personal) {
       }
     }
 
-    // --- CORRECCIÓN CLAVE: CAMPO OBSERVACIÓN SIEMPRE DISPONIBLE E INPUT PARA TODOS ---
-    // Si es DISPONIBLE e inicia limpio, muestra "SIN NOVEDAD" pero te permite escribir encima
     let valorObservacionActual = registro.observacion || "";
     if (estadoActual === "DISPONIBLE" && valorObservacionActual === "") {
       valorObservacionActual = "SIN NOVEDAD";
@@ -287,21 +285,67 @@ function renderizarPanelOperacional(personal) {
   calcularYRenderizarMatrices(personal);
 }
 
-function solicitarEdicionEstado(cedula, estadoAnterior) {
+// --- ADAPTADO: AUDITORÍA DIRECTA E INSTANTÁNEA EN BITÁCORA ---
+async function solicitarEdicionEstado(cedula, estadoAnterior) {
   const observacionBitacora = prompt(
     `Para auditar el cambio de "Editar Estado", ingrese la AUTORIZACIÓN ADMINISTRATIVA u Observación:`,
   );
-  if (observacionBitacora === null) return;
 
+  if (observacionBitacora === null || observacionBitacora.trim() === "") {
+    alert(
+      "❌ Operación cancelada. Es obligatorio ingresar una autorización administrativa para auditar.",
+    );
+    return;
+  }
+
+  const registro = mapaEstadosPersonal[cedula];
+
+  // Armar el payload de auditoría inmediata para este militar individual
+  const payloadAuditoriaDirecta = {
+    target: "control_operacional",
+    action: "save_matrix",
+    registros: [
+      {
+        cedula: String(cedula),
+        grado: registro.grado || "",
+        apellidos_nombres: registro.apellidos_nombres,
+        id_estado: registro.id_estado,
+        fecha_presentacion: registro.fecha_presentacion || "-",
+        fecha_reincorporacion: registro.fecha_reincorporacion || "-",
+        dias_falto: parseInt(registro.dias_falto) || 0,
+        observacion: registro.observacion || "SIN NOVEDAD",
+        audit_realizado: true, // Forzar escritura en la pestaña BITACORA_AUDITORIA
+        audit_anterior: estadoAnterior,
+        audit_nuevo: "SOLICITUD EDICIÓN (DESBLOQUEO)",
+        audit_observacion: observacionBitacora.toUpperCase(),
+      },
+    ],
+  };
+
+  // Desbloquear el control en la interfaz del usuario
   filasDesbloqueadasSoloEstado[cedula] = true;
-  mapaEstadosPersonal[cedula].observacion_auditoria = observacionBitacora;
+  registro.observacion_auditoria = observacionBitacora;
 
-  if (window.datosPersonalGlobal)
-    renderizarPanelOperacional(window.datosPersonalGlobal);
+  // Ejecución asíncrona inmediata hacia el servidor de Google Apps Script
+  if (typeof sendData === "function") {
+    sendData(payloadAuditoriaDirecta, () => {
+      console.log(
+        `✔ Auditoría directa registrada en la nube para la CC: ${cedula}`,
+      );
+      if (window.datosPersonalGlobal) {
+        renderizarPanelOperacional(window.datosPersonalGlobal);
+      }
+    });
+  }
 }
 
 function cerrarEdicionEstado(cedula) {
   filasDesbloqueadasSoloEstado[cedula] = false;
+  if (mapaEstadosPersonal[cedula]) {
+    delete mapaEstadosPersonal[cedula].audit_estado_anterior;
+    delete mapaEstadosPersonal[cedula].audit_estado_nuevo;
+    delete mapaEstadosPersonal[cedula].observacion_auditoria;
+  }
   if (window.datosPersonalGlobal)
     renderizarPanelOperacional(window.datosPersonalGlobal);
 }
@@ -428,7 +472,9 @@ function calcularYRenderizarMatrices(personal) {
     const est = reg ? reg.id_estado : estadosDisponibles[0];
     if (conteoEstados[est] !== undefined) conteoEstados[est]++;
 
-    const gradoLimpio = p.grado ? String(p.grado).trim().toUpperCase() : "SIN GRADO";
+    const gradoLimpio = p.grado
+      ? String(p.grado).trim().toUpperCase()
+      : "SIN GRADO";
 
     if (!conteoCruzado[gradoLimpio]) {
       conteoCruzado[gradoLimpio] = {};
@@ -438,7 +484,6 @@ function calcularYRenderizarMatrices(personal) {
       conteoCruzado[gradoLimpio][est]++;
   });
 
-  // 1. Renderizar Matriz Resumen de Estados
   const tbodyResumen = document.getElementById("table-body-matriz-resumen");
   tbodyResumen.innerHTML = "";
   let sumaEstadosVerificacion = 0;
@@ -448,26 +493,23 @@ function calcularYRenderizarMatrices(personal) {
   });
   tbodyResumen.innerHTML += `<tr><td>TOTAL PERSONAL</td><td>${sumaEstadosVerificacion}</td></tr>`;
 
-  // 2. Renderizar Matriz Cruzada de Distribución con Fila de Totales de Alta Visibilidad
   const theadCruzado = document.getElementById("thead-matriz-cruzada");
   const tbodyCruzado = document.getElementById("table-body-matriz-cruzada");
 
   theadCruzado.innerHTML = `<tr><th>Grado</th>${estadosDisponibles.map((e) => `<th>${e}</th>`).join("")}<th>Total</th></tr>`;
   tbodyCruzado.innerHTML = "";
 
-  // --- ARREGLOS DE ACUMULACIÓN VERTICAL (NUEVA REGLA LOGÍSTICA) ---
   let totalesColumnas = {};
   estadosDisponibles.forEach((est) => (totalesColumnas[est] = 0));
   let granTotalGeneral = 0;
 
-  // Renderizar filas por cada grado militar
   Object.keys(conteoCruzado).forEach((grado) => {
     let totalFilaGrado = 0;
     let celdasResultantes = estadosDisponibles
       .map((est) => {
         const val = conteoCruzado[grado][est] || 0;
         totalFilaGrado += val;
-        totalesColumnas[est] += val; // Suma acumulativa vertical por columna
+        totalesColumnas[est] += val;
         return `<td>${val}</td>`;
       })
       .join("");
@@ -476,7 +518,6 @@ function calcularYRenderizarMatrices(personal) {
     tbodyCruzado.innerHTML += `<tr><td><strong>${grado}</strong></td>${celdasResultantes}<td style="font-weight:bold; background:#f8fafc;">${totalFilaGrado}</td></tr>`;
   });
 
-  // --- CONSTRUCCIÓN E INYECCIÓN DE LA FILA FINAL DE TOTALES ---
   let celdasTotalesVerticales = estadosDisponibles
     .map((est) => {
       const sumaColumna = totalesColumnas[est];
@@ -484,7 +525,6 @@ function calcularYRenderizarMatrices(personal) {
     })
     .join("");
 
-  // Fila de cierre idéntica al Parte Diario de Google Sheets
   tbodyCruzado.innerHTML += `
     <tr style="background-color: #e2e8f0; font-weight: bold; border-top: 2px solid #cbd5e1;">
       <td style="background: #e2e8f0; color: #2c3e50; font-weight: bold; position: sticky; left: 0; z-index: 2;">TOTAL</td>
@@ -493,7 +533,6 @@ function calcularYRenderizarMatrices(personal) {
     </tr>
   `;
 
-  // 3. Validación de Sincronización del Badge
   const badge = document.getElementById("validation-status-badge");
   if (sumaEstadosVerificacion === totalPersonal) {
     badge.className = "validation-badge success";
