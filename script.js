@@ -2,52 +2,55 @@
 // SISTEMA DE NAVEGACIÓN SPA (SINGLE PAGE APPLICATION)
 // ============================================================
 document.addEventListener("DOMContentLoaded", () => {
-    inicializarNavegacionSPA();
+  inicializarNavegacionSPA();
 });
 
 function inicializarNavegacionSPA() {
-    const tabs = document.querySelectorAll(".menu-tab");
-    const titleHeader = document.getElementById("current-module-title");
+  const tabs = document.querySelectorAll(".menu-tab");
+  const titleHeader = document.getElementById("current-module-title");
 
-    // 1. Cargar el último módulo visitado desde LocalStorage (Regla de persistencia opcional)
-    const ultimoModulo = localStorage.getItem("lastMilitarModule") || "municion";
-    showModule(ultimoModulo);
+  // 1. Cargar el último módulo visitado desde LocalStorage (Regla de persistencia opcional)
+  const ultimoModulo = localStorage.getItem("lastMilitarModule") || "municion";
+  showModule(ultimoModulo);
 
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            const moduleId = tab.dataset.module;
-            showModule(moduleId);
-        });
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const moduleId = tab.dataset.module;
+      showModule(moduleId);
+    });
+  });
+
+  function showModule(moduleId) {
+    // A. Ocultar de forma masiva todos los contenedores de módulos
+    document.querySelectorAll(".tab-content").forEach((content) => {
+      content.classList.remove("active");
+      content.classList.add("hidden");
     });
 
-    function showModule(moduleId) {
-        // A. Ocultar de forma masiva todos los contenedores de módulos
-        document.querySelectorAll(".tab-content").forEach(content => {
-            content.classList.remove("active");
-            content.classList.add("hidden");
-        });
+    // B. Desactivar clases visuales activas en los botones de navegación
+    tabs.forEach((t) => t.classList.remove("active"));
 
-        // B. Desactivar clases visuales activas en los botones de navegación
-        tabs.forEach(t => t.classList.remove("active"));
+    // C. Localizar y activar el módulo seleccionado
+    const targetContent = document.getElementById(`module-${moduleId}`);
+    const targetTab = document.querySelector(
+      `.menu-tab[data-module="${moduleId}"]`,
+    );
 
-        // C. Localizar y activar el módulo seleccionado
-        const targetContent = document.getElementById(`module-${moduleId}`);
-        const targetTab = document.querySelector(`.menu-tab[data-module="${moduleId}"]`);
+    if (targetContent && targetTab) {
+      targetContent.classList.remove("hidden");
+      targetContent.classList.add("active");
+      targetTab.classList.add("active");
 
-        if (targetContent && targetTab) {
-            targetContent.classList.remove("hidden");
-            targetContent.classList.add("active");
-            targetTab.classList.add("active");
+      // D. Actualizar el título dinámico de la cabecera general
+      titleHeader.innerText =
+        "Sección de " +
+        targetTab.textContent.replace(/[^\w\s\/\.ñÑáéíóúÁÉÍÓÚ]/g, "").trim();
 
-            // D. Actualizar el título dinámico de la cabecera general
-            titleHeader.innerText = "Sección de " + targetTab.textContent.replace(/[^\w\s\/\.ñÑáéíóúÁÉÍÓÚ]/g, '').trim();
-
-            // E. Guardar en memoria local
-            localStorage.setItem("lastMilitarModule", moduleId);
-        }
+      // E. Guardar en memoria local
+      localStorage.setItem("lastMilitarModule", moduleId);
     }
+  }
 }
-
 
 // REEMPLAZA CON TU URL DE DEPLOYMENT DE APPS SCRIPT
 const WEB_APP_URL =
@@ -95,6 +98,13 @@ const btnCancelEsp = document.getElementById("btn-cancel-esp");
 const formTitleEsp = document.getElementById("form-title-esp");
 const btnSaveEsp = document.getElementById("btn-save-esp");
 
+// Selectores calibre_Armamento
+const formArmCal = document.getElementById("form-armamento-calibre");
+const tableBodyArmCal = document.getElementById("table-body-armamento-calibre");
+const btnCancelArmCal = document.getElementById("btn-cancel-armcal");
+const formTitleArmCal = document.getElementById("form-title-armcal");
+const btnSaveArmCal = document.getElementById("btn-save-armcal");
+
 // Selectores Estado
 const formEst = document.getElementById("form-estado");
 const tableBodyEst = document.getElementById("table-body-estado");
@@ -111,6 +121,7 @@ let isEditingFunco = false;
 let isEditingLug = false;
 let isEditingEsp = false;
 let isEditingEst = false;
+let isEditingArmCal = false;
 
 document.addEventListener("DOMContentLoaded", loadAllData);
 
@@ -123,6 +134,7 @@ async function loadAllData() {
   tableBodyLug.innerHTML = "";
   tableBodyEsp.innerHTML = "";
   tableBodyEst.innerHTML = "";
+  tableBodyArmCal.innerHTML = "";
   try {
     const response = await fetch(WEB_APP_URL);
     const data = await response.json();
@@ -202,6 +214,19 @@ async function loadAllData() {
       tableBodyEst.appendChild(tr);
     });
 
+    //Renderizado calibre-Armamento
+    if (data.armamento_calibre) {
+      tableBodyArmCal.innerHTML = "";
+      data.armamento_calibre.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${item.tipo_armamento}</strong></td><td>${item.calibre_reglamentario}</td>
+          <td><button class="btn-edit" onclick="setupEditArmCal('${item.id}', '${item.tipo_armamento}', '${item.calibre_reglamentario}')">Editar</button>
+          <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento_calibre')">Eliminar</button></td>`;
+        tableBodyArmCal.appendChild(tr);
+      });
+    }
+
     // Sincronización Segura del archivo personal.js
     if (typeof renderPersonalTable === "function") {
       renderPersonalTable(data.personal);
@@ -212,11 +237,29 @@ async function loadAllData() {
     if (typeof inicializarControlOperacional === "function") {
       inicializarControlOperacional(data);
     }
+    // Sincronización Segura del archivo personal.js[cite: 7]
+    if (typeof renderPersonalTable === "function") {
+      renderPersonalTable(data.personal);
+      poblarDesplegablesPersonal();
+    }
+
+    // --- INYECCIÓN DE ENLACE CRÍTICA PARA GENERAR SALVOCONDUCTOS ---
+    if (typeof poblarDesplegablesSalvoconducto === "function") {
+      poblarDesplegablesSalvoconducto(data);
+    }
+
+    // Inyección de Control Estadístico Operacional[cite: 7]
+    if (typeof inicializarControlOperacional === "function") {
+      inicializarControlOperacional(data);
+    }
+  
   } catch (error) {
     console.error("Error cargando inventarios:", error);
   } finally {
     loadingText.style.display = "none";
   }
+
+
 }
 
 // ============================================================
@@ -225,7 +268,7 @@ async function loadAllData() {
 async function sendData(payload, callbackReset) {
   loadingText.style.display = "block";
   loadingText.innerText = "Sincronizando cambios con Google Sheets...";
-  
+
   try {
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
@@ -243,7 +286,7 @@ async function sendData(payload, callbackReset) {
     setTimeout(() => {
       // Ejecuta la limpieza o congelamiento del formulario web correspondiente
       callbackReset();
-      
+
       // --- REGLA DE LOGÍSTICA SINCRO: NO RESETEAR LA VISTA SI SOLO SE GUARDA EL PARTE ---
       if (payload.target !== "control_operacional") {
         // Si creamos, editamos o eliminamos personal, munición o armamento, recarga TODO en caliente
@@ -352,7 +395,23 @@ formEst.addEventListener("submit", (e) => {
     resetFormEstado,
   );
 });
-
+formArmCal.addEventListener("submit", (e) => {
+  e.preventDefault();
+  sendData(
+    {
+      target: "armamento_calibre",
+      action: isEditingArmCal ? "update" : "create",
+      id: document.getElementById("armcal-id").value,
+      tipo_armamento: document
+        .getElementById("armcal-tipo")
+        .value.toUpperCase(),
+      calibre_reglamentario: document
+        .getElementById("armcal-calibre")
+        .value.toUpperCase(),
+    },
+    resetFormArmCalibre,
+  );
+});
 // Interfaces de Edición
 function setupEditMun(id, calibre, cantidad, lote) {
   isEditingMun = true;
@@ -416,7 +475,15 @@ function setupEditEst(id, est) {
   document.getElementById("est-id").value = id;
   document.getElementById("est-nombre").value = est;
 }
-
+function setupEditArmCal(id, tipo, calibre) {
+  isEditingArmCal = true;
+  formTitleArmCal.innerText = "Modificar Relación";
+  btnSaveArmCal.innerText = "Actualizar";
+  btnCancelArmCal.style.display = "block";
+  document.getElementById("armcal-id").value = id;
+  document.getElementById("armcal-tipo").value = tipo;
+  document.getElementById("armcal-calibre").value = calibre;
+}
 // Resets
 function resetFormMunicion() {
   isEditingMun = false;
@@ -460,6 +527,13 @@ function resetFormEstado() {
   btnCancelEst.style.display = "none";
   formEst.reset();
   document.getElementById("est-id").value = "";
+}
+function resetFormArmCalibre() {
+  isEditingArmCal = false;
+  formTitleArmCal.innerText = "Ingresar Relación Reglamentaria";
+  btnCancelArmCal.style.display = "none";
+  formArmCal.reset();
+  document.getElementById("armcal-id").value = "";
 }
 
 async function deleteItem(id, type) {
