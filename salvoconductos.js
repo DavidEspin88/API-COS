@@ -154,7 +154,7 @@ function renderizarTablaSalvoconductos() {
       <td><strong>${s.lugar}</strong></td> <td><small>${s.fecha_inicio} al ${s.fecha_fin}</small></td>
       <td><span class="badge-ord" style="background:${esActivo ? '#e67e22' : '#7f8c8d'}; font-size:11px;">${s.estado}</span></td>
       <td>
-        ${esActivo ? `<button type="button" class="btn-submit" style="background:#27ae60; padding:4px 8px; font-size:11px;" onclick="registrarDevolucionAnticipada('${s.id}')">Devolución</button>` : `<span style="color:#27ae60; font-weight:bold;">✔ En Polvorín</span>`}
+        ${esActivo ? `<button type="button" class="btn-submit" style="background:#27ae60; padding:4px 8px; font-size:11px;" onclick="registrarDevolucionAnticipada('${s.id}')">Devolución</button>` : `<span style="color:#27ae60; font-weight:bold;">✔ En Armerillo</span>`}
       </td>
     `;
     tbody.appendChild(tr);
