@@ -116,7 +116,7 @@
                         </div>
                     </div>
                 </section>
-                
+
 
                 <section id="module-armamento" class="tab-content hidden">
                     <div class="dashboard-grid">
@@ -185,6 +185,7 @@
                                     onclick="resetFormGrado()">Cancelar Edición</button>
                             </form>
                         </div>
+                        <img src="" alt="" srcset="">
                         <div class="card">
                             <h3>Jerarquía / Grados Registrados</h3>
                             <div class="table-container">
@@ -445,12 +446,12 @@
 
                 <section id="module-salvoconductos" class="tab-content hidden">
                     <div class="vertical-layout">
-                        
-                        <div class="card" style="width: 100%; background: #ffffff;">
-                            <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--secondary-color); padding-bottom: 6px;">Resumen de Existencias Operativas en Tiempo Real</h3>
-                            <div class="matrices-top-row" style="display: flex; gap: 20px; width: 100%;">
-                                <div class="table-container" style="flex: 1; min-width: 300px;">
-                                    <h4 style="margin: 5px; font-size: 12px; color: var(--accent-color);">STOCK DE FUSILES / ARMAMENTO</h4>
+
+                        <div class="card card-inventario-superior">
+                            <h3 class="titulo-resumen-stock">Resumen de Existencias Operativas en Tiempo Real</h3>
+                            <div class="matrices-top-row panel-existencias-flex">
+                                <div class="table-container col-resumen-stock">
+                                    <h4 class="subtitulo-stock-armas">STOCK DE FUSILES / ARMAMENTO</h4>
                                     <table>
                                         <thead>
                                             <tr>
@@ -463,8 +464,8 @@
                                         <tbody id="table-body-resumen-armas"></tbody>
                                     </table>
                                 </div>
-                                <div class="table-container" style="flex: 1; min-width: 300px;">
-                                    <h4 style="margin: 5px; font-size: 12px; color: var(--color-especialidad);">STOCK DE MUNICIÓN</h4>
+                                <div class="table-container col-resumen-stock">
+                                    <h4 class="subtitulo-stock-mun">STOCK DE MUNICIÓN (CARTUCHOS)</h4>
                                     <table>
                                         <thead>
                                             <tr>
@@ -482,52 +483,61 @@
 
                         <div class="dashboard-grid">
                             <div class="card-militar">
-                                <h3 style="color:var(--accent-color); border-bottom:2px solid #e1e8ed; padding-bottom:8px;">Emisión Oficial de Salvoconducto</h3>
+                                <h3 class="titulo-emision-salvo">Emisión Oficial de Salvoconducto</h3>
                                 <form id="form-salvoconducto" class="form-militar">
                                     <input type="hidden" id="salvo-id">
-                                    
+
                                     <div class="form-section-block">
                                         <h4><span class="step-num">1</span> Identidad del Conductor / Tripulante</h4>
                                         <div class="form-row">
-                                            <div class="form-group flex-1">
+                                            <div class="form-group flex-2">
                                                 <label for="salvo-cedula">Cédula del Funcionario</label>
-                                                <input type="text" id="salvo-cedula" required placeholder="Digite la cédula..." oninput="buscarCedulaSalvoconducto(this.value)">
+                                                <input type="text" id="salvo-cedula" required
+                                                    placeholder="Digite la cédula..."
+                                                    oninput="buscarCedulaSalvoconducto(this.value)">
                                             </div>
                                             <div class="form-group flex-2">
                                                 <label for="salvo-info-militar">Grado, Apellidos y Nombres</label>
-                                                <input type="text" id="salvo-info-militar" readonly placeholder="Se auto-completa..." style="background:#e0e0e0; font-weight:bold; color:var(--primary-color);">
+                                                <input type="text" id="salvo-info-militar" readonly
+                                                    placeholder="Se auto-completa..." class="input-readonly-militar">
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="form-section-block">
-                                        <h4><span class="step-num">2</span> Características de la Dotación / Armamento</h4>
+                                        <h4><span class="step-num">2</span> Características de la Dotación / Armamento
+                                        </h4>
                                         <div class="form-row">
                                             <div class="form-group">
                                                 <label for="salvo-tipo-arma">Tipo de Armamento</label>
-                                                <select id="salvo-tipo-arma" required onchange="filtrarSeriesPorTipo(this.value)">
+                                                <select id="salvo-tipo-arma" required
+                                                    onchange="filtrarSeriesPorTipo(this.value)">
                                                     <option value="">-- Seleccione Tipo --</option>
                                                 </select>
                                             </div>
                                             <div class="form-group">
                                                 <label for="salvo-serie">Número de Serie Disponible</label>
-                                                <select id="salvo-serie" required onchange="vincularDetallesArma(this.value)">
+                                                <select id="salvo-serie" required
+                                                    onchange="vincularDetallesArma(this.value)">
                                                     <option value="">-- Seleccione Serie --</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-row" style="margin-top: 10px;">
+                                        <div class="form-row form-row-spacing">
                                             <div class="form-group">
                                                 <label for="salvo-marca">Marca</label>
-                                                <input type="text" id="salvo-marca" readonly style="background:#e0e0e0;">
+                                                <input type="text" id="salvo-marca" readonly
+                                                    class="input-readonly-standard">
                                             </div>
                                             <div class="form-group">
                                                 <label for="salvo-calibre">Calibre</label>
-                                                <input type="text" id="salvo-calibre" readonly style="background:#e0e0e0; font-weight:bold;">
+                                                <input type="text" id="salvo-calibre" readonly
+                                                    class="input-readonly-bold">
                                             </div>
                                             <div class="form-group">
                                                 <label for="salvo-cant-mun">Cantidad Munición</label>
-                                                <input type="number" id="salvo-cant-mun" required min="1" placeholder="0">
+                                                <input type="number" id="salvo-cant-mun" required min="1"
+                                                    placeholder="0">
                                             </div>
                                         </div>
                                     </div>
@@ -552,11 +562,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-section-block" style="border-left-color: var(--color-grado);">
-                                        <h4 style="color:var(--color-grado);">AUTORIZACIÓN DE SALVOCONDUCTO</h4>
+                                    <div class="form-section-block form-section-autorizacion">
+                                        <h4 class="titulo-seccion-autorizacion">AUTORIZACIÓN DE SALVOCONDUCTO</h4>
                                         <div class="form-row">
                                             <div class="form-group flex-1">
-                                                <label for="salvo-aprobador">Autorizado Formalmente por:</label>
+                                                <label for="salvo-aprobador">Autorizado por:</label>
                                                 <select id="salvo-aprobador" required>
                                                     <option value="">-- Seleccione Autoridad Militar --</option>
                                                 </select>
@@ -565,17 +575,32 @@
                                     </div>
 
                                     <div class="form-buttons militar-actions">
-                                        <button type="submit" class="btn-submit" style="background:#27ae60;">Registrar y Emitir Salvoconducto</button>
+                                        <button type="submit" class="btn-submit btn-emitir-salvo">Registrar y Emitir
+                                            Salvoconducto</button>
                                     </div>
                                 </form>
                             </div>
 
                             <div class="card">
-                                <h3>Matriz de Registro y Control de Salvoconductos Emitidos</h3>
+                                <div class="matriz-salvo-header-flex">
+                                    <h3>Matriz de Registro y Control de Salvoconductos Emitidos</h3>
+                                    <div class="matriz-salvo-acciones-flex">
+                                        <span id="salvo-contador-seleccionados"
+                                            class="contador-seleccionados-label">Seleccionados: 0</span>
+                                        <button type="button" id="btn-imprimir-salvoconductos"
+                                            class="btn-submit btn-imprimir-masivo">
+                                            <i class="fa-solid fa-print"></i> IMPRIMIR SALVOCONDUCTOS
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="table-container">
                                     <table>
                                         <thead>
                                             <tr>
+                                                <th class="col-th-checkbox">
+                                                    <input type="checkbox" id="salvo-select-all"
+                                                        class="checkbox-maestro-style">
+                                                </th>
                                                 <th>Fecha Emisión</th>
                                                 <th>Cédula</th>
                                                 <th>Apellidos y Nombres</th>
@@ -594,8 +619,7 @@
                         </div>
                     </div>
                 </section>
-
-                    <section id="module-armamento_calibre" class="tab-content hidden">
+                <section id="module-armamento_calibre" class="tab-content hidden">
                     <div class="dashboard-grid">
                         <div class="card">
                             <h3 id="form-title-armcal">Ingresar Relación Reglamentaria</h3>
@@ -603,14 +627,17 @@
                                 <input type="hidden" id="armcal-id">
                                 <div class="form-group">
                                     <label for="armcal-tipo">Tipo de Armamento</label>
-                                    <input type="text" id="armcal-tipo" required placeholder="Ej. FUSIL / PISTOLA / ESCOPETA">
+                                    <input type="text" id="armcal-tipo" required
+                                        placeholder="Ej. FUSIL / PISTOLA / ESCOPETA">
                                 </div>
                                 <div class="form-group">
                                     <label for="armcal-calibre">Calibre Reglamentario</label>
-                                    <input type="text" id="armcal-calibre" required placeholder="Ej. 7.62 MM / 9 MM / 12 GA">
+                                    <input type="text" id="armcal-calibre" required
+                                        placeholder="Ej. 7.62 MM / 9 MM / 12 GA">
                                 </div>
                                 <button type="submit" class="btn-submit" id="btn-save-armcal">Guardar Relación</button>
-                                <button type="button" class="btn-cancel" id="btn-cancel-armcal" style="display:none;" onclick="resetFormArmCalibre()">Cancelar Edición</button>
+                                <button type="button" class="btn-cancel" id="btn-cancel-armcal" style="display:none;"
+                                    onclick="resetFormArmCalibre()">Cancelar Edición</button>
                             </form>
                         </div>
                         <div class="card">
@@ -696,7 +723,10 @@
     <script src="script.js"></script>
     <script src="personal.js"></script>
     <script src="control_operacional.js"></script>
-    <script src="salvoconductos.js"></script>    
+    <script src="salvoconductos.js"></script>
 </body>
 
 </html>
+
+
+

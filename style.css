@@ -627,3 +627,187 @@ tr.row-funcionario-falto td {
         border-bottom-color: var(--secondary-color);
     }
 }
+
+/* ============================================================
+   PROTECCIÓN DE FLUJO Y AJUSTES DE IMPRESIÓN (MEDIA PRINT)
+   ============================================================ */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .img-encabezado, .sidebar, .main-header, .card-militar {
+        display: none !important;
+    }
+    /* El renderizado nativo se despacha mediante la subcapa aislada en el iframe del módulo */
+}
+
+/* Estilo para los Checkboxes de la matriz */
+.salvo-row-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-color);
+}
+/* ============================================================
+   INTEGRACIÓN COMPLETA: MÓDULO DE SALVOCONDUCTOS
+   ============================================================ */
+
+/* 1. Tabla de Existencias e Inventario Superior */
+.card.card-inventario-superior {
+    width: 100%; 
+    background: #ffffff;
+}
+
+.titulo-resumen-stock {
+    color: var(--primary-color); 
+    border-bottom: 2px solid var(--secondary-color); 
+    padding-bottom: 6px;
+}
+
+.panel-existencias-flex {
+    display: flex; 
+    gap: 20px; 
+    width: 100%;
+}
+
+.table-container.col-resumen-stock {
+    flex: 1; 
+    min-width: 300px;
+}
+
+.subtitulo-stock-armas {
+    margin: 5px; 
+    font-size: 12px; 
+    color: var(--accent-color);
+}
+
+.subtitulo-stock-mun {
+    margin: 5px; 
+    font-size: 12px; 
+    color: var(--color-especialidad);
+}
+
+/* 2. Componentes Internos del Formulario de Emisión */
+.titulo-emision-salvo {
+    color: var(--accent-color); 
+    border-bottom: 2px solid #e1e8ed; 
+    padding-bottom: 8px;
+}
+
+.form-section-block .input-readonly-militar {
+    background: #e0e0e0; 
+    font-weight: bold; 
+    color: var(--primary-color);
+}
+
+.form-row.form-row-spacing {
+    margin-top: 10px;
+}
+
+.input-readonly-standard {
+    background: #e0e0e0;
+}
+
+.input-readonly-bold {
+    background: #e0e0e0; 
+    font-weight: bold;
+}
+
+.form-section-block.form-section-autorizacion {
+    border-left-color: var(--color-grado);
+}
+
+.titulo-seccion-autorizacion {
+    color: var(--color-grado);
+}
+
+.btn-submit.btn-emitir-salvo {
+    background: #27ae60;
+}
+
+/* 3. Cabecera y Elementos de la Matriz de Registros */
+.matriz-salvo-header-flex {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 2px solid #e1e8ed; 
+    padding-bottom: 8px; 
+    margin-bottom: 12px;
+}
+
+.matriz-salvo-acciones-flex {
+    display: flex; 
+    align-items: center; 
+    gap: 15px;
+}
+
+.contador-seleccionados-label {
+    font-weight: 600; 
+    color: var(--accent-color); 
+    font-size: 13px;
+}
+
+.btn-submit.btn-imprimir-masivo {
+    background: var(--accent-color); 
+    width: auto; 
+    padding: 6px 15px; 
+    margin: 0; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px;
+}
+
+.btn-imprimir-masivo:hover {
+    background-color: #1f6fa3;
+}
+
+th.col-checkbox-width {
+    width: 40px; 
+    text-align: center;
+}
+
+#salvo-select-all {
+    cursor: pointer; 
+    transform: scale(1.1);
+}
+
+/* ============================================================
+   CORRECCIÓN DE CAPAS Y EVENTOS DE CLIC EN SALVOCONDUCTOS
+   ============================================================ */
+
+/* Asegurar que la grilla divida los espacios de manera estricta sin invadirse */
+#module-salvoconductos .dashboard-grid {
+    display: flex !important;
+    gap: 20px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+/* Forzar que el formulario no se desborde horizontalmente */
+#module-salvoconductos .card-militar {
+    flex: 0 0 35% !important;
+    min-width: 320px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Darle prioridad de capa (z-index) y aislamiento de puntero a la matriz de registros */
+#module-salvoconductos .card-militar + .card {
+    flex: 1 1 65% !important;
+    position: relative;
+    z-index: 20; /* Capa superior para que los elementos interactivos dominen el clic */
+    pointer-events: auto !important; /* Habilitar explícitamente eventos del mouse */
+    overflow: hidden;
+}
+
+/* Calibración del checkbox para que tenga una zona de clic limpia */
+.salvo-row-checkbox {
+    cursor: pointer !important;
+    position: relative;
+    z-index: 30;
+}
+
+#salvo-select-all {
+    cursor: pointer !important;
+    position: relative;
+    z-index: 30;
+}
