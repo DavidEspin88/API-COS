@@ -111,6 +111,11 @@ const btnCancelEst = document.getElementById("btn-cancel-est");
 const formTitleEst = document.getElementById("form-title-est");
 const btnSaveEst = document.getElementById("btn-save-est");
 
+//Usuarios
+const formUsr = document.getElementById("form-usuarios");
+const tableBodyUsr = document.getElementById("table-body-usuarios");
+
+
 const loadingText = document.getElementById("loading-text");
 
 let isEditingMun = false;
@@ -121,6 +126,7 @@ let isEditingLug = false;
 let isEditingEsp = false;
 let isEditingEst = false;
 let isEditingArmCal = false;
+let isEditingUsr = false;
 
 document.addEventListener("DOMContentLoaded", loadAllData);
 
@@ -223,6 +229,24 @@ async function loadAllData() {
           <td><button class="btn-edit" onclick="setupEditArmCal('${item.id}', '${item.tipo_armamento}', '${item.calibre_reglamentario}')">Editar</button>
           <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento_calibre')">Eliminar</button></td>`;
         tableBodyArmCal.appendChild(tr);
+      });
+    }
+
+    // Renderizar Usuarios (Inyectar dentro del bloque try-catch de loadAllData)
+    if (data.usuarios) {
+      tableBodyUsr.innerHTML = "";
+      data.usuarios.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="badge-ord">${item.id_usuario.substring(0,5)}</span></td>
+          <td>${item.correo}</td>
+          <td><strong>${item.tipo_usuario}</strong></td>
+          <td>${item.apellidos_nombres}</td>
+          <td>
+            <button class="btn-edit" onclick="setupEditUsr('${item.id_usuario}', '${item.correo}', '${item.tipo_usuario}', '${item.apellidos_nombres}', '${item.contrasena}')">Editar</button>
+            <button class="btn-delete" onclick="deleteItem('${item.id_usuario}', 'usuarios')">Eliminar</button>
+          </td>`;
+        tableBodyUsr.appendChild(tr);
       });
     }
 
@@ -411,6 +435,49 @@ formArmCal.addEventListener("submit", (e) => {
     resetFormArmCalibre,
   );
 });
+
+formUsr.addEventListener("submit", (e) => {
+  e.preventDefault();
+  sendData({
+    target: "usuarios",
+    action: isEditingUsr ? "update" : "create",
+    id: document.getElementById("usr-id").value,
+    correo: document.getElementById("usr-correo").value,
+    tipo_usuario: document.getElementById("usr-tipo").value,
+    apellidos_nombres: document.getElementById("usr-nombres").value.toUpperCase(),
+    contrasena: document.getElementById("usr-password").value, // Envío de contraseña
+    estado_cuenta: "ACTIVO"
+  }, resetFormUsuarios);
+});
+
+function setupEditUsr(id, correo, tipo, nombres, contrasena) {
+  isEditingUsr = true;
+  document.getElementById("form-title-usr").innerText = "Modificar Usuario";
+  document.getElementById("btn-save-usr").innerText = "Actualizar";
+  document.getElementById("btn-cancel-usr").style.display = "block";
+  document.getElementById("usr-id").value = id;
+  document.getElementById("usr-correo").value = correo;
+  document.getElementById("usr-tipo").value = tipo;
+  document.getElementById("usr-nombres").value = nombres;
+  // Inyectar contraseña en el campo al editar (se recupera de la caché)
+  document.getElementById("usr-password").value = contrasena || "";
+}
+
+function resetFormUsuarios() {
+  isEditingUsr = false;
+  document.getElementById("form-title-usr").innerText = "Registrar Usuario";
+  document.getElementById("btn-cancel-usr").style.display = "none";
+  formUsr.reset();
+  document.getElementById("usr-id").value = "";
+}
+
+// Helper visual interactivo para mostrar/ocultar los caracteres de la contraseña
+function toggleVisibilidadPassword() {
+  const inputPass = document.getElementById("usr-password");
+  if (inputPass) {
+    inputPass.type = inputPass.type === "password" ? "text" : "password";
+  }
+}
 // Interfaces de Edición
 function setupEditMun(id, calibre, cantidad, lote) {
   isEditingMun = true;

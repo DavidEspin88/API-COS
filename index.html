@@ -57,6 +57,9 @@
                 <button type="button" class="menu-tab" data-module="parte_diario">
                     <span class="icon"><i class="fa-solid fa-chart-line"></i></span> Parte Diario
                 </button>
+                <button type="button" class="menu-tab" data-module="usuarios">
+                    <span class="icon"><i class="fa-solid fa-users-gear"></i></span> Configurar Usuarios
+                </button>
             </nav>
             <div class="sidebar-footer">
                 <div id="validation-status-badge" class="validation-badge">Sincronizando...</div>
@@ -664,8 +667,8 @@
                             <div class="card card-control-asignacion">
                                 <h3>Asignación y Control Operacional de Estados</h3>
                                 <div class="buscador-diario-wrapper">
-                                    <label for="buscar-parte-diario"
-                                        ><span><i class="fa-solid fa-magnifying-glass"></i></span></i></label>
+                                    <label for="buscar-parte-diario"><span><i
+                                                class="fa-solid fa-magnifying-glass"></i></span></i></label>
                                     <input type="text" id="buscar-parte-diario"
                                         placeholder=" Buscar por Cédula, Grado o Apellidos..."
                                         oninput="filtrarTablaParteDiario(this.value)">
@@ -721,38 +724,97 @@
                         </div>
                     </div>
                 </section>
+                <!-- Ventana Modal de Desglose Táctico de Personal por Estado (Añadido) -->
+                <div id="modal-desglose-operacional" class="modal-militar hidden">
+                    <div class="modal-militar-content shadow-lg">
+                        <div class="modal-militar-header">
+                            <h3 id="modal-titulo-estado">Desglose de Personal</h3>
+                            <button type="button" class="btn-close-modal"
+                                onclick="cerrarModalDesglose()">&times;</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ORD.</th>
+                                        <th>GRADO</th>
+                                        <th>APELLIDOS Y NOMBRES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-modal-desglose"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- 12. MÓDULO EXCLUSIVO: GESTIÓN DE USUARIOS Y ROLES DE ACCESO -->
+                <section id="module-usuarios" class="tab-content hidden">
+                    <div class="dashboard-grid">
+                        <div class="card">
+                            <h3 id="form-title-usr">Registrar Usuario</h3>
+                            <form id="form-usuarios">
+                                <input type="hidden" id="usr-id">
+                                <div class="form-group">
+                                    <label for="usr-correo">Correo Electrónico Institucional</label>
+                                    <input type="email" id="usr-correo" required placeholder="ejemplo@fae.mil.ec">
+                                </div>
+                                <div class="form-group">
+                                    <label for="usr-tipo">Tipo de Usuario / Rol</label>
+                                    <select id="usr-tipo" required>
+                                        <option value="">-- Seleccione un Rol de Acceso --</option>
+                                        <option value="ADMINISTRADOR">ADMINISTRADOR (Acceso Total)</option>
+                                        <option value="ARMERILLO">ARMERO (Control de Stock y Salvoconductos)</option>
+                                        <option value="OFICIAL_SEMANA">OFICIAL DE SEMANA (Solo Parte Diario)</option>
+                                        <option value="LECTURA">CONSULTA (Solo Lectura)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="usr-nombres">Apellidos y Nombres</label>
+                                    <input type="text" id="usr-nombres" required placeholder="Ej: ZAMBRANO BYRON">
+                                </div>
+                                <div class="form-group">
+                                    <label for="usr-password">Contraseña de Acceso</label>
+                                    <div style="position: relative; display: flex; align-items: center;">
+                                        <input type="password" id="usr-password" required
+                                            placeholder="Mínimo 6 caracteres..." style="padding-right: 40px;">
+                                        <button type="button" onclick="toggleVisibilidadPassword()"
+                                            style="position: absolute; right: 5px; width: auto; background: transparent; color: #555; padding: 5px; margin: 0; font-size: 14px; z-index: 10;">👁</button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-submit" id="btn-save-usr">Guardar Usuario</button>
+                                <button type="button" class="btn-cancel" id="btn-cancel-usr" style="display:none;"
+                                    onclick="resetFormUsuarios()">Cancelar</button>
+                            </form>
+                        </div>
 
+                        <div class="card">
+                            <h3>Usuarios y Roles Registrados</h3>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Correo</th>
+                                            <th>Tipo de Usuario</th>
+                                            <th>Apellidos y Nombres</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-body-usuarios"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
-    <!-- Ventana Modal de Desglose Táctico de Personal por Estado (Añadido) -->
     <div id="modal-desglose-operacional" class="modal-militar hidden">
-        <div class="modal-militar-content shadow-lg">
-            <div class="modal-militar-header">
-                <h3 id="modal-titulo-estado">Desglose de Personal</h3>
-                <button type="button" class="btn-close-modal" onclick="cerrarModalDesglose()">&times;</button>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ORD.</th>
-                            <th>GRADO</th>
-                            <th>APELLIDOS Y NOMBRES</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body-modal-desglose"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</body>
+         </div>
 
-
-<script src="script.js"></script>
-<script src="personal.js"></script>
-<script src="control_operacional.js"></script>
-<script src="salvoconductos.js"></script>
+    <script src="script.js"></script>
+    <script src="personal.js"></script>
+    <script src="control_operacional.js"></script>
+    <script src="salvoconductos.js"></script>
 </body>
 
 </html>
