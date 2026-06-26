@@ -24,6 +24,16 @@
 
     --font-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --transition: 0.25s ease;
+
+    --auth-primary: #6C63FF;
+    --auth-secondary: #8E8CFF;
+    --auth-bg: #FFFFFF;
+    --auth-text-main: #2D2D2D;
+    --auth-text-sub: #8A8A8A;
+    --auth-border-radius: 12px;
+    --auth-transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --auth-shadow-soft: 0 4px 20px rgba(108, 99, 255, 0.08);
+    --auth-shadow-focus: 0 0 0 4px rgba(108, 99, 255, 0.15);
 }
 
 /* ============================================================
@@ -1057,4 +1067,568 @@ th.col-checkbox-width {
 
 .btn-close-modal:hover {
     color: var(--secondary-color) !important;
+}
+
+/*===============================================
+  MÓDULO DE AUTENTICACIÓN — DISEÑO TÁCTICO PREMIUM
+  Paleta: #0A0E17 (noche) · #00C896 (teal operacional) · #C9A84C (dorado institucional)
+  Tipografía: Inter (UI) + JetBrains Mono (datos/HUD)
+==================================================*/
+
+/* Proteger módulo de impresión - mover fuera del bloque auth */
+.salvoconducto-container, .salvoconducto-tarjeta { visibility: visible !important; }
+.salvoconducto-container { pointer-events: auto; }
+.salvoconducto-container .marca-agua-fae,
+.panel-izquierdo .marca-agua-fae { animation: none !important; }
+
+/* ── Variables locales ── */
+:root {
+    --at-dark:    #0A0E17;
+    --at-panel:   #111827;
+    --at-border:  rgba(255,255,255,0.07);
+    --at-teal:    #00C896;
+    --at-teal-dim: rgba(0,200,150,0.12);
+    --at-gold:    #C9A84C;
+    --at-text:    #F1F5F9;
+    --at-muted:   #64748B;
+    --at-error:   #F87171;
+    --at-success: #34D399;
+    --at-radius:  10px;
+    --at-trans:   0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Contenedor raíz ── */
+.auth-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--at-dark);
+    overflow: hidden;
+    opacity: 0;
+    animation: authFadeIn 0.5s ease forwards;
+}
+
+@keyframes authFadeIn { to { opacity: 1; } }
+
+/* ════════════════════════════════════════════
+   LADO IZQUIERDO — PANEL TÁCTICO OSCURO
+   ════════════════════════════════════════════ */
+.auth-visual-side {
+    display: none;
+    position: relative;
+    background: var(--at-dark);
+    overflow: hidden;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cuadrícula de puntos tipo HUD */
+.geo-grid-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(0,200,150,0.18) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+}
+
+/* Velo degradado encima de los puntos para profundidad */
+.geo-grid-dots::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, var(--at-dark) 80%);
+}
+
+/* Formas geométricas decorativas (reaprovechadas del HTML) */
+.geo-shape { display: none; }
+.geo-line  { display: none; }
+
+/* ── Anillos radar ── */
+.radar-system {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent !important;
+    z-index: 2;
+}
+
+.radar-bg-image {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.radar-bg-image img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    border-radius: 50%;
+    opacity: 0.06;
+    filter: grayscale(1);
+}
+
+.radar-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(0,200,150,0.20);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ring-1 { width: 100%; height: 100%; animation: radarSpin 40s linear infinite; }
+.ring-2 { width: 68%;  height: 68%;  animation: radarSpin 28s linear infinite reverse; }
+.ring-3 { width: 38%;  height: 38%;  border-style: dashed; border-color: rgba(201,168,76,0.25); animation: radarSpin 20s linear infinite; }
+
+@keyframes radarSpin { to { transform: rotate(360deg); } }
+
+/* Barrido de radar */
+.radar-sweep {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 0;
+    left: 50%;
+    transform-origin: 0% 100%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(0,200,150,0.15) 40deg, transparent 41deg);
+    animation: sweepRotate 4s linear infinite;
+    border-radius: 0 100% 0 0;
+}
+@keyframes sweepRotate { to { transform: rotate(360deg); } }
+
+/* Nodos en los anillos */
+.radar-node {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: var(--at-panel);
+    border: 1.5px solid var(--at-teal);
+    color: var(--at-teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    box-shadow: 0 0 12px rgba(0,200,150,0.35);
+    animation: nodeBlink 2.5s ease-in-out infinite alternate;
+}
+@keyframes nodeBlink {
+    from { box-shadow: 0 0 6px rgba(0,200,150,0.2); }
+    to   { box-shadow: 0 0 18px rgba(0,200,150,0.6); }
+}
+.node-1 { top: 8%;  left: 30%; }
+.node-2 { bottom: 10%; right: 12%; }
+.node-3 { top: 42%; right: -10px; }
+.node-4 { bottom: 2%; left: 38%; animation-delay: 1.2s; }
+
+/* ── Bloque de texto institucional inferior ── */
+.auth-visual-text {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 0 32px;
+    margin-top: 40px;
+}
+
+.auth-visual-unit {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    color: var(--at-teal);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.auth-visual-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--at-text);
+    margin: 0 0 10px;
+    line-height: 1.2;
+}
+
+.auth-visual-title em {
+    font-style: normal;
+    color: var(--at-gold);
+}
+
+.auth-visual-desc {
+    font-size: 0.8rem;
+    color: var(--at-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Línea divisora dorada */
+.auth-visual-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--at-gold);
+    margin: 14px auto;
+    border-radius: 2px;
+}
+
+/* ── Ticker de clasificación ── */
+.auth-classification-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(201,168,76,0.08);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 4;
+}
+
+.auth-classif-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--at-gold);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.auth-classif-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--at-gold);
+    opacity: 0.5;
+}
+
+/* ════════════════════════════════════════════
+   LADO DERECHO — FORMULARIO PREMIUM
+   ════════════════════════════════════════════ */
+.auth-form-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 24px;
+    background: #FFFFFF;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Acento teal sutil en esquina superior */
+.auth-form-side::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--at-teal) 0%, transparent 70%);
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Marca / Logo ── */
+.auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 36px;
+}
+
+.auth-logo {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 2px solid #E5E7EB;
+    padding: 3px;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.auth-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-brand h2 {
+    font-family: 'Inter', var(--font-base);
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+}
+
+.brand-sub {
+    margin: 2px 0 0;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: #64748B;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* ── Encabezado ── */
+.auth-header {
+    margin-bottom: 28px;
+}
+
+.auth-header h1 {
+    font-family: 'Inter', var(--font-base);
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0 0 6px;
+    letter-spacing: -0.03em;
+    text-transform: none;
+}
+
+.auth-header p {
+    color: #64748B;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* Línea separadora teal */
+.auth-header-rule {
+    width: 36px;
+    height: 3px;
+    background: #00C896;
+    border-radius: 2px;
+    margin-bottom: 14px;
+}
+
+/* ── Alerta global ── */
+.auth-alert {
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.45;
+}
+
+.auth-alert.hidden { display: none !important; }
+
+.auth-alert.error {
+    background: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+}
+
+.auth-alert.success {
+    background: #F0FDF4;
+    color: #166534;
+    border: 1px solid #BBF7D0;
+}
+
+/* ── Campos del formulario (override del global) ── */
+.auth-form-side .form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-form-side .form-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    font-family: 'Inter', var(--font-base);
+    font-size: 0.9rem;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 9px;
+    color: #0F172A;
+    background: #F8FAFC;
+    transition: border-color var(--at-trans), box-shadow var(--at-trans), background var(--at-trans);
+    box-shadow: none;
+}
+
+.input-wrapper input::placeholder { color: #94A3B8; }
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: #00C896;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(0,200,150,0.14);
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: #94A3B8;
+    font-size: 0.95rem;
+    pointer-events: none;
+    transition: color var(--at-trans);
+    z-index: 1;
+}
+
+.input-wrapper input:focus ~ .input-icon { color: #00C896; }
+
+/* Botón mostrar/ocultar contraseña */
+.btn-toggle-pass {
+    position: absolute;
+    right: 2px;
+    width: 38px;
+    height: 38px;
+    background: transparent !important;
+    color: #94A3B8;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    border-radius: 7px;
+    transition: color var(--at-trans), background var(--at-trans);
+}
+
+.btn-toggle-pass:hover {
+    color: #00C896;
+    background: rgba(0,200,150,0.07) !important;
+}
+
+/* ── Botón principal ── */
+.btn-auth-submit {
+    width: 100%;
+    padding: 13px 20px;
+    background: #0F172A !important;
+    border-radius: 9px;
+    font-family: 'Inter', var(--font-base);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    color: #FFFFFF;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: background var(--at-trans), transform var(--at-trans), box-shadow var(--at-trans);
+    box-shadow: 0 2px 8px rgba(15,23,42,0.18);
+}
+
+.btn-auth-submit:hover {
+    background: #1E293B !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(15,23,42,0.22);
+}
+
+.btn-auth-submit:active { transform: scale(0.99); }
+
+.btn-auth-submit:disabled {
+    background: #94A3B8 !important;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Acento teal en el borde inferior del botón al hover */
+.btn-auth-submit::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #00C896;
+    border-radius: 0 0 9px 9px;
+    opacity: 0;
+    transition: opacity var(--at-trans);
+}
+.btn-auth-submit { position: relative; overflow: hidden; }
+.btn-auth-submit:hover::after { opacity: 1; }
+
+/* ── Textos de error de campo ── */
+.error-text {
+    font-size: 0.75rem;
+    color: #DC2626;
+    margin-top: 5px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ── Spinner ── */
+.spinner {
+    width: 17px;
+    height: 17px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #FFFFFF;
+    animation: spinLoader 0.65s linear infinite;
+    flex-shrink: 0;
+}
+@keyframes spinLoader { to { transform: rotate(360deg); } }
+
+/* ── Footer ── */
+.auth-footer {
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid #F1F5F9;
+    text-align: center;
+}
+
+.auth-footer p {
+    font-size: 0.72rem;
+    color: #94A3B8;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+
+/* ── Utilidad global ── */
+.hidden { display: none !important; }
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════ */
+@media (min-width: 860px) {
+    .auth-visual-side {
+        display: flex !important;
+        flex: 0 0 48%;
+    }
+    .auth-form-side {
+        flex: 0 0 52%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .auth-visual-side { flex: 0 0 50%; }
+    .auth-form-side   { flex: 0 0 50%; }
 }

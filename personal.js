@@ -70,11 +70,14 @@ function poblarDesplegablesPersonal() {
   if (window.funcionesCargadas) {
     window.funcionesCargadas.forEach((item) => {
       const opt = document.createElement("option");
-      opt.value = item.funcion;
-      opt.textContent = item.funcion;
-      selectFuncion.appendChild(opt);
-    });
-  }
+      // Normalización: el servidor puede devolver "funcion" o "valor_unico"
+      const nombreFuncion = item.function || item.funcion || "";
+    
+    opt.value = nombreFuncion;
+    opt.textContent = nombreFuncion;
+    selectFuncion.appendChild(opt);
+  });
+}
 
   selectGrado.value = currentGrado;
   selectEspecialidad.value = currentEsp;

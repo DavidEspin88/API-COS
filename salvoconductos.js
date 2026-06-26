@@ -501,7 +501,7 @@ function ejecutarImpresionFormatoOficial(registros) {
               <div class="meta-label-block">Grado, Apellidos y Nombres</div>
             </div>
 
-            <div class="grid-datos-armas" ">
+            <div class="grid-datos-armas">
               <div>
                 <div class="meta-value-text">${r.cedula}</div>
                 <div class="meta-label-block">Cédula</div>

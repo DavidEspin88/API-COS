@@ -87,7 +87,7 @@ const btnSaveFunco = document.getElementById("btn-save-funco");
 const formLug = document.getElementById("form-lugar");
 const tableBodyLug = document.getElementById("table-body-lugar");
 const btnCancelLug = document.getElementById("btn-cancel-lug");
-const formTitleLug = document.getElementById("form-title-lug");
+const formTitleLug = document.getElementById("form-title-lugar");
 const btnSaveLug = document.getElementById("btn-save-lug");
 
 // Selectores Especialidad
@@ -115,7 +115,6 @@ const btnSaveEst = document.getElementById("btn-save-est");
 const formUsr = document.getElementById("form-usuarios");
 const tableBodyUsr = document.getElementById("table-body-usuarios");
 
-
 const loadingText = document.getElementById("loading-text");
 
 let isEditingMun = false;
@@ -128,100 +127,127 @@ let isEditingEst = false;
 let isEditingArmCal = false;
 let isEditingUsr = false;
 
-document.addEventListener("DOMContentLoaded", loadAllData);
+let cuentaUsuarioActivoSesion = null;
+window.listUsuariosGlobalMemoria = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadAllData();
+  inicializarMóduloAutenticacionFAE();
+});
 
 async function loadAllData() {
-  loadingText.style.display = "block";
-  tableBodyMun.innerHTML = "";
-  tableBodyArm.innerHTML = "";
-  tableBodyGra.innerHTML = "";
-  tableBodyFunco.innerHTML = "";
-  tableBodyLug.innerHTML = "";
-  tableBodyEsp.innerHTML = "";
-  tableBodyEst.innerHTML = "";
-  tableBodyArmCal.innerHTML = "";
+  if (loadingText) loadingText.style.display = "block";
+  if (tableBodyMun) tableBodyMun.innerHTML = "";
+  if (tableBodyArm) tableBodyArm.innerHTML = "";
+  if (tableBodyGra) tableBodyGra.innerHTML = "";
+  if (tableBodyFunco) tableBodyFunco.innerHTML = "";
+  if (tableBodyLug) tableBodyLug.innerHTML = "";
+  if (tableBodyEsp) tableBodyEsp.innerHTML = "";
+  if (tableBodyEst) tableBodyEst.innerHTML = "";
+  if (tableBodyArmCal) tableBodyArmCal.innerHTML = "";
+  
   try {
     const response = await fetch(WEB_APP_URL);
     const data = await response.json();
 
+    // Guardar los usuarios en la memoria global
+    window.listUsuariosGlobalMemoria = data.usuarios || [];
+
     // Renderizar Munición
-    data.municion.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
+    if (data.municion && tableBodyMun) {
+      data.municion.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
             <td>${item.calibre}</td><td>${item.cantidad}</td><td>${item.lote}</td>
             <td><button class="btn-edit" onclick="setupEditMun('${item.id}', '${item.calibre}', ${item.cantidad}, '${item.lote}')">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'municion')">Eliminar</button></td>`;
-      tableBodyMun.appendChild(tr);
-    });
+        tableBodyMun.appendChild(tr);
+      });
+    }
 
     // Renderizar Armamento
-    data.armamento.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${item.tipo}</td><td>${item.marca || "-"}</td><td>${item.serie}</td><td>${item.cantidad_armamento}</td>
-        <td>
-            <button class="btn-edit" onclick="setupEditArm('${item.id}', '${item.tipo}', '${item.marca || ""}', '${item.serie}', ${item.cantidad_armamento})">Editar</button>
-            <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento')">Eliminar</button>
-        </td>`;
-      tableBodyArm.appendChild(tr);
-    });
+    if (data.armamento && tableBodyArm) {
+      data.armamento.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.tipo}</td><td>${item.marca || "-"}</td><td>${item.serie}</td><td>${item.cantidad_armamento}</td>
+          <td>
+              <button class="btn-edit" onclick="setupEditArm('${item.id}', '${item.tipo}', '${item.marca || ""}', '${item.serie}', ${item.cantidad_armamento})">Editar</button>
+              <button class="btn-delete" onclick="deleteItem('${item.id}', 'armamento')">Eliminar</button>
+          </td>`;
+        tableBodyArm.appendChild(tr);
+      });
+    }
 
     // Renderizar Grado
     window.gradosCargados = data.grado;
-    data.grado.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
+    if (data.grado && tableBodyGra) {
+      data.grado.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
             <td><strong>${item.grado}</strong></td><td>${item.grado_completo}</td>
             <td><button class="btn-edit" onclick="setupEditGra('${item.id}', '${item.grado}', '${item.grado_completo}')">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'grado')">Eliminar</button></td>`;
-      tableBodyGra.appendChild(tr);
-    });
+        tableBodyGra.appendChild(tr);
+      });
+    }
 
-    // Renderizar Función
+    // ✔️ Renderizar Función CORREGIDO (Mapeo dinámico seguro frente a valor_unico o funcion)
     window.funcionesCargadas = data.funcion;
-    data.funcion.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-            <td>${item.funcion}</td>
-            <td><button class="btn-edit" onclick="setupEditFunco('${item.id}', '${item.funcion}')">Editar</button>
+    if (data.funcion && tableBodyFunco) {
+      data.funcion.forEach((item) => {
+        const nombreFuncion = item.function || item.funcion || item.valor_unico || "";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${nombreFuncion}</td>
+            <td><button class="btn-edit" onclick="setupEditFunco('${item.id}', '${nombreFuncion}')">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'funcion')">Eliminar</button></td>`;
-      tableBodyFunco.appendChild(tr);
-    });
+        tableBodyFunco.appendChild(tr);
+      });
+    }
 
     // Renderizar Lugar
-    data.lugar.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-            <td>${item.lugar}</td>
-            <td><button class="btn-edit" onclick="setupEditLug('${item.id}', '${item.lugar}')">Editar</button>
+    if (data.lugar && tableBodyLug) {
+      data.lugar.forEach((item) => {
+        const nombreLugar = item.lugar || item.valor_unico || "";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${nombreLugar}</td>
+            <td><button class="btn-edit" onclick="setupEditLug('${item.id}', '${nombreLugar}')">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'lugar')">Eliminar</button></td>`;
-      tableBodyLug.appendChild(tr);
-    });
+        tableBodyLug.appendChild(tr);
+      });
+    }
 
     // Renderizar Especialidad
     window.especialidadesCargadas = data.especialidad;
-    data.especialidad.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-            <td>${item.especialidad}</td>
-            <td><button class="btn-edit" onclick="setupEditEsp('${item.id}', '${item.especialidad}')">Editar</button>
+    if (data.especialidad && tableBodyEsp) {
+      data.especialidad.forEach((item) => {
+        const nombreEsp = item.especialidad || item.valor_unico || "";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${nombreEsp}</td>
+            <td><button class="btn-edit" onclick="setupEditEsp('${item.id}', '${nombreEsp}')">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'especialidad')">Eliminar</button></td>`;
-      tableBodyEsp.appendChild(tr);
-    });
+        tableBodyEsp.appendChild(tr);
+      });
+    }
 
     // Renderizar Estado
-    data.estado.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-            <td>${item.estado}</td>
-            <td><button class="btn-edit" onclick="setupEditEst('${item.id}', '${item.estado}')">Editar</button>
+    if (data.estado && tableBodyEst) {
+      data.estado.forEach((item) => {
+        const nombreEst = item.estado || item.valor_unico || "";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${nombreEst}</td>
+            <td><button class="btn-edit" onclick="setupEditEst('${item.id}', '${nombreEst}')">Editar</button>
             <button class="btn-delete" onclick="deleteItem('${item.id}', 'estado')">Eliminar</button></td>`;
-      tableBodyEst.appendChild(tr);
-    });
+        tableBodyEst.appendChild(tr);
+      });
+    }
 
     //Renderizado calibre-Armamento
-    if (data.armamento_calibre) {
-      tableBodyArmCal.innerHTML = "";
+    if (data.armamento_calibre && tableBodyArmCal) {
       data.armamento_calibre.forEach((item) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -232,13 +258,13 @@ async function loadAllData() {
       });
     }
 
-    // Renderizar Usuarios (Inyectar dentro del bloque try-catch de loadAllData)
-    if (data.usuarios) {
+    // Renderizar Usuarios
+    if (data.usuarios && tableBodyUsr) {
       tableBodyUsr.innerHTML = "";
       data.usuarios.forEach((item) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td><span class="badge-ord">${item.id_usuario.substring(0,5)}</span></td>
+          <td><span class="badge-ord">${item.id_usuario.substring(0, 5)}</span></td>
           <td>${item.correo}</td>
           <td><strong>${item.tipo_usuario}</strong></td>
           <td>${item.apellidos_nombres}</td>
@@ -250,20 +276,12 @@ async function loadAllData() {
       });
     }
 
-    // Sincronización Segura del archivo personal.js
+    // Sincronización Segura del archivo personal.js (Se unificó la llamada doble)
     if (typeof renderPersonalTable === "function") {
       renderPersonalTable(data.personal);
-      poblarDesplegablesPersonal();
-    }
-
-    // Inyección de Control Estadístico Operacional
-    if (typeof inicializarControlOperacional === "function") {
-      inicializarControlOperacional(data);
-    }
-    // Sincronización Segura del archivo personal.js
-    if (typeof renderPersonalTable === "function") {
-      renderPersonalTable(data.personal);
-      poblarDesplegablesPersonal();
+      if (typeof poblarDesplegablesPersonal === "function") {
+        poblarDesplegablesPersonal(data); 
+      }
     }
 
     // --- INYECCIÓN DE ENLACE CRÍTICA PARA GENERAR SALVOCONDUCTOS ---
@@ -277,20 +295,22 @@ async function loadAllData() {
     }
   
   } catch (error) {
-    console.error("Error cargando inventarios:", error);
+    console.error("Error cargando la base de datos general:", error);
   } finally {
-    loadingText.style.display = "none";
+    if (document.getElementById("loading-text")) {
+      document.getElementById("loading-text").style.display = "none";
+    }
   }
-
-
 }
 
 // ============================================================
 // FUNCIÓN CENTRAL PARA ENVIAR DATOS (POST) CON AUTO-REFRESCO
 // ============================================================
 async function sendData(payload, callbackReset) {
-  loadingText.style.display = "block";
-  loadingText.innerText = "Sincronizando cambios...";
+  if (loadingText) {
+    loadingText.style.display = "block";
+    loadingText.innerText = "Sincronizando cambios...";
+  }
 
   try {
     const response = await fetch(WEB_APP_URL, {
@@ -302,7 +322,7 @@ async function sendData(payload, callbackReset) {
     const result = await response.json();
     if (result.status === "error") {
       alert("Error del servidor: " + result.message);
-      loadingText.style.display = "none";
+      if (loadingText) loadingText.style.display = "none";
       return;
     }
 
@@ -312,172 +332,146 @@ async function sendData(payload, callbackReset) {
 
       // --- REGLA DE LOGÍSTICA SINCRO: NO RESETEAR LA VISTA SI SOLO SE GUARDA EL PARTE ---
       if (payload.target !== "control_operacional") {
-        // Si creamos, editamos o eliminamos personal, munición o armamento, recarga TODO en caliente
         loadAllData();
       } else {
-        loadingText.style.display = "none"; // Si es el parte diario, solo apaga el indicador y mantiene tus datos en pantalla
+        if (loadingText) loadingText.style.display = "none";
       }
     }, 1200);
   } catch (error) {
     console.error("Error remoto:", error);
     alert("❌ Error de comunicación con el servidor...");
-    loadingText.style.display = "none";
+    if (loadingText) loadingText.style.display = "none";
   }
 }
 
 // Submits Listeners
-formMun.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "municion",
-      action: isEditingMun ? "update" : "create",
-      id: document.getElementById("mun-id").value,
-      calibre: document.getElementById("mun-calibre").value,
-      cantidad: parseInt(document.getElementById("mun-cantidad").value),
-      lote: document.getElementById("mun-lote").value,
-    },
-    resetFormMunicion,
-  );
-});
-formArm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "armamento",
-      action: isEditingArm ? "update" : "create",
-      id: document.getElementById("arm-id").value,
-      tipo: document.getElementById("arm-tipo").value,
-      marca: document.getElementById("arm-marca").value,
-      serie: document.getElementById("arm-serie").value,
-      cantidad_armamento: parseInt(
-        document.getElementById("arm-cantidad").value,
-      ),
-    },
-    resetFormArmamento,
-  );
-});
-formGra.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "grado",
-      action: isEditingGra ? "update" : "create",
-      id: document.getElementById("gra-id").value,
-      grado: document.getElementById("gra-sigla").value,
-      grado_completo: document.getElementById("gra-completo").value,
-    },
-    resetFormGrado,
-  );
-});
-formFunco.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "funcion",
-      action: isEditingFunco ? "update" : "create",
-      id: document.getElementById("funco-id").value,
-      valor_unico: document.getElementById("funco-nombre").value,
-    },
-    resetFormFuncion,
-  );
-});
-formLug.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "lugar",
-      action: isEditingLug ? "update" : "create",
-      id: document.getElementById("lug-id").value,
-      valor_unico: document.getElementById("lug-nombre").value,
-    },
-    resetFormLugar,
-  );
-});
-formEsp.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "especialidad",
-      action: isEditingEsp ? "update" : "create",
-      id: document.getElementById("esp-id").value,
-      valor_unico: document.getElementById("esp-nombre").value,
-    },
-    resetFormEspecialidad,
-  );
-});
-formEst.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "estado",
-      action: isEditingEst ? "update" : "create",
-      id: document.getElementById("est-id").value,
-      valor_unico: document.getElementById("est-nombre").value,
-    },
-    resetFormEstado,
-  );
-});
-formArmCal.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData(
-    {
-      target: "armamento_calibre",
-      action: isEditingArmCal ? "update" : "create",
-      id: document.getElementById("armcal-id").value,
-      tipo_armamento: document
-        .getElementById("armcal-tipo")
-        .value.toUpperCase(),
-      calibre_reglamentario: document
-        .getElementById("armcal-calibre")
-        .value.toUpperCase(),
-    },
-    resetFormArmCalibre,
-  );
-});
-
-formUsr.addEventListener("submit", (e) => {
-  e.preventDefault();
-  sendData({
-    target: "usuarios",
-    action: isEditingUsr ? "update" : "create",
-    id: document.getElementById("usr-id").value,
-    correo: document.getElementById("usr-correo").value,
-    tipo_usuario: document.getElementById("usr-tipo").value,
-    apellidos_nombres: document.getElementById("usr-nombres").value.toUpperCase(),
-    contrasena: document.getElementById("usr-password").value, // Envío de contraseña
-    estado_cuenta: "ACTIVO"
-  }, resetFormUsuarios);
-});
-
-function setupEditUsr(id, correo, tipo, nombres, contrasena) {
-  isEditingUsr = true;
-  document.getElementById("form-title-usr").innerText = "Modificar Usuario";
-  document.getElementById("btn-save-usr").innerText = "Actualizar";
-  document.getElementById("btn-cancel-usr").style.display = "block";
-  document.getElementById("usr-id").value = id;
-  document.getElementById("usr-correo").value = correo;
-  document.getElementById("usr-tipo").value = tipo;
-  document.getElementById("usr-nombres").value = nombres;
-  // Inyectar contraseña en el campo al editar (se recupera de la caché)
-  document.getElementById("usr-password").value = contrasena || "";
+if (formMun) {
+  formMun.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "municion",
+        action: isEditingMun ? "update" : "create",
+        id: document.getElementById("mun-id").value,
+        calibre: document.getElementById("mun-calibre").value,
+        cantidad: parseInt(document.getElementById("mun-cantidad").value),
+        lote: document.getElementById("mun-lote").value,
+      },
+      resetFormMunicion,
+    );
+  });
 }
 
-function resetFormUsuarios() {
-  isEditingUsr = false;
-  document.getElementById("form-title-usr").innerText = "Registrar Usuario";
-  document.getElementById("btn-cancel-usr").style.display = "none";
-  formUsr.reset();
-  document.getElementById("usr-id").value = "";
+if (formArm) {
+  formArm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "armamento",
+        action: isEditingArm ? "update" : "create",
+        id: document.getElementById("arm-id").value,
+        tipo: document.getElementById("arm-tipo").value,
+        marca: document.getElementById("arm-marca").value,
+        serie: document.getElementById("arm-serie").value,
+        cantidad_armamento: parseInt(document.getElementById("arm-cantidad").value),
+      },
+      resetFormArmamento,
+    );
+  });
 }
 
-// Helper visual interactivo para mostrar/ocultar los caracteres de la contraseña
-function toggleVisibilidadPassword() {
-  const inputPass = document.getElementById("usr-password");
-  if (inputPass) {
-    inputPass.type = inputPass.type === "password" ? "text" : "password";
-  }
+if (formGra) {
+  formGra.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "grado",
+        action: isEditingGra ? "update" : "create",
+        id: document.getElementById("gra-id").value,
+        grado: document.getElementById("gra-sigla").value,
+        grado_completo: document.getElementById("gra-completo").value,
+      },
+      resetFormGrado,
+    );
+  });
 }
+
+if (formFunco) {
+  formFunco.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "funcion",
+        action: isEditingFunco ? "update" : "create",
+        id: document.getElementById("funco-id").value,
+        valor_unico: document.getElementById("funco-nombre").value,
+      },
+      resetFormFuncion,
+    );
+  });
+}
+
+if (formLug) {
+  formLug.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "lugar",
+        action: isEditingLug ? "update" : "create",
+        id: document.getElementById("lug-id").value,
+        valor_unico: document.getElementById("lug-nombre").value,
+      },
+      resetFormLugar,
+    );
+  });
+}
+
+if (formEsp) {
+  formEsp.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "especialidad",
+        action: isEditingEsp ? "update" : "create",
+        id: document.getElementById("esp-id").value,
+        valor_unico: document.getElementById("esp-nombre").value,
+      },
+      resetFormEspecialidad,
+    );
+  });
+}
+
+if (formEst) {
+  formEst.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "estado",
+        action: isEditingEst ? "update" : "create",
+        id: document.getElementById("est-id").value,
+        valor_unico: document.getElementById("est-nombre").value,
+      },
+      resetFormEstado,
+    );
+  });
+}
+
+if (formArmCal) {
+  formArmCal.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendData(
+      {
+        target: "armamento_calibre",
+        action: isEditingArmCal ? "update" : "create",
+        id: document.getElementById("armcal-id").value,
+        tipo_armamento: document.getElementById("armcal-tipo").value.toUpperCase(),
+        calibre_reglamentario: document.getElementById("armcal-calibre").value.toUpperCase(),
+      },
+      resetFormArmCalibre,
+    );
+  });
+}
+
 // Interfaces de Edición
 function setupEditMun(id, calibre, cantidad, lote) {
   isEditingMun = true;
@@ -550,6 +544,11 @@ function setupEditArmCal(id, tipo, calibre) {
   document.getElementById("armcal-tipo").value = tipo;
   document.getElementById("armcal-calibre").value = calibre;
 }
+function setupEditUsr(id, correo, tipo, nombres, pass) {
+  isEditingUsr = true;
+  // Implementación base para sincronía de edición de usuarios si fuese requerida
+}
+
 // Resets
 function resetFormMunicion() {
   isEditingMun = false;
@@ -574,18 +573,21 @@ function resetFormFuncion() {
   formTitleFunco.innerText = "Ingresar Función";
   btnCancelFunco.style.display = "none";
   formFunco.reset();
+  document.getElementById("funco-id").value = "";
 }
 function resetFormLugar() {
   isEditingLug = false;
   if (formTitleLug) formTitleLug.innerText = "Ingresar Lugar";
   btnCancelLug.style.display = "none";
   formLug.reset();
+  document.getElementById("lug-id").value = "";
 }
 function resetFormEspecialidad() {
   isEditingEsp = false;
   formTitleEsp.innerText = "Ingresar Especialidad";
   btnCancelEsp.style.display = "none";
   formEsp.reset();
+  document.getElementById("esp-id").value = "";
 }
 function resetFormEstado() {
   isEditingEst = false;
@@ -605,4 +607,152 @@ function resetFormArmCalibre() {
 async function deleteItem(id, type) {
   if (confirm(`¿Eliminar de ${type}?`))
     sendData({ action: "delete", id: id, target: type }, () => {});
+}
+
+// ============================================================
+// LOGICA DE AUTENTICACIÓN (LOGIN ROBUSTO - VERSIÓN CORREGIDA)
+// ============================================================
+function inicializarMóduloAutenticacionFAE() {
+  const formAuth = document.getElementById("form-auth-login");
+  const btnToggle = document.getElementById("btn-toggle-pass");
+  const inputPass = document.getElementById("auth-password");
+  const iconEye = document.getElementById("icon-pass-eye");
+
+  if (!formAuth) return;
+
+  // Funcionalidad para mostrar/ocultar contraseña con el ojo
+  if (btnToggle && inputPass && iconEye) {
+    btnToggle.addEventListener("click", () => {
+      const esPass = inputPass.type === "password";
+      inputPass.type = esPass ? "text" : "password";
+      iconEye.className = esPass
+        ? "fa-regular fa-eye-slash"
+        : "fa-regular fa-eye";
+    });
+  }
+
+  formAuth.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Captura limpia de los elementos en el momento del submit
+    const emailInput = document.getElementById("auth-email");
+    const passwordInput = document.getElementById("auth-password");
+    
+    const errEmail = document.getElementById("err-email");
+    const errPass = document.getElementById("err-password");
+    const alertBox = document.getElementById("auth-alert");
+
+    const btnSubmit = document.getElementById("btn-submit-auth");
+    const btnText = document.getElementById("btn-text-auth");
+    const btnSpinner = document.getElementById("btn-spinner-auth");
+
+    // Resetear mensajes de error visuales previos
+    if (errEmail) errEmail.textContent = "";
+    if (errPass) errPass.textContent = "";
+    if (alertBox) {
+      alertBox.className = "auth-alert hidden";
+      alertBox.textContent = "";
+    }
+
+    // Asegurar lectura fidedigna de los valores escritos
+    const emailValue = emailInput ? emailInput.value.trim() : "";
+    const passValue = passwordInput ? passwordInput.value : "";
+    let hayErrores = false;
+
+    if (!emailValue) {
+      if (errEmail) errEmail.textContent = "❌ El correo electrónico institucional es obligatorio.";
+      hayErrores = true;
+    }
+    if (!passValue) {
+      if (errPass) errPass.textContent = "❌ La contraseña de acceso es obligatoria.";
+      hayErrores = true;
+    }
+
+    if (hayErrores) return;
+
+    // Activar estado visual de carga (Spinner)
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      if (btnText) btnText.textContent = "Verificando Credenciales...";
+      if (btnSpinner) btnSpinner.classList.remove("hidden");
+    }
+
+    // Procesar autenticación local basándose en la memoria global cargada de la hoja
+    setTimeout(() => {
+      const listaUsuariosCache = window.listUsuariosGlobalMemoria || [];
+
+      // Imprimir logs rápidos en la consola del navegador por si necesitas auditar qué se compara
+      console.log("Intentando ingresar con:", emailValue);
+      console.log("Usuarios en memoria local del navegador:", listaUsuariosCache);
+
+      const usuarioEncontrado = listaUsuariosCache.find(
+        (u) =>
+          String(u.correo).trim().toLowerCase() === emailValue.toLowerCase() &&
+          String(u.contrasena).trim() === String(passValue).trim()
+      );
+
+      if (!usuarioEncontrado) {
+        if (alertBox) {
+          alertBox.textContent = "❌ Acceso Denegado: El correo electrónico o la contraseña son incorrectos.";
+          alertBox.className = "auth-alert error";
+        }
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          if (btnText) btnText.textContent = "Iniciar Sesión";
+          if (btnSpinner) btnSpinner.classList.add("hidden");
+        }
+        return;
+      }
+
+      // --- LOGIN EXITOSO ---
+      cuentaUsuarioActivoSesion = usuarioEncontrado;
+      if (alertBox) {
+        alertBox.textContent = "✔ Autenticación autorizada. Ingresando al sistema...";
+        alertBox.className = "auth-alert success";
+      }
+
+      // Formatear firma del operador logueado
+      const tokensNombres = usuarioEncontrado.apellidos_nombres.trim().split(/\s+/);
+      let firmaLegibleTripulante = usuarioEncontrado.apellidos_nombres;
+
+      if (tokensNombres.length >= 3) {
+        const apellido1 = tokensNombres[0];
+        const primerNombre = tokensNombres[2];
+        firmaLegibleTripulante = `${primerNombre} ${apellido1}`;
+      }
+
+      let gradoMilitarPrefijo = "OPERADOR";
+      if (usuarioEncontrado.tipo_usuario !== "ADMINISTRADOR") {
+        const militarFicha = (window.datosPersonalGlobal || []).find((m) =>
+          m.apellidos_nombres.includes(tokensNombres[0])
+        );
+        if (militarFicha) gradoMilitarPrefijo = militarFicha.grado;
+      } else {
+        gradoMilitarPrefijo = "ADMIN";
+      }
+
+      const textEscuadron = document.querySelector(".text-escuadron");
+      if (textEscuadron) {
+        const divOperador =
+          document.getElementById("sidebar-operador-firma") ||
+          document.createElement("div");
+        divOperador.id = "sidebar-operador-firma";
+        divOperador.innerHTML = `<span style="font-size: 11px; color: #18bc9c; font-weight: 600; text-transform: uppercase;"><i class="fa-solid fa-user-shield"></i> ${gradoMilitarPrefijo} ${firmaLegibleTripulante}</span>`;
+        textEscuadron.parentNode.insertBefore(
+          divOperador,
+          textEscuadron.nextSibling
+        );
+      }
+
+      // Transición e intercambio de pantallas para SPA
+      setTimeout(() => {
+        const authContainer = document.querySelector(".auth-container");
+        if (authContainer) authContainer.style.display = "none";
+
+        const wrapperMain = document.querySelector(".app-layout");
+        if (wrapperMain) wrapperMain.style.display = "flex";
+      }, 1200);
+      
+    }, 1200);
+  });
 }
