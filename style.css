@@ -811,3 +811,62 @@ th.col-checkbox-width {
     position: relative;
     z-index: 30;
 }
+/* ============================================================
+   OPTIMIZACIÓN RESPONSIVE PARA DISPOSITIVOS MÓVILES (SALVOCONDUCTOS)
+   ============================================================ */
+@media (max-width: 850px) {
+    /* 1. Apilar las tablas de existencias superiores en una sola columna */
+    .panel-existencias-flex {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    .table-container.col-resumen-stock {
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+
+    /* 2. Forzar que la grilla principal pase de horizontal a vertical */
+    #module-salvoconductos .dashboard-grid {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    /* 3. Hacer que el formulario ocupe el 100% del ancho del teléfono */
+    #module-salvoconductos .card-militar {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+    }
+
+    /* 4. Mover la matriz de registros abajo del formulario al 100% de capacidad */
+    #module-salvoconductos .card-militar + .card {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 5. Apilar verticalmente el título de la matriz y el botón de impresión masiva */
+    .matriz-salvo-header-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .matriz-salvo-acciones-flex {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+
+    .btn-submit.btn-imprimir-masivo {
+        width: auto !important; /* Evitar que el botón ocupe toda la pantalla de forma tosca */
+        padding: 8px 16px !important;
+    }
+
+    /* 6. Controlar los campos de entrada de validez y destino en móviles */
+    #module-salvoconductos .form-section-block .form-row {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+}
