@@ -26,7 +26,7 @@ function poblarDesplegablesSalvoconducto(data) {
     if (t) selectTipo.innerHTML += `<option value="${t}">${t}</option>`;
   });
 
-  // 2. Población de Lugares / Repartos desde la base de datos
+  // 2. Población de Lugares / Repartos desde la base de datos (REQUERIMIENTO 3)
   selectLugar.innerHTML = '<option value="">-- Seleccione Destino --</option>';
   (data.lugar || []).forEach((l) => {
     if (l.lugar)
@@ -39,8 +39,8 @@ function poblarDesplegablesSalvoconducto(data) {
   (data.personal || []).forEach((p) => {
     const cargoLimpio = String(p.funcion).trim().toUpperCase();
     if (
-      cargoLimpio === 'COMANDANTE DE ESCUADRON VIGALGO "BUITRE"' ||
-      cargoLimpio === "OFICIAL DE SEMANA"
+      cargoLimpio === 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"' ||
+      cargoLimpio === 'OFICIAL DE SEMANA ESCUADRÓN VIGALGO "BUITRE"'
     ) {
       selectAprobador.innerHTML += `<option value="${p.grado} ${p.apellidos_nombres}">${p.grado} ${p.apellidos_nombres}</option>`;
     }
@@ -51,6 +51,7 @@ function poblarDesplegablesSalvoconducto(data) {
   renderizarTablaSalvoconductos();
 }
 
+// === CÁLCULO ARITMÉTICO DINÁMICO DE EXISTENCIAS EN TIEMPO REAL ===
 function calcularYRenderizarExistenciasDisponibles() {
   const tbodyArmas = document.getElementById("table-body-resumen-armas");
   const tbodyMun = document.getElementById("table-body-resumen-municion");
@@ -59,6 +60,7 @@ function calcularYRenderizarExistenciasDisponibles() {
   tbodyArmas.innerHTML = "";
   tbodyMun.innerHTML = "";
 
+  // A. Consolidación y conteo de Armamento
   let resumenArmas = {};
   salvoCacheArmamentoReal.forEach((a) => {
     const tipo = String(a.tipo).trim().toUpperCase();
@@ -66,6 +68,7 @@ function calcularYRenderizarExistenciasDisponibles() {
     resumenArmas[tipo].total += parseInt(a.cantidad_armamento) || 0;
   });
 
+  // B. Consolidación y conteo de Munición
   let resumenMun = {};
   salvoCacheMunicionStock.forEach((m) => {
     const calibre = String(m.calibre).trim().toUpperCase();
@@ -73,17 +76,19 @@ function calcularYRenderizarExistenciasDisponibles() {
     resumenMun[calibre].total += parseInt(m.cantidad) || 0;
   });
 
+  // C. Cruzar contra Salvoconductos activos ("CUSTODIA")
   salvoconductosEmitidosLista.forEach((s) => {
-    if (s.estado === "ENTREGA") {
+    if (s.estado === "CUSTODIA") {
       const tipoArma = String(s.tipo_arma).trim().toUpperCase();
       const calibre = String(s.calibre).trim().toUpperCase();
       const cantMun = parseInt(s.cantidad_municion) || 0;
 
-      if (resumenArmas[tipoArma]) resumenArmas[tipoArma].asignados += 1;
+      if (resumenArmas[tipoArma]) resumenArmas[tipoArma].asignados += 1; // 1 Fusil/Arma por documento físico de serie
       if (resumenMun[calibre]) resumenMun[calibre].entregado += cantMun;
     }
   });
 
+  // D. Dibujar Tabla Resumen Armas
   Object.keys(resumenArmas).forEach((tipo) => {
     const total = resumenArmas[tipo].total;
     const asignados = resumenArmas[tipo].asignados;
@@ -91,6 +96,7 @@ function calcularYRenderizarExistenciasDisponibles() {
     tbodyArmas.innerHTML += `<tr><td><strong>${tipo}</strong></td><td>${total}</td><td>${asignados}</td><td style="font-weight:bold; color:${disponible > 0 ? "#18bc9c" : "#e74c3c"}">${disponible}</td></tr>`;
   });
 
+  // E. Dibujar Tabla Resumen Munición
   Object.keys(resumenMun).forEach((calibre) => {
     const total = resumenMun[calibre].total;
     const entregado = resumenMun[calibre].entregado;
@@ -114,7 +120,7 @@ function filtrarSeriesPorTipo(tipoArma) {
     const estaPrestada = salvoconductosEmitidosLista.some(
       (s) =>
         String(s.serie).trim().toUpperCase() ===
-          String(arma.serie).trim().toUpperCase() && s.estado === "ENTREGA",
+          String(arma.serie).trim().toUpperCase() && s.estado === "CUSTODIA",
     );
     if (!estaPrestada)
       selectSerie.innerHTML += `<option value="${arma.serie}">${arma.serie}</option>`;
@@ -172,11 +178,9 @@ function renderizarTablaSalvoconductos() {
 
   salvoconductosEmitidosLista.forEach((s) => {
     const tr = document.createElement("tr");
-    const esActivo = s.estado === "ENTREGA";
+    const esActivo = s.estado === "CUSTODIA";
 
     tr.innerHTML = `
-
-
         <td style="text-align:center; display: flex; align-items: center; justify-content: center; gap: 10px; height: 100%;">
             <input type="checkbox" class="salvo-row-checkbox" data-id="${s.id}"
                 style="cursor: pointer; transform: scale(1.2); margin: 0;">
@@ -294,7 +298,7 @@ function ejecutarImpresionFormatoOficial(registros) {
 
         .salvoconducto-container {
             width: 190mm;
-            height: 76mm;
+            height: 70mm;
             margin-bottom: 15mm;
             border: 1px solid #000000;
             box-sizing: border-box;
@@ -310,8 +314,8 @@ function ejecutarImpresionFormatoOficial(registros) {
         }
 
         .panel-izquierdo {
-            width: 95mm;
-            height: 75mm;
+            width: 94.5mm;
+            height: 68.9mm;
             border: 3px solid #000000;
             padding: 6px 8px;
             box-sizing: border-box;
@@ -323,12 +327,13 @@ function ejecutarImpresionFormatoOficial(registros) {
         }
 
         .panel-derecho {
-            width: 95mm;
-            height: 75mm;
+            width: 94.5mm;
+            height: 68.9mm;
             border: 3px solid #000000;
             padding: 8px 10px;
             box-sizing: border-box;
             display: flex;
+            margin-left:1px;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
@@ -349,7 +354,7 @@ function ejecutarImpresionFormatoOficial(registros) {
 
         .header-titulo {
             text-align: center;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: bold;
             line-height: 1.2;
             text-transform: uppercase;
@@ -357,24 +362,26 @@ function ejecutarImpresionFormatoOficial(registros) {
         }
 
         .meta-label-block {
-            font-size: 11px;
-            color: #555;
+            font-size: 9px;
             text-transform: uppercase;
             margin-top: 1px;
+            margin-bottom: 2px;
+            font-weight: normal;
         }
 
         .meta-value-text {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
-            color: #000;
             text-transform: uppercase;
         }
 
         .grid-datos-armas {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2px 6px;
+            gap: 1px 6px;
             margin-top: 1px;
+            margin-left:5px;
+            font-weight: 400;
         }
 
         .texto-legal-sub {
@@ -382,14 +389,14 @@ function ejecutarImpresionFormatoOficial(registros) {
             margin: 5px 0;
             text-align: justify;
             line-height: 1.4;
-            font-weight: 600;
+            font-weight: 400;
         }
 
         .texto-legal-footer {
             font-size: 11px;
             margin: 8px 0 2px;
             text-align: left;
-            font-weight: 600;
+            font-weight: normal;
         }
 
         .pie-firma-autoridad {
@@ -403,7 +410,7 @@ function ejecutarImpresionFormatoOficial(registros) {
         .linea-portador {
             width: 70%;
             margin: 0 auto 2px;
-            border-bottom: 1px solid #777;
+            border-bottom: 1px solid #000;
         }
 
         @media print {
@@ -424,7 +431,7 @@ function ejecutarImpresionFormatoOficial(registros) {
     for (let j = i; j < i + 3 && j < registros.length; j++) {
       const r = registros[j];
 
-      // === AUTOMATIZACIÓN 1: RESOLVER MARCA INDEFINIDA MEDIANTE BÚSQUEDA EN CALIENTE ===
+      // === CORRECCIÓN 1: RESOLVER MARCA REAL MEDIANTE COMPARACIÓN ROBUSTA DE SERIE ===
       const armaFisica = salvoCacheArmamentoReal.find(
         (a) =>
           String(a.serie).trim().toUpperCase() ===
@@ -432,12 +439,13 @@ function ejecutarImpresionFormatoOficial(registros) {
       );
       const marcaCorrecta = armaFisica
         ? armaFisica.marca || "SIN MARCA"
-        : r.marca && r.marca !== "undefined"
-          ? r.marca
-          : "-";
+        : (r.marca && r.marca !== "undefined" ? r.marca : "-");
 
-      // === AUTOMATIZACIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA (GRADO + ESP_ABRV + AVC. + 1er NOMBRE + 2 APELLIDOS) ===
+      // === CORRECCIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA EXTRAYENDO DE LA BASE DE DATOS ===
       let firmaBloqueFormateado = r.aprobado_por; // Respaldo por defecto
+      let funcionCargoAutoridad = "COMANDANTE DEL ESCUADRÓN VIGALCO \"BUITRE\""; // Respaldo por defecto
+
+      // Buscar la ficha completa del aprobador en la caché de personal utilizando su rango y nombre
       const autorizador = salvoCachePersonal.find(
         (p) =>
           `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() ===
@@ -445,9 +453,11 @@ function ejecutarImpresionFormatoOficial(registros) {
       );
 
       if (autorizador) {
-        // Formatear nombres: base de datos viene como "APELLIDO1 APELLIDO2 NOMBRE1 NOMBRE2"
+        // Formatear nombres: la base de datos viene como "APELLIDO1 APELLIDO2 NOMBRE1 NOMBRE2"
+        // Extraemos el primer nombre (índice 2) y los dos apellidos (índices 0 y 1)
         const tokens = autorizador.apellidos_nombres.trim().split(/\s+/);
         let nombreFirma = autorizador.apellidos_nombres;
+        
         if (tokens.length >= 3) {
           const ap1 = tokens[0];
           const ap2 = tokens[1];
@@ -455,19 +465,25 @@ function ejecutarImpresionFormatoOficial(registros) {
           nombreFirma = `${nom1} ${ap1} ${ap2}`;
         }
 
-        // Abreviar la Especialidad de forma estandarizada
-        let espAbr = autorizador.especialidad
-          ? autorizador.especialidad.trim().toUpperCase()
-          : "";
-        if (espAbr.includes("TÉCNICO") || espAbr.includes("TECNICO"))
+        // Abreviar la Especialidad de forma estandarizada e institucional FAE
+        let espAbr = autorizador.especialidad ? autorizador.especialidad.trim().toUpperCase() : "";
+        if (espAbr.includes("TÉCNICO") || espAbr.includes("TECNICO") || espAbr.includes("ARMAMENTO")) {
           espAbr = "TÉC.";
-        else if (espAbr.includes("ESPECIALISTA"))
-          espAbr = "ESP."; // Consistencia con credencial base FAE
-        else if (espAbr.includes("PILOTO"))
-          espAbr = "PLTO."; // Consistencia con credencial base FAE
-        else if (espAbr.length > 0) espAbr = espAbr.substring(0, 3) + ".";
+        } else if (espAbr.includes("ESPECIALISTA")) {
+          espAbr = "ESP.";
+        } else if (espAbr.includes("PILOTO")) {
+          espAbr = "PLTO.";
+        } else if (espAbr.length > 0) {
+          espAbr = espAbr.substring(0, 3) + ".";
+        }
 
+        // Construcción simétrica solicitada: GRADO + ESP_ABRV + AVC. + 1er NOMBRE + 2 APELLIDOS
         firmaBloqueFormateado = `${autorizador.grado} ${espAbr} AVC. ${nombreFirma}`;
+        
+        // Cargar dinámicamente la función militar de la base de datos (Comandante u Oficial de Semana)
+        if (autorizador.funcion) {
+          funcionCargoAutoridad = String(autorizador.funcion).trim().toUpperCase();
+        }
       }
 
       htmlContenido += `
@@ -477,26 +493,26 @@ function ejecutarImpresionFormatoOficial(registros) {
             
             <div class="header-titulo">
               FUERZA AEREA ECUATORIANA<br>
-              <span style="font-size: 12px; font-weight: normal;">Salvoconducto para Portar Arma</span>
+              <span style="font-size: 13px; font-weight:normal;">Salvoconducto para Portar Arma</span>
             </div>
 
-            <div style="margin-top: 2px; margin-left:5px;">
+            <div style="margin-top: 1px; margin-left:5px;">
               <div class="meta-value-text">${r.apellidos_nombres}</div>
-              <div class="meta-label-block" style="font-size: 11px; margin-bottom: 4px;">Grado, Apellidos y Nombres</div>
+              <div class="meta-label-block">Grado, Apellidos y Nombres</div>
             </div>
 
-            <div class="grid-datos-armas" style="margin-left:5px;">
+            <div class="grid-datos-armas" ">
               <div>
                 <div class="meta-value-text">${r.cedula}</div>
                 <div class="meta-label-block">Cédula</div>
                 
-                <div class="meta-value-text" style="margin-top: 2px;">${r.serie}</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.serie}</div>
                 <div class="meta-label-block">Serie</div>
                 
-                <div class="meta-value-text" style="margin-top: 2px;">${r.calibre}</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.calibre}</div>
                 <div class="meta-label-block">Calibre</div>
                 
-                <div class="meta-value-text" style="margin-top: 2px;">${r.fecha_inicio}</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_inicio}</div>
                 <div class="meta-label-block">Fecha Emisión</div>
               </div>
               
@@ -504,21 +520,21 @@ function ejecutarImpresionFormatoOficial(registros) {
                 <div class="meta-value-text">${r.tipo_arma}</div>
                 <div class="meta-label-block">Tipo de Arma</div>
                 
-                <div class="meta-value-text" style="margin-top: 2px;">${marcaCorrecta}</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${marcaCorrecta}</div>
                 <div class="meta-label-block">Marca</div>
                 
-                <div class="meta-value-text" style="margin-top: 2px;">${r.cantidad_municion}</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.cantidad_municion}</div>
                 <div class="meta-label-block">Cantidad Munición</div>
                 
-                <div class="meta-value-text" style="margin-top: 2px;">${r.fecha_fin}</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_fin}</div>
                 <div class="meta-label-block">Fecha Caducidad</div>
               </div>
             </div>
 
             <div class="pie-firma-autoridad">
               <div class="linea-portador"></div>
-              <div class="meta-value-text" style="margin-top: 2px; font-size: 10px; font-weight:normal">${firmaBloqueFormateado}</div>
-              <div class="meta-value-text" style="margin-top: 2px; font-size: 10px; font-weight: bold"> ${autorizador.funcion}</div>
+              <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight:normal">${firmaBloqueFormateado}</div>
+              <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight: bold">${funcionCargoAutoridad}</div>
             </div>
           </div>
 

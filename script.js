@@ -52,7 +52,6 @@ function inicializarNavegacionSPA() {
   }
 }
 
-// REEMPLAZA CON TU URL DE DEPLOYMENT DE APPS SCRIPT
 const WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbxOFjWcL-NIb4HsshGL6fIdwZi9AeAX7p4xhKdP56H5Z3KcfO8m9CD3q7xGZIzRp_aTbw/exec";
 
@@ -237,7 +236,7 @@ async function loadAllData() {
     if (typeof inicializarControlOperacional === "function") {
       inicializarControlOperacional(data);
     }
-    // Sincronización Segura del archivo personal.js[cite: 7]
+    // Sincronización Segura del archivo personal.js
     if (typeof renderPersonalTable === "function") {
       renderPersonalTable(data.personal);
       poblarDesplegablesPersonal();
@@ -248,7 +247,7 @@ async function loadAllData() {
       poblarDesplegablesSalvoconducto(data);
     }
 
-    // Inyección de Control Estadístico Operacional[cite: 7]
+    // Inyección de Control Estadístico Operacional
     if (typeof inicializarControlOperacional === "function") {
       inicializarControlOperacional(data);
     }
@@ -267,7 +266,7 @@ async function loadAllData() {
 // ============================================================
 async function sendData(payload, callbackReset) {
   loadingText.style.display = "block";
-  loadingText.innerText = "Sincronizando cambios con Google Sheets...";
+  loadingText.innerText = "Sincronizando cambios...";
 
   try {
     const response = await fetch(WEB_APP_URL, {
@@ -297,7 +296,7 @@ async function sendData(payload, callbackReset) {
     }, 1200);
   } catch (error) {
     console.error("Error remoto:", error);
-    alert("❌ Error de comunicación con el servidor de Google Sheets.");
+    alert("❌ Error de comunicación con el servidor...");
     loadingText.style.display = "none";
   }
 }
