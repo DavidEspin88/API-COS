@@ -618,8 +618,9 @@ function desplegarModalPersonalPorEstado(estadoSeleccionado, listaPersonalComple
   const modal = document.getElementById("modal-desglose-operacional");
   const titulo = document.getElementById("modal-titulo-estado");
   const tbodyModal = document.getElementById("table-body-modal-desglose");
+  const theadModal = modal ? modal.querySelector("thead") : null;
 
-  if (!modal || !tbodyModal) return;
+  if (!modal || !tbodyModal || !theadModal) return;
 
   // Filtrar el personal que se encuentra actualmente asignado a este estado
   const personalFiltrado = listaPersonalCompleto.filter(p => {
@@ -631,16 +632,54 @@ function desplegarModalPersonalPorEstado(estadoSeleccionado, listaPersonalComple
   // Si no hay personal registrado en esta condición, el sistema no abre nada por seguridad
   if (personalFiltrado.length === 0) return;
 
+  const esDiferenteADisponible = String(estadoSeleccionado).trim().toUpperCase() !== "DISPONIBLE";
+
+  // --- REQUERIMIENTO: GENERACIÓN DINÁMICA DE ENCABEZADOS DE ACUERDO AL ESTADO ---
+  if (esDiferenteADisponible) {
+    theadModal.innerHTML = `
+      <tr>
+        <th>ORD.</th>
+        <th>GRADO</th>
+        <th>APELLIDOS Y NOMBRES</th>
+        <th>FECHA INICIO</th>
+        <th>FECHA FINAL</th>
+        <th>OBSERVACIÓN / NOVEDAD</th>
+      </tr>
+    `;
+  } else {
+    // Si es DISPONIBLE, se mantiene la estructura simplificada original
+    theadModal.innerHTML = `
+      <tr>
+        <th>ORD.</th>
+        <th>GRADO</th>
+        <th>APELLIDOS Y NOMBRES</th>
+      </tr>
+    `;
+  }
+
   titulo.innerText = `PERSONAL EN CONDICIÓN DE: ${estadoSeleccionado.toUpperCase()} (${personalFiltrado.length})`;
   tbodyModal.innerHTML = "";
 
   personalFiltrado.forEach((m, index) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><span class="badge-ord">${index + 1}</span></td>
-      <td><strong>${m.grado}</strong></td>
-      <td style="text-align:left;">${m.apellidos_nombres}</td>
-    `;
+    const registro = mapaEstadosPersonal[m.cedula] || {};
+
+    if (esDiferenteADisponible) {
+      tr.innerHTML = `
+        <td><span class="badge-ord">${index + 1}</span></td>
+        <td><strong>${m.grado}</strong></td>
+        <td style="text-align:left;">${m.apellidos_nombres}</td>
+        <td><small>${registro.fecha_presentacion || "-"}</small></td>
+        <td><small>${registro.fecha_reincorporacion || "-"}</small></td>
+        <td style="text-align:left; font-weight:500; font-size:12px; color:var(--danger-color);">${registro.observacion || "SIN NOVEDAD"}</td>
+      `;
+    } else {
+      tr.innerHTML = `
+        <td><span class="badge-ord">${index + 1}</span></td>
+        <td><strong>${m.grado}</strong></td>
+        <td style="text-align:left;">${m.apellidos_nombres}</td>
+      `;
+    }
     tbodyModal.appendChild(tr);
   });
 

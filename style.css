@@ -987,10 +987,11 @@ th.col-checkbox-width {
 }
 
 /* Caja de contenido central */
+/* Modificar únicamente esta regla al final de tu style.css para dar espacio a las nuevas columnas */
 .modal-militar-content {
     background: #ffffff !important;
-    width: 90% !important;
-    max-width: 550px !important;
+    width: 95% !important; /* Aprovechamiento del espacio en tablets y móviles */
+    max-width: 850px !important; /* Se amplía de 550px a 850px para albergar cómodamente las fechas y novedades */
     border-radius: var(--radius-lg) !important;
     border: 1px solid #cbd5e1 !important;
     overflow: hidden !important;
