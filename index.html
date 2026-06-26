@@ -663,6 +663,13 @@
                         <div class="matrices-top-row">
                             <div class="card card-control-asignacion">
                                 <h3>Asignación y Control Operacional de Estados</h3>
+                                <div class="buscador-diario-wrapper">
+                                    <label for="buscar-parte-diario"
+                                        >Filtrar <span><i class="fa-solid fa-magnifying-glass"></i></span></i></label>
+                                    <input type="text" id="buscar-parte-diario"
+                                        placeholder=" Buscar por Cédula, Grado o Apellidos..."
+                                        oninput="filtrarTablaParteDiario(this.value)">
+                                </div>
                                 <div class="table-container">
                                     <table>
                                         <thead>
@@ -742,13 +749,10 @@
 </body>
 
 
-    <script src="script.js"></script>
-    <script src="personal.js"></script>
-    <script src="control_operacional.js"></script>
-    <script src="salvoconductos.js"></script>
+<script src="script.js"></script>
+<script src="personal.js"></script>
+<script src="control_operacional.js"></script>
+<script src="salvoconductos.js"></script>
 </body>
 
 </html>
-
-
-

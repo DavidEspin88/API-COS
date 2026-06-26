@@ -703,3 +703,35 @@ function cerrarModalDesglose() {
     modal.onclick = null; // Limpiar el listener de memoria al cerrar para optimizar el rendimiento
   }
 }
+
+// ============================================================
+// FUNCIONALIDAD AÑADIDA: BUSCADOR REACTIVO EN TIEMPO REAL
+// ============================================================
+function filtrarTablaParteDiario(textoBusqueda) {
+  const query = String(textoBusqueda).trim().toLowerCase();
+  const tbodyControl = document.getElementById("table-body-control-operacional");
+  
+  if (!tbodyControl) return;
+  
+  const filas = tbodyControl.getElementsByTagName("tr");
+
+  for (let i = 0; i < filas.length; i++) {
+    const fila = filas[i];
+    
+    // Extraer el texto de las celdas de Cédula (col 1), Grado (col 2) y Apellidos/Nombres (col 3)
+    const celdaCedula  = fila.cells[0] ? fila.cells[0].textContent.toLowerCase() : "";
+    const celdaGrado   = fila.cells[1] ? fila.cells[1].textContent.toLowerCase() : "";
+    const celdaNombres = fila.cells[2] ? fila.cells[2].textContent.toLowerCase() : "";
+
+    // Verificar si el texto ingresado coincide con alguno de los tres campos
+    if (
+      celdaCedula.includes(query) || 
+      celdaGrado.includes(query)  || 
+      celdaNombres.includes(query)
+    ) {
+      fila.style.display = ""; // Muestra la fila si coincide
+    } else {
+      fila.style.display = "none"; // Oculta la fila si no coincide
+    }
+  }
+}
