@@ -71,7 +71,7 @@
 
             <header class="main-header">
                 <h1 id="current-module-title">Sección de Munición</h1>
-                <div id="loading-text" class="loading">Sincronizando Base de Datos de Google Sheets...</div>
+                <div id="loading-text" class="loading">Sincronizando Base de Datos...</div>
             </header>
 
             <div class="content-wrapper">
@@ -718,6 +718,28 @@
             </div>
         </main>
     </div>
+    <!-- Ventana Modal de Desglose Táctico de Personal por Estado (Añadido) -->
+    <div id="modal-desglose-operacional" class="modal-militar hidden">
+        <div class="modal-militar-content shadow-lg">
+            <div class="modal-militar-header">
+                <h3 id="modal-titulo-estado">Desglose de Personal</h3>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalDesglose()">&times;</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ORD.</th>
+                            <th>GRADO</th>
+                            <th>APELLIDOS Y NOMBRES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-modal-desglose"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
 
 
     <script src="script.js"></script>

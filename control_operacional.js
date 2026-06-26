@@ -487,11 +487,22 @@ function calcularYRenderizarMatrices(personal) {
   const tbodyResumen = document.getElementById("table-body-matriz-resumen");
   tbodyResumen.innerHTML = "";
   let sumaEstadosVerificacion = 0;
+
   estadosDisponibles.forEach((est) => {
     sumaEstadosVerificacion += conteoEstados[est];
-    tbodyResumen.innerHTML += `<tr><td>${est}</td><td>${conteoEstados[est]}</td></tr>`;
+    
+    const trResumen = document.createElement("tr");
+    trResumen.innerHTML = `<td>${est}</td><td><strong>${conteoEstados[est]}</strong></td>`;
+    
+    // Filtro reactivo en caliente de personal al hacer clic en la fila
+    trResumen.onclick = () => desplegarModalPersonalPorEstado(est, personal);
+    
+    tbodyResumen.appendChild(trResumen);
   });
-  tbodyResumen.innerHTML += `<tr><td><strong>TOTAL PERSONAL</strong></td><td><strong>${sumaEstadosVerificacion}</strong></td></tr>`;
+
+  const trTotal = document.createElement("tr");
+  trTotal.innerHTML = `<td><strong>TOTAL PERSONAL</strong></td><td><strong>${sumaEstadosVerificacion}</strong></td>`;
+  tbodyResumen.appendChild(trTotal);
 
   const theadCruzado = document.getElementById("thead-matriz-cruzada");
   const tbodyCruzado = document.getElementById("table-body-matriz-cruzada");
@@ -596,5 +607,60 @@ async function guardarControlOperacional() {
         renderizarPanelOperacional(window.datosPersonalGlobal);
       }
     });
+  }
+}
+
+// ============================================================
+// FUNCIONALIDAD ADAPTADA: ENRUTADORES DE LA CAPA MODAL
+// ============================================================
+
+function desplegarModalPersonalPorEstado(estadoSeleccionado, listaPersonalCompleto) {
+  const modal = document.getElementById("modal-desglose-operacional");
+  const titulo = document.getElementById("modal-titulo-estado");
+  const tbodyModal = document.getElementById("table-body-modal-desglose");
+
+  if (!modal || !tbodyModal) return;
+
+  // Filtrar el personal que se encuentra actualmente asignado a este estado
+  const personalFiltrado = listaPersonalCompleto.filter(p => {
+    const registro = mapaEstadosPersonal[p.cedula];
+    const estadoActualMilitar = registro ? registro.id_estado : estadosDisponibles[0];
+    return String(estadoActualMilitar).trim().toUpperCase() === String(estadoSeleccionado).trim().toUpperCase();
+  });
+
+  // Si no hay personal registrado en esta condición, el sistema no abre nada por seguridad
+  if (personalFiltrado.length === 0) return;
+
+  titulo.innerText = `PERSONAL EN CONDICIÓN DE: ${estadoSeleccionado.toUpperCase()} (${personalFiltrado.length})`;
+  tbodyModal.innerHTML = "";
+
+  personalFiltrado.forEach((m, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="badge-ord">${index + 1}</span></td>
+      <td><strong>${m.grado}</strong></td>
+      <td style="text-align:left;">${m.apellidos_nombres}</td>
+    `;
+    tbodyModal.appendChild(tr);
+  });
+
+  // Remover la clase de ocultamiento SPA
+  modal.classList.remove("hidden");
+
+  // === ESCUCHADOR AÑADIDO: CERRAR AL HACER CLIC FUERA DE LA CAJA ===
+  // Si el usuario hace clic exactamente en el contenedor gris de fondo ('modal-desglose-operacional')
+  // y no dentro de la tarjeta blanca de contenido, el modal se cerrará automáticamente.
+  modal.onclick = function(evento) {
+    if (evento.target === modal) {
+      cerrarModalDesglose();
+    }
+  };
+}
+
+function cerrarModalDesglose() {
+  const modal = document.getElementById("modal-desglose-operacional");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.onclick = null; // Limpiar el listener de memoria al cerrar para optimizar el rendimiento
   }
 }

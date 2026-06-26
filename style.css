@@ -870,3 +870,165 @@ th.col-checkbox-width {
         gap: 10px !important;
     }
 }
+
+/* ============================================================
+   ESTILOS INTERACTIVOS PARA LA VENTANA MODAL DEL PARTE DIARIO
+   ============================================================ */
+
+/* Indicar visualmente que la matriz resumen es interactiva */
+#table-body-matriz-resumen tr {
+    cursor: pointer;
+    transition: background-color var(--transition);
+}
+#table-body-matriz-resumen tr:hover {
+    background-color: rgba(24, 188, 156, 0.15) !important;
+}
+
+/* Contenedor de fondo opaco */
+.modal-militar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(44, 62, 80, 0.5); /* Sombra primaria */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    transition: opacity var(--transition);
+}
+
+/* Caja de contenido central */
+.modal-militar-content {
+    background: #ffffff;
+    width: 90%;
+    max-width: 550px;
+    border-radius: var(--radius-lg);
+    border: 1px solid #cbd5e1;
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+}
+
+/* Encabezado del modal */
+.modal-militar-header {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-militar-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #ffffff;
+}
+
+/* Botón de cierre */
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    width: auto;
+    padding: 0;
+    margin: 0;
+}
+.btn-close-modal:hover {
+    color: var(--secondary-color);
+}
+
+@keyframes modalSlideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* ============================================================
+   BLOQUE DE CONTROL OPERACIONAL: VENTANAS MODALES (CORREGIDO)
+   ============================================================ */
+
+/* Regla Crítica: Ocultar el modal por completo y liberar el mouse cuando tenga la clase hidden */
+.modal-militar.hidden {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important; /* Libera el mouse para que puedas dar clics en la tabla de atrás */
+    visibility: hidden !important;
+}
+
+/* Regla de Despliegue: Se activa únicamente cuando se remueve la clase hidden */
+.modal-militar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(44, 62, 80, 0.5) !important; /* Sombra translúcida */
+    display: flex !important; /* Centra el contenido horizontal y verticalmente */
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 3000 !important; /* Capa por encima de la barra lateral y tablas */
+    pointer-events: auto !important; /* Captura clics dentro de su área activa */
+    transition: opacity var(--transition);
+}
+
+/* Indicar visualmente que la matriz resumen es interactiva */
+#table-body-matriz-resumen tr {
+    cursor: pointer !important;
+    transition: background-color var(--transition);
+}
+
+#table-body-matriz-resumen tr:hover {
+    background-color: rgba(24, 188, 156, 0.15) !important;
+}
+
+/* Caja de contenido central */
+.modal-militar-content {
+    background: #ffffff !important;
+    width: 90% !important;
+    max-width: 550px !important;
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid #cbd5e1 !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
+    animation: modalSlideIn 0.2s ease-out !important;
+}
+
+/* Encabezado del modal */
+.modal-militar-header {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    padding: 12px 18px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.modal-militar-header h3 {
+    margin: 0 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    color: #ffffff !important;
+}
+
+/* Botón de cierre superior (X) */
+.btn-close-modal {
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.btn-close-modal:hover {
+    color: var(--secondary-color) !important;
+}
