@@ -112,7 +112,37 @@ const formTitleEst = document.getElementById("form-title-est");
 const btnSaveEst = document.getElementById("btn-save-est");
 
 //Usuarios
-const formUsr = document.getElementById("form-usuarios");
+const formUsrElement = document.getElementById("form-usuarios");
+if (formUsrElement) {
+  formUsrElement.addEventListener("submit", (e) => {
+    e.preventDefault();
+    
+    // Desbloquear temporalmente para capturar el valor en el submit si está editando
+    const selectRolForm = document.getElementById("usr-tipo");
+    if (selectRolForm) selectRolForm.disabled = false;
+
+    sendData(
+      {
+        target: "usuarios",
+        action: isEditingUsr ? "update" : "create",
+        id: document.getElementById("usr-id").value,
+        correo: document.getElementById("usr-correo").value.trim(),
+        tipo_usuario: document.getElementById("usr-tipo").value,
+        apellidos_nombres: document.getElementById("usr-nombres").value.toUpperCase(),
+        estado_cuenta: "ACTIVO", // Campo mapeado con el backend de la hoja
+        contrasena: document.getElementById("usr-password").value,
+      },
+      () => {
+        isEditingUsr = false;
+        if (formTitleUsr) formTitleUsr.innerText = "Registrar Usuario";
+        formUsrElement.reset();
+        if (selectRolForm) selectRolForm.disabled = false;
+        // Re-ejecutar la lógica de perfil para re-poblar las opciones limitadas del select
+        if (cuentaUsuarioActivoSesion) aplicarRestriccionesDePerfil(cuentaUsuarioActivoSesion.tipo_usuario);
+      }
+    );
+  });
+}
 const tableBodyUsr = document.getElementById("table-body-usuarios");
 
 const loadingText = document.getElementById("loading-text");
@@ -544,9 +574,29 @@ function setupEditArmCal(id, tipo, calibre) {
   document.getElementById("armcal-tipo").value = tipo;
   document.getElementById("armcal-calibre").value = calibre;
 }
+
 function setupEditUsr(id, correo, tipo, nombres, pass) {
   isEditingUsr = true;
-  // Implementación base para sincronía de edición de usuarios si fuese requerida
+  const formTitle = document.getElementById("form-title-usr");
+  const btnSave = document.getElementById("btn-save-usr");
+  const btnCancel = document.getElementById("btn-cancel-usr");
+  
+  if (formTitle) formTitle.innerText = "Modificar Usuario";
+  if (btnSave) btnSave.innerText = "Actualizar Usuario";
+  if (btnCancel) btnCancel.style.display = "block";
+  
+  document.getElementById("usr-id").value = id;
+  document.getElementById("usr-correo").value = correo;
+  document.getElementById("usr-nombres").value = nombres;
+  document.getElementById("usr-password").value = pass;
+  
+  // Habilitado para edición libre de rol false
+  const selectRolForm = document.getElementById("usr-tipo");
+  if (selectRolForm) {
+    selectRolForm.innerHTML = `<option value="${tipo}">${tipo}</option>`;
+    selectRolForm.value = tipo;
+    selectRolForm.disabled = false; 
+  }
 }
 
 // Resets
@@ -706,42 +756,43 @@ function inicializarMóduloAutenticacionFAE() {
 
       // --- LOGIN EXITOSO ---
       cuentaUsuarioActivoSesion = usuarioEncontrado;
+      
+      // Control de Estado de Cuenta Estricto
+      if (String(usuarioEncontrado.estado_cuenta).trim().toUpperCase() !== "ACTIVO") {
+        if (alertBox) {
+          alertBox.textContent = "❌ Acceso Denegado: Su cuenta militar se encuentra INACTIVA. Contacte al Administrador.";
+          alertBox.className = "auth-alert error";
+        }
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          if (btnText) btnText.textContent = "Iniciar Sesión";
+          if (btnSpinner) btnSpinner.classList.add("hidden");
+        }
+        return;
+      }
+
       if (alertBox) {
         alertBox.textContent = "✔ Autenticación autorizada. Ingresando al sistema...";
         alertBox.className = "auth-alert success";
       }
 
-      // Formatear firma del operador logueado
+      // Aplicar Matriz de Permisos Operacionales en el DOM
+      aplicarRestriccionesDePerfil(usuarioEncontrado.tipo_usuario);
+
+      // Formatear firma del operador logueado (Tu lógica existente)
       const tokensNombres = usuarioEncontrado.apellidos_nombres.trim().split(/\s+/);
       let firmaLegibleTripulante = usuarioEncontrado.apellidos_nombres;
-
       if (tokensNombres.length >= 3) {
-        const apellido1 = tokensNombres[0];
-        const primerNombre = tokensNombres[2];
-        firmaLegibleTripulante = `${primerNombre} ${apellido1}`;
+        firmaLegibleTripulante = `${tokensNombres[2]} ${tokensNombres[0]}`;
       }
 
-      let gradoMilitarPrefijo = "OPERADOR";
-      if (usuarioEncontrado.tipo_usuario !== "ADMINISTRADOR") {
-        const militarFicha = (window.datosPersonalGlobal || []).find((m) =>
-          m.apellidos_nombres.includes(tokensNombres[0])
-        );
-        if (militarFicha) gradoMilitarPrefijo = militarFicha.grado;
-      } else {
-        gradoMilitarPrefijo = "ADMIN";
-      }
-
+      let gradoMilitarPrefijo = usuarioEncontrado.tipo_usuario;
       const textEscuadron = document.querySelector(".text-escuadron");
       if (textEscuadron) {
-        const divOperador =
-          document.getElementById("sidebar-operador-firma") ||
-          document.createElement("div");
+        const divOperador = document.getElementById("sidebar-operador-firma") || document.createElement("div");
         divOperador.id = "sidebar-operador-firma";
-        divOperador.innerHTML = `<span style="font-size: 11px; color: #18bc9c; font-weight: 600; text-transform: uppercase;"><i class="fa-solid fa-user-shield"></i> ${gradoMilitarPrefijo} ${firmaLegibleTripulante}</span>`;
-        textEscuadron.parentNode.insertBefore(
-          divOperador,
-          textEscuadron.nextSibling
-        );
+        divOperador.innerHTML = `<span style="font-size: 11px; color: #18bc9c; font-weight: 600; text-transform: uppercase;"><i class="fa-solid fa-user-shield"></i> ${gradoMilitarPrefijo}: ${firmaLegibleTripulante}</span>`;
+        textEscuadron.parentNode.insertBefore(divOperador, textEscuadron.nextSibling);
       }
 
       // Transición e intercambio de pantallas para SPA
@@ -755,4 +806,26 @@ function inicializarMóduloAutenticacionFAE() {
       
     }, 1200);
   });
+}
+function aplicarRestriccionesDePerfil(perfil) {
+  // SE ELIMINAN LAS RESTRICCIONES VISUALES DE MÓDULOS Y COLUMNAS
+  // Todos los usuarios tienen acceso a ver el menú lateral completo y las acciones de seguridad
+
+  // Poblar el formulario de usuarios con todas las opciones disponibles para todos
+  const selectRolForm = document.getElementById("usr-tipo");
+  if (selectRolForm) {
+    selectRolForm.innerHTML = `
+      <option value="">-- Seleccione un Rol de Acceso --</option>
+      <option value="ADMINISTRADOR">ADMINISTRADOR (Acceso Total)</option>
+      <option value="ADMINISTRATIVO">ADMINISTRATIVO (Acceso Total)</option>
+      <option value="COMANDANTE">COMANDANTE (Acceso Total)</option>
+    `;
+  }
+}
+function toggleVisibilidadPassword() {
+  const inputPass = document.getElementById("usr-password");
+  if (inputPass) {
+    const esPass = inputPass.type === "password";
+    inputPass.type = esPass ? "text" : "password";
+  }
 }

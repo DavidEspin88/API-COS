@@ -192,12 +192,16 @@ function renderizarTablaSalvoconductos() {
         <td>${s.cantidad_municion} <br><small>${s.calibre}</small></td>
         <td><strong>${s.lugar}</strong></td>
         <td><small>${s.fecha_inicio} al ${s.fecha_fin}</small></td>
-        <td><span class="badge-ord" style="background:${esActivo ? " #e67e22" : "#7f8c8d" }; font-size:11px;">${s.estado}</span>
+        <td><span class="badge-ord" style="background:${esActivo ? " #e67e22" : "#7f8c8d"}; font-size:11px;">${s.estado}</span>
         </td>
         <td>
-            ${esActivo ? `<button type="button" class="btn-submit" style="background:#27ae60; padding:4px 8px; font-size:11px;"
-                onclick="registrarDevolucionAnticipada('${s.id}')">Devolución</button>` : `<span
-                style="color:#27ae60; font-weight:bold;">✔ En Armerillo</span>`}
+            ${
+              esActivo
+                ? `<button type="button" class="btn-submit" style="background:#27ae60; padding:4px 8px; font-size:11px;"
+                onclick="registrarDevolucionAnticipada('${s.id}')">Devolución</button>`
+                : `<span
+                style="color:#27ae60; font-weight:bold;">✔ En Armerillo</span>`
+            }
         </td>
     `;
     tbody.appendChild(tr);
@@ -439,11 +443,13 @@ function ejecutarImpresionFormatoOficial(registros) {
       );
       const marcaCorrecta = armaFisica
         ? armaFisica.marca || "SIN MARCA"
-        : (r.marca && r.marca !== "undefined" ? r.marca : "-");
+        : r.marca && r.marca !== "undefined"
+          ? r.marca
+          : "-";
 
       // === CORRECCIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA EXTRAYENDO DE LA BASE DE DATOS ===
       let firmaBloqueFormateado = r.aprobado_por; // Respaldo por defecto
-      let funcionCargoAutoridad = "COMANDANTE DEL ESCUADRÓN VIGALCO \"BUITRE\""; // Respaldo por defecto
+      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALCO "BUITRE"'; // Respaldo por defecto
 
       // Buscar la ficha completa del aprobador en la caché de personal utilizando su rango y nombre
       const autorizador = salvoCachePersonal.find(
@@ -457,7 +463,7 @@ function ejecutarImpresionFormatoOficial(registros) {
         // Extraemos el primer nombre (índice 2) y los dos apellidos (índices 0 y 1)
         const tokens = autorizador.apellidos_nombres.trim().split(/\s+/);
         let nombreFirma = autorizador.apellidos_nombres;
-        
+
         if (tokens.length >= 3) {
           const ap1 = tokens[0];
           const ap2 = tokens[1];
@@ -466,8 +472,14 @@ function ejecutarImpresionFormatoOficial(registros) {
         }
 
         // Abreviar la Especialidad de forma estandarizada e institucional FAE
-        let espAbr = autorizador.especialidad ? autorizador.especialidad.trim().toUpperCase() : "";
-        if (espAbr.includes("TÉCNICO") || espAbr.includes("TECNICO") || espAbr.includes("ARMAMENTO")) {
+        let espAbr = autorizador.especialidad
+          ? autorizador.especialidad.trim().toUpperCase()
+          : "";
+        if (
+          espAbr.includes("TÉCNICO") ||
+          espAbr.includes("TECNICO") ||
+          espAbr.includes("ARMAMENTO")
+        ) {
           espAbr = "TÉC.";
         } else if (espAbr.includes("ESPECIALISTA")) {
           espAbr = "ESP.";
@@ -479,10 +491,12 @@ function ejecutarImpresionFormatoOficial(registros) {
 
         // Construcción simétrica solicitada: GRADO + ESP_ABRV + AVC. + 1er NOMBRE + 2 APELLIDOS
         firmaBloqueFormateado = `${autorizador.grado} ${espAbr} AVC. ${nombreFirma}`;
-        
+
         // Cargar dinámicamente la función militar de la base de datos (Comandante u Oficial de Semana)
         if (autorizador.funcion) {
-          funcionCargoAutoridad = String(autorizador.funcion).trim().toUpperCase();
+          funcionCargoAutoridad = String(autorizador.funcion)
+            .trim()
+            .toUpperCase();
         }
       }
 
@@ -578,7 +592,37 @@ function ejecutarImpresionFormatoOficial(registros) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const modalSalvo = document.getElementById("modal-emision-salvoconducto");
+  const btnAbrirModal = document.getElementById("btn-abrir-nuevo-salvo");
+  const btnCerrarModal = document.getElementById("btn-cerrar-modal-salvo");
   const formSalvoconducto = document.getElementById("form-salvoconducto");
+
+  // 1. Manejo de aperturas y cierres del Modal
+  if (btnAbrirModal && modalSalvo) {
+    btnAbrirModal.addEventListener("click", () => {
+      // ACCESO CONCEDIDO A TODOS LOS USUARIOS SIN RESTRICCIONES
+      formSalvoconducto.reset();
+      document.getElementById("salvo-info-militar").value = "";
+      modalSalvo.classList.remove("hidden");
+    });
+  }
+
+  if (btnCerrarModal && modalSalvo) {
+    btnCerrarModal.addEventListener("click", () => {
+      modalSalvo.classList.add("hidden");
+    });
+  }
+
+  // Cerrar si hace clic en el fondo translúcido exterior
+  if (modalSalvo) {
+    modalSalvo.addEventListener("click", (e) => {
+      if (e.target === modalSalvo) {
+        modalSalvo.classList.add("hidden");
+      }
+    });
+  }
+
+  // 2. Interceptor del Formulario de Envío
   if (formSalvoconducto) {
     formSalvoconducto.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -600,6 +644,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const stockDisponible = loteMunicion
         ? parseInt(loteMunicion.cantidad)
         : 0;
+
       if (cantMunSolicitada > stockDisponible) {
         alert(
           `❌ Abortado: Stock insuficiente en polvorín. Almacenado: ${stockDisponible}.`,
@@ -627,6 +672,8 @@ document.addEventListener("DOMContentLoaded", () => {
         sendData(payload, () => {
           formSalvoconducto.reset();
           document.getElementById("salvo-info-militar").value = "";
+          // REGLA DE OPTIMIZACIÓN: Ocultar modal automáticamente tras guardar con éxito
+          if (modalSalvo) modalSalvo.classList.add("hidden");
         });
       }
     });

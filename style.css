@@ -1630,3 +1630,13 @@ th.col-checkbox-width {
     .auth-visual-side { flex: 0 0 50%; }
     .auth-form-side   { flex: 0 0 50%; }
 }
+
+/* Expandir la base de datos de personal al ancho completo tras la conversión a modal */
+#module-registro_personal .vertical-layout {
+    display: block !important;
+    width: 100% !important;
+}
+
+#module-registro_personal .card.full-width {
+    width: 100% !important;
+}

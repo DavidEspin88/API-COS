@@ -20,8 +20,36 @@ let datosPersonalGlobal = [];
 let currentPage = 1;
 const rowsPerPage = 10;
 
-// Inicializar Listeners para las Flechas de navegación de la tabla
+// Inicializar Listeners para las Flechas de navegación de la tabla y Control del Modal
 document.addEventListener("DOMContentLoaded", () => {
+  const modalPer = document.getElementById("modal-registro-personal");
+  const btnAbrirModalPer = document.getElementById("btn-abrir-nuevo-personal");
+  const btnCerrarModalPer = document.getElementById(
+    "btn-cerrar-modal-personal",
+  );
+
+  if (btnAbrirModalPer && modalPer) {
+    btnAbrirModalPer.addEventListener("click", () => {
+      resetFormPersonal();
+      modalPer.classList.remove("hidden");
+    });
+  }
+
+  if (btnCerrarModalPer && modalPer) {
+    btnCerrarModalPer.addEventListener("click", () => {
+      modalPer.classList.add("hidden");
+    });
+  }
+
+  // Cerrar al hacer clic en el fondo oscuro
+  if (modalPer) {
+    modalPer.addEventListener("click", (e) => {
+      if (e.target === modalPer) {
+        modalPer.classList.add("hidden");
+      }
+    });
+  }
+
   if (btnPrevPage && btnNextPage) {
     btnPrevPage.addEventListener("click", () => {
       if (currentPage > 1) {
@@ -39,6 +67,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// Envío de Formulario
+formPer.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const antInput = document.getElementById("per-ant").value;
+  const payload = {
+    target: "personal",
+    action: isEditingPer ? "update" : "create",
+    cedula: document.getElementById("per-cedula").value,
+    grado: selectGrado.value,
+    especialidad: selectEspecialidad.value,
+    ant: antInput === "" ? "" : parseInt(antInput),
+    apellidos_nombres: document
+      .getElementById("per-nombres")
+      .value.toUpperCase(),
+    funcion: selectFuncion.value,
+    fecha_nacimiento: document.getElementById("per-fecha").value,
+    contacto: document.getElementById("per-contacto").value,
+    nombre_contacto: document.getElementById("per-nombre-contacto").value,
+  };
+
+  if (typeof sendData === "function") {
+    sendData(payload, () => {
+      resetFormPersonal();
+      // Ocultar modal automáticamente tras guardar con éxito
+      const modalPer = document.getElementById("modal-registro-personal");
+      if (modalPer) modalPer.classList.add("hidden");
+    });
+  }
+});
 // 1. Población Dinámica de Menús Desplegables
 function poblarDesplegablesPersonal() {
   const currentGrado = selectGrado.value;
@@ -72,12 +129,12 @@ function poblarDesplegablesPersonal() {
       const opt = document.createElement("option");
       // Normalización: el servidor puede devolver "funcion" o "valor_unico"
       const nombreFuncion = item.function || item.funcion || "";
-    
-    opt.value = nombreFuncion;
-    opt.textContent = nombreFuncion;
-    selectFuncion.appendChild(opt);
-  });
-}
+
+      opt.value = nombreFuncion;
+      opt.textContent = nombreFuncion;
+      selectFuncion.appendChild(opt);
+    });
+  }
 
   selectGrado.value = currentGrado;
   selectEspecialidad.value = currentEsp;
@@ -191,6 +248,7 @@ formPer.addEventListener("submit", async (e) => {
 });
 
 // 4. Configurar Interfaz para Edición
+// Configurar Interfaz para Edición
 function setupEditPer(
   cedula,
   grado,
@@ -249,13 +307,16 @@ function setupEditPer(
 
   document.getElementById("per-contacto").value = contacto;
   document.getElementById("per-nombre-contacto").value = nombreContacto;
-  formPer.scrollIntoView({ behavior: "smooth" });
+
+  // REGLA DE APERTURA: Desplegar el modal automáticamente al presionar editar
+  const modalPer = document.getElementById("modal-registro-personal");
+  if (modalPer) modalPer.classList.remove("hidden");
 }
 
-// 5. Limpieza del Formulario
+// Limpieza del Formulario
 function resetFormPersonal() {
   isEditingPer = false;
-  formTitlePer.innerText = "Registrar Nuevo Personal";
+  formTitlePer.innerText = "Registrar Nuevo Personal Militar";
   btnCancelPer.style.display = "none";
   const cedulaInput = document.getElementById("per-cedula");
   cedulaInput.readOnly = false;
