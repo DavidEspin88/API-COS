@@ -850,21 +850,9 @@
             <div class="radar-bg-image">
                 <img src="imagenes/radar-segruidad-montecristi.png" alt="deteccion helicoptero por radar">
             </div>
-            <div class="radar-system">
-                <div class="radar-ring ring-1">
-                    <span class="radar-node node-1"><i class="fa-solid fa-plane"></i></span>
-                    <span class="radar-node node-2"><i class="fa-solid fa-plane"></i></span>
-                </div>
-                <div class="radar-ring ring-2">
-                    <span class="radar-node node-2"><i class="fa-solid fa-plane"></i></span>
-                </div>
-                <div class="radar-ring ring-3">
-                    <span class="radar-node node-2"><i class="fa-solid fa-plane"></i></span>
-                    <span class="radar-node node-1"><i class="fa-solid fa-plane"></i></i></span>
-                    <span class="radar-node node-2"><i class="fa-solid fa-plane"></i></span>
-                </div>
-                <div class="radar-sweep"></div>
-            </div>
+            <div class="radar-system" style="width: 400px; height: 400px; position: relative; background: #030712; border-radius: 50%; padding: 0; box-shadow: 0 0 35px rgba(0, 200, 150, 0.15); border: 2px solid rgba(0, 200, 150, 0.3);">
+    <canvas id="radarCanvas" width="400" height="400" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 5;"></canvas>
+</div>
 
             <!-- Texto institucional -->
             <div class="auth-visual-text">

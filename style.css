@@ -1146,14 +1146,11 @@ th.col-checkbox-width {
 
 /* ── Anillos radar ── */
 .radar-system {
-    position: relative;
-    width: 400px;
-    height: 400px;
+    margin: 20px auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: transparent !important;
-    z-index: 2;
+    overflow: hidden;
 }
 
 .radar-bg-image {
@@ -1631,12 +1628,6 @@ th.col-checkbox-width {
     .auth-form-side   { flex: 0 0 50%; }
 }
 
-/* Expandir la base de datos de personal al ancho completo tras la conversión a modal */
-#module-registro_personal .vertical-layout {
-    display: block !important;
-    width: 100% !important;
-}
-
-#module-registro_personal .card.full-width {
-    width: 100% !important;
-}
+/* ============================================================
+   BARRA LATERAL: ENTORNO DEL RADAR TÁCTICO MILITAR
+   ============================================================ */
