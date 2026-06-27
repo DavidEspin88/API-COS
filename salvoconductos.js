@@ -33,10 +33,22 @@ function poblarDesplegablesSalvoconducto(data) {
       selectLugar.innerHTML += `<option value="${l.lugar}">${l.lugar}</option>`;
   });
 
-  // 3. Población de Autoridades Aprobadoras (Filtro por Rol)
+// 3. Población de Autoridades Aprobadoras (Filtro por Rol - Combinando Planta y Agregado Activo)
   selectAprobador.innerHTML =
     '<option value="">-- Seleccione Autoridad Militar Facultada --</option>';
-  (data.personal || []).forEach((p) => {
+  
+  // Unificar listas para evaluar autorizadores facultados
+  const listaPoolPersonalTotal = [...(data.personal || [])];
+  
+  if (data.personal_agregado) {
+    data.personal_agregado.forEach(pa => {
+      if (String(pa.estado).toUpperCase() === "ACTIVO") {
+        listaPoolPersonalTotal.push(pa);
+      }
+    });
+  }
+
+  listaPoolPersonalTotal.forEach((p) => {
     const cargoLimpio = String(p.funcion).trim().toUpperCase();
     if (
       cargoLimpio === 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"' ||
@@ -447,17 +459,20 @@ function ejecutarImpresionFormatoOficial(registros) {
           ? r.marca
           : "-";
 
-      // === CORRECCIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA EXTRAYENDO DE LA BASE DE DATOS ===
+   // === CORRECCIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA EXTRAYENDO DE LA BASE DE DATOS ===
       let firmaBloqueFormateado = r.aprobado_por; // Respaldo por defecto
-      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALCO "BUITRE"'; // Respaldo por defecto
+      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"'; // Respaldo por defecto
 
-      // Buscar la ficha completa del aprobador en la caché de personal utilizando su rango y nombre
-      const autorizador = salvoCachePersonal.find(
+      // Unificar cachés locales para la búsqueda del autorizador en impresión
+      const poolAutorizadoresImpresion = [...salvoCachePersonal, ...datosPersonalAgregadoGlobal];
+
+      // Buscar la ficha completa del aprobador utilizando su rango y nombre
+      const autorizador = poolAutorizadoresImpresion.find(
         (p) =>
           `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() ===
           String(r.aprobado_por).trim().toUpperCase(),
       );
-
+      
       if (autorizador) {
         // Formatear nombres: la base de datos viene como "APELLIDO1 APELLIDO2 NOMBRE1 NOMBRE2"
         // Extraemos el primer nombre (índice 2) y los dos apellidos (índices 0 y 1)

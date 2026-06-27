@@ -310,14 +310,24 @@
                 </section>
 
                 <section id="module-registro_personal" class="tab-content hidden">
-                    <div class="vertical-layout">
-                        <!-- 1. Tabla de Personal Expandida al 100% con Botón de Registro -->
+                    <div
+                        style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px;">
+                        <button type="button" id="btn-sub-planta" class="btn-submit"
+                            style="width: auto; padding: 6px 18px; margin: 0; background: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-users"></i> Personal de Planta
+                        </button>
+                        <button type="button" id="btn-sub-agregado" class="btn-submit"
+                            style="width: auto; padding: 6px 18px; margin: 0; background: #7f8c8d; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-people-arrows"></i> Personal Agregado Temporal
+                        </button>
+                    </div>
+
+                    <div class="vertical-layout" id="submodulo-planta-view">
                         <div class="card full-width" style="width: 100% !important;">
                             <div class="table-header-flex"
                                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h3>Base de Datos de Personal Fuerza Aérea</h3>
+                                <h3>Base de Datos de Personal de Planta (Fuerza Aérea)</h3>
                                 <div style="display: flex; align-items: center; gap: 15px;">
-                                    <!-- NUEVO BOTÓN PARA ACTIVAR EL MODAL DE PERSONAL -->
                                     <button type="button" id="btn-abrir-nuevo-personal" class="btn-submit"
                                         style="background: #18bc9c; width: auto; padding: 6px 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
                                         <i class="fa-solid fa-user-plus"></i> REGISTRAR NUEVO PERSONAL
@@ -354,7 +364,39 @@
                         </div>
                     </div>
 
-                    <!-- 2. NUEVA VENTANA MODAL PARA REGISTRO / MODIFICACIÓN DE PERSONAL -->
+                    <div class="vertical-layout hidden" id="submodulo-agregado-view">
+                        <div class="card full-width" style="width: 100% !important;">
+                            <div class="table-header-flex"
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h3>Matriz de Control de Personal Agregado Táctico</h3>
+                                <button type="button" id="btn-abrir-nuevo-agregado" class="btn-submit"
+                                    style="background: #e67e22; width: auto; padding: 6px 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-user-plus"></i> AÑADIR PERSONAL AGREGADO
+                                </button>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ORD</th>
+                                            <th>Cédula</th>
+                                            <th>Grado</th>
+                                            <th>Especialidad</th>
+                                            <th>Antigüedad</th>
+                                            <th>Apellidos y Nombres</th>
+                                            <th>Función Temporal</th>
+                                            <th>Contacto</th>
+                                            <th>Estado</th>
+                                            <th>Acciones Operacionales</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-body-personal-agregado">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="modal-registro-personal" class="modal-militar hidden">
                         <div class="modal-militar-content shadow-lg" style="max-width: 750px !important;">
                             <div class="modal-militar-header"

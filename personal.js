@@ -1,4 +1,6 @@
-// Selectores Exclusivos de Personal
+// ============================================================
+// SELECTORES EXCLUSIVOS DE PERSONAL
+// ============================================================
 const formPer = document.getElementById("form-personal");
 const tableBodyPer = document.getElementById("table-body-personal");
 const btnCancelPer = document.getElementById("btn-cancel-per");
@@ -14,23 +16,71 @@ const btnPrevPage = document.getElementById("btn-prev-page");
 const btnNextPage = document.getElementById("btn-next-page");
 const paginationText = document.getElementById("pagination-text");
 
-// Variables de Estado de Paginación
+// Variables de Estado de Paginación y Control
 let isEditingPer = false;
 let datosPersonalGlobal = [];
+let datosPersonalAgregadoGlobal = []; // Memoria caché para personal agregado
 let currentPage = 1;
 const rowsPerPage = 10;
 
-// Inicializar Listeners para las Flechas de navegación de la tabla y Control del Modal
+// ============================================================
+// INICIALIZACIÓN DE LISTENERS (DOM CONTENT LOADED)
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   const modalPer = document.getElementById("modal-registro-personal");
   const btnAbrirModalPer = document.getElementById("btn-abrir-nuevo-personal");
+  const btnAbrirModalAgregado = document.getElementById(
+    "btn-abrir-nuevo-agregado",
+  );
   const btnCerrarModalPer = document.getElementById(
     "btn-cerrar-modal-personal",
   );
 
+  // Botones de la barra de sub-navegación interna
+  const btnSubPlanta = document.getElementById("btn-sub-planta");
+  const btnSubAgregado = document.getElementById("btn-sub-agregado");
+  const submoduloPlantaView = document.getElementById("submodulo-planta-view");
+  const submoduleAgregadoView = document.getElementById(
+    "submodulo-agregado-view",
+  );
+
+  // --- CONTROL DE SUB-NAVEGACIÓN INTERNA ---
+  if (
+    btnSubPlanta &&
+    btnSubAgregado &&
+    submoduloPlantaView &&
+    submoduleAgregadoView
+  ) {
+    btnSubPlanta.addEventListener("click", () => {
+      btnSubPlanta.style.background = "var(--primary-color)";
+      btnSubAgregado.style.background = "#7f8c8d";
+      submoduloPlantaView.classList.remove("hidden");
+      submoduleAgregadoView.classList.add("hidden");
+    });
+
+    btnSubAgregado.addEventListener("click", () => {
+      btnSubAgregado.style.background = "var(--primary-color)";
+      btnSubPlanta.style.background = "#7f8c8d";
+      submoduleAgregadoView.classList.remove("hidden");
+      submoduloPlantaView.classList.add("hidden");
+    });
+  }
+
+  // --- CONTROL DE MODALES (PLANTA VS AGREGADO) ---
   if (btnAbrirModalPer && modalPer) {
     btnAbrirModalPer.addEventListener("click", () => {
       resetFormPersonal();
+      formPer.dataset.modeTarget = "personal"; // Bandera: Destino Planta
+      formTitlePer.innerHTML = `<i class="fa-solid fa-user-gear"></i> Registrar Nuevo Personal de Planta`;
+      modalPer.classList.remove("hidden");
+    });
+  }
+
+  if (btnAbrirModalAgregado && modalPer) {
+    btnAbrirModalAgregado.addEventListener("click", () => {
+      resetFormPersonal();
+      formPer.dataset.modeTarget = "personal_agregado"; // Bandera: Destino Agregado
+      formTitlePer.innerHTML = `<i class="fa-solid fa-people-arrows"></i> Registrar Personal Agregado (Temporal)`;
       modalPer.classList.remove("hidden");
     });
   }
@@ -41,15 +91,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Cerrar al hacer clic en el fondo oscuro
   if (modalPer) {
     modalPer.addEventListener("click", (e) => {
-      if (e.target === modalPer) {
-        modalPer.classList.add("hidden");
-      }
+      if (e.target === modalPer) modalPer.classList.add("hidden");
     });
   }
 
+  // --- CONTROLES DE PAGINACIÓN DE PLANTA ---
   if (btnPrevPage && btnNextPage) {
     btnPrevPage.addEventListener("click", () => {
       if (currentPage > 1) {
@@ -67,36 +115,53 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Envío de Formulario
-formPer.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const antInput = document.getElementById("per-ant").value;
-  const payload = {
-    target: "personal",
-    action: isEditingPer ? "update" : "create",
-    cedula: document.getElementById("per-cedula").value,
-    grado: selectGrado.value,
-    especialidad: selectEspecialidad.value,
-    ant: antInput === "" ? "" : parseInt(antInput),
-    apellidos_nombres: document
-      .getElementById("per-nombres")
-      .value.toUpperCase(),
-    funcion: selectFuncion.value,
-    fecha_nacimiento: document.getElementById("per-fecha").value,
-    contacto: document.getElementById("per-contacto").value,
-    nombre_contacto: document.getElementById("per-nombre-contacto").value,
-  };
+// ============================================================
+// ENVÍO DE FORMULARIO MAESTRO (PROCESAMIENTO INTELIGENTE)
+// ============================================================
+if (formPer) {
+  formPer.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const antInput = document.getElementById("per-ant").value;
+    const modoDestino = formPer.dataset.modeTarget || "personal"; //
 
-  if (typeof sendData === "function") {
-    sendData(payload, () => {
-      resetFormPersonal();
-      // Ocultar modal automáticamente tras guardar con éxito
-      const modalPer = document.getElementById("modal-registro-personal");
-      if (modalPer) modalPer.classList.add("hidden");
-    });
-  }
-});
-// 1. Población Dinámica de Menús Desplegables
+    const payload = {
+      target: modoDestino,
+      action: isEditingPer
+        ? "update"
+        : modoDestino === "personal_agregado"
+          ? "save"
+          : "create",
+      cedula: document.getElementById("per-cedula").value.trim(),
+      grado: selectGrado.value,
+      especialidad: selectEspecialidad.value,
+      ant: antInput === "" ? "" : parseInt(antInput),
+      apellidos_nombres: document
+        .getElementById("per-nombres")
+        .value.toUpperCase()
+        .trim(),
+      funcion: selectFuncion.value,
+      fecha_nacimiento: document.getElementById("per-fecha").value,
+      contacto: document.getElementById("per-contacto").value.trim(),
+      nombre_contacto: document
+        .getElementById("per-nombre-contacto")
+        .value.toUpperCase()
+        .trim(),
+    };
+
+    if (typeof sendData === "function") {
+      sendData(payload, () => {
+        resetFormPersonal();
+        const modalPer = document.getElementById("modal-registro-personal");
+        if (modalPer) modalPer.classList.add("hidden");
+        loadAllData();
+      });
+    }
+  });
+}
+
+// ============================================================
+// POBLACIÓN DE DATOS Y RENDERIZADO DE TABLAS
+// ============================================================
 function poblarDesplegablesPersonal() {
   const currentGrado = selectGrado.value;
   const currentEsp = selectEspecialidad.value;
@@ -127,9 +192,7 @@ function poblarDesplegablesPersonal() {
   if (window.funcionesCargadas) {
     window.funcionesCargadas.forEach((item) => {
       const opt = document.createElement("option");
-      // Normalización: el servidor puede devolver "funcion" o "valor_unico"
       const nombreFuncion = item.function || item.funcion || "";
-
       opt.value = nombreFuncion;
       opt.textContent = nombreFuncion;
       selectFuncion.appendChild(opt);
@@ -141,15 +204,13 @@ function poblarDesplegablesPersonal() {
   selectFuncion.value = currentFun;
 }
 
-// 2. Interceptor de la Carga de Datos de Personal
 function renderPersonalTable(personalData) {
   datosPersonalGlobal = personalData || [];
-  window.datosPersonalGlobal = datosPersonalGlobal; // Compartir en ventana para control_operacional.js
+  window.datosPersonalGlobal = datosPersonalGlobal;
   currentPage = 1;
   mostrarPaginaActual();
 }
 
-// 2.1 Dividir y renderizar el segmento de 10 registros correspondientes
 function mostrarPaginaActual() {
   tableBodyPer.innerHTML = "";
   const totalRegistros = datosPersonalGlobal.length;
@@ -175,44 +236,39 @@ function mostrarPaginaActual() {
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="badge-ord">${item.ord}</span></td><td><strong>${item.cedula}</strong></td>
-      <td>${item.grado}</td><td>${item.especialidad}</td><td>${antMostrar}</td>
-      <td>${item.apellidos_nombres}</td><td>${item.funcion || "-"}</td><td>${item.fecha_nacimiento || "-"}</td>
-      <td>${item.contacto}</td><td>${item.nombre_contacto}</td>
+      <td><span class="badge-ord">${item.ord}</span></td>
+      <td><strong>${item.cedula}</strong></td>
+      <td>${item.grado}</td>
+      <td>${item.especialidad}</td>
+      <td>${antMostrar}</td>
+      <td style="text-align:left;">${item.apellidos_nombres}</td>
+      <td>${item.funcion || "-"}</td>
+      <td>${item.fecha_nacimiento || "-"}</td>
+      <td>${item.contacto}</td>
+      <td>${item.nombre_contacto}</td>
       <td>
         <button class="btn-edit btn-edit-per" type="button">Editar</button>
         <button class="btn-delete btn-delete-per" type="button">Eliminar</button>
       </td>`;
 
     const btnEdit = tr.querySelector(".btn-edit-per");
-    btnEdit.dataset.cedula = item.cedula;
-    btnEdit.dataset.grado = item.grado;
-    btnEdit.dataset.especialidad = item.especialidad;
-    btnEdit.dataset.ant = antPasarParametro;
-    btnEdit.dataset.nombres = item.apellidos_nombres;
-    btnEdit.dataset.funcion = item.funcion || "";
-    btnEdit.dataset.fecha = item.fecha_nacimiento || "";
-    btnEdit.dataset.contacto = item.contacto;
-    btnEdit.dataset.nombreContacto = item.nombre_contacto;
-
-    btnEdit.addEventListener("click", function () {
+    btnEdit.addEventListener("click", () => {
+      formPer.dataset.modeTarget = "personal"; //
       setupEditPer(
-        this.dataset.cedula,
-        this.dataset.grado,
-        this.dataset.especialidad,
-        this.dataset.ant,
-        this.dataset.nombres,
-        this.dataset.funcion,
-        this.dataset.fecha,
-        this.dataset.contacto,
-        this.dataset.nombreContacto,
+        item.cedula,
+        item.grado,
+        item.especialidad,
+        antPasarParametro,
+        item.apellidos_nombres,
+        item.funcion || "",
+        item.fecha_nacimiento || "",
+        item.contacto,
+        item.nombre_contacto,
       );
     });
 
-    const btnDelete = tr.querySelector(".btn-delete-per");
-    btnDelete.dataset.cedula = item.cedula;
-    btnDelete.addEventListener("click", function () {
-      deletePersonal(this.dataset.cedula);
+    tr.querySelector(".btn-delete-per").addEventListener("click", () => {
+      deletePersonal(item.cedula);
     });
 
     tableBodyPer.appendChild(tr);
@@ -224,31 +280,154 @@ function mostrarPaginaActual() {
   btnNextPage.disabled = currentPage === maxPage || maxPage === 0;
 }
 
-// 3. Envío de Formulario
-formPer.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const antInput = document.getElementById("per-ant").value;
-  const payload = {
-    target: "personal",
-    action: isEditingPer ? "update" : "create",
-    cedula: document.getElementById("per-cedula").value,
-    grado: selectGrado.value,
-    especialidad: selectEspecialidad.value,
-    ant: antInput === "" ? "" : parseInt(antInput),
-    apellidos_nombres: document
-      .getElementById("per-nombres")
-      .value.toUpperCase(),
-    funcion: selectFuncion.value,
-    fecha_nacimiento: document.getElementById("per-fecha").value,
-    contacto: document.getElementById("per-contacto").value,
-    nombre_contacto: document.getElementById("per-nombre-contacto").value,
-  };
+// ============================================================
+// RENDERIZADO Y CONTROL DE PERSONAL AGREGADO (SOLUCIÓN COMPLETA DE EVENTOS)
+// ============================================================
+function actualizarMatrizSalvoconductosYPersonalExterna(data) {
+  datosPersonalAgregadoGlobal = data.personal_agregado || [];
+  window.datosPersonalAgregadoGlobal = datosPersonalAgregadoGlobal; //
 
-  if (typeof sendData === "function") sendData(payload, resetFormPersonal);
-});
+  const tbodyAgregados = document.getElementById(
+    "table-body-personal-agregado",
+  );
+  if (!tbodyAgregados) return;
+  tbodyAgregados.innerHTML = "";
 
-// 4. Configurar Interfaz para Edición
-// Configurar Interfaz para Edición
+  if (datosPersonalAgregadoGlobal.length === 0) {
+    tbodyAgregados.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#7f8c8d; padding:15px;">No hay personal agregado registrado en el escuadrón</td></tr>`;
+    return;
+  }
+
+  datosPersonalAgregadoGlobal.forEach((item, index) => {
+    const tr = document.createElement("tr");
+    const esActivo = String(item.estado).toUpperCase() === "ACTIVO";
+    const antPasarParametro = item.ant === null ? "" : String(item.ant);
+
+    tr.innerHTML = `
+      <td><span class="badge-ord">${index + 1}</span></td>
+      <td><strong>${item.cedula}</strong></td>
+      <td>${item.grado}</td>
+      <td>${item.especialidad}</td>
+      <td>${item.ant || "-"}</td>
+      <td style="text-align:left;">${item.apellidos_nombres}</td>
+      <td>${item.funcion || "-"}</td>
+      <td>${item.contacto}</td>
+      <td><span class="badge-ord" style="background:${esActivo ? "#18bc9c" : "#7f8c8d"}; font-size:11px;">${item.estado}</span></td>
+      <td>
+         <button type="button" class="btn-edit btn-edit-pa" style="padding:4px 8px; font-size:11px; margin:0;"><i class="fa-solid fa-user-pen"></i> Editar</button>
+         ${
+           esActivo
+             ? `<button type="button" class="btn-delete btn-concluir-pa" style="padding:4px 8px; font-size:11px; margin:0; background:#e67e22;"><i class="fa-solid fa-power-off"></i> Concluir</button>`
+             : `<button type="button" class="btn-submit btn-activar-pa" style="padding:4px 8px; font-size:11px; margin:0; background:#2980b9;"><i class="fa-solid fa-user-check"></i> Reincorporar</button>`
+         }
+         <button type="button" class="btn-delete btn-delete-pa" style="padding:4px 8px; font-size:11px; margin:0 0 0 4px;"><i class="fa-solid fa-trash"></i> Eliminar</button>
+      </td>
+    `;
+
+    // --- ENLACE SEGURO DE ESCUCHADORES DE EVENTOS POR FILA (EVITA ERRORES DE SINTAXIS) ---
+    tr.querySelector(".btn-edit-pa").addEventListener("click", () => {
+      formPer.dataset.modeTarget = "personal_agregado";
+      setupEditPer(
+        item.cedula,
+        item.grado,
+        item.especialidad,
+        antPasarParametro,
+        item.apellidos_nombres,
+        item.funcion || "",
+        item.fecha_nacimiento || "",
+        item.contacto,
+        item.nombre_contacto,
+      );
+      formTitlePer.innerHTML = `<i class="fa-solid fa-user-gear"></i> Modificar Personal Agregado`;
+    });
+
+    if (esActivo) {
+      tr.querySelector(".btn-concluir-pa").addEventListener("click", () => {
+        concluirServicioAgregado(item.cedula);
+      });
+    } else {
+      // EVENTO PARA VOLVER ACTIVO AL USUARIO INACTIVO
+      tr.querySelector(".btn-activar-pa").addEventListener("click", () => {
+        reactivarServicioAgregado(item);
+      });
+    }
+
+    tr.querySelector(".btn-delete-pa").addEventListener("click", () => {
+      eliminarPersonalAgregadoTotal(item.cedula);
+    });
+
+    tbodyAgregados.appendChild(tr);
+  });
+}
+
+// Concluir servicio temporal (Pasar a Inactivo)
+function concluirServicioAgregado(cedula) {
+  if (
+    confirm(
+      `¿Confirmar la conclusión de servicios para la CC: ${cedula}? Su registro pasará a estado Inactivo.`,
+    )
+  ) {
+    if (typeof sendData === "function") {
+      sendData(
+        { target: "personal_agregado", action: "concluir", id: cedula },
+        () => {
+          loadAllData();
+        },
+      );
+    }
+  }
+}
+
+// REINCORPORAR: Enviar de nuevo los datos como "save" para reactivarlo en Sheets
+function reactivarServicioAgregado(item) {
+  if (
+    confirm(
+      `¿Desea reincorporar y dar el ALTA ACTIVA nuevamente al efectivo CC: ${item.cedula}?`,
+    )
+  ) {
+    const payload = {
+      target: "personal_agregado",
+      action: "save", // El backend cambiará automáticamente el campo a "ACTIVO" al recibirlo de nuevo
+      cedula: item.cedula,
+      grado: item.grado,
+      especialidad: item.especialidad,
+      ant: item.ant === null ? "" : parseInt(item.ant),
+      apellidos_nombres: item.apellidos_nombres,
+      funcion: item.funcion,
+      fecha_nacimiento: item.fecha_nacimiento,
+      contacto: item.contacto,
+      nombre_contacto: item.nombre_contacto,
+    };
+
+    if (typeof sendData === "function") {
+      sendData(payload, () => {
+        loadAllData();
+      });
+    }
+  }
+}
+
+// Eliminar Físicamente de la pestaña PERSONAL_AGREGADO
+function eliminarPersonalAgregadoTotal(cedula) {
+  if (
+    confirm(
+      `¿Está seguro de eliminar de forma PERMANENTE al efectivo agregado con CC: ${cedula} de la base de datos?`,
+    )
+  ) {
+    if (typeof sendData === "function") {
+      sendData(
+        { target: "personal_agregado", action: "delete", id: cedula },
+        () => {
+          loadAllData();
+        },
+      );
+    }
+  }
+}
+
+// ============================================================
+// AUXILIARES: CONFIGURACIÓN DE EDICIÓN Y LIMPIEZA
+// ============================================================
 function setupEditPer(
   cedula,
   grado,
@@ -308,12 +487,10 @@ function setupEditPer(
   document.getElementById("per-contacto").value = contacto;
   document.getElementById("per-nombre-contacto").value = nombreContacto;
 
-  // REGLA DE APERTURA: Desplegar el modal automáticamente al presionar editar
   const modalPer = document.getElementById("modal-registro-personal");
   if (modalPer) modalPer.classList.remove("hidden");
 }
 
-// Limpieza del Formulario
 function resetFormPersonal() {
   isEditingPer = false;
   formTitlePer.innerText = "Registrar Nuevo Personal Militar";
@@ -324,12 +501,14 @@ function resetFormPersonal() {
   formPer.reset();
 }
 
-// 6. Eliminar Personal
 async function deletePersonal(cedulaId) {
   if (
     !confirm(`¿Eliminar permanentemente al personal con cédula: ${cedulaId}?`)
   )
     return;
-  if (typeof sendData === "function")
-    sendData({ action: "delete", id: cedulaId, target: "personal" }, () => {});
+  if (typeof sendData === "function") {
+    sendData({ action: "delete", id: cedulaId, target: "personal" }, () => {
+      loadAllData();
+    });
+  }
 }

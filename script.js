@@ -313,6 +313,9 @@ async function loadAllData() {
         poblarDesplegablesPersonal(data); 
       }
     }
+    if (typeof actualizarMatrizSalvoconductosYPersonalExterna === "function") {
+  actualizarMatrizSalvoconductosYPersonalExterna(data);
+}
 
     // --- INYECCIÓN DE ENLACE CRÍTICA PARA GENERAR SALVOCONDUCTOS ---
     if (typeof poblarDesplegablesSalvoconducto === "function") {
