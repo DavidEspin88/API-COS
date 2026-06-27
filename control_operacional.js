@@ -1,13 +1,13 @@
 // ============================================================
 // VARIABLES CONTROLADORAS DE ESTADO (DECLARACIÓN ÚNICA SEGURA)
 // ============================================================
-if (typeof estadosDisponibles === "undefined") {
+if (typeof estadosDisponibles === 'undefined') {
   var estadosDisponibles = [];
 }
-if (typeof mapaEstadosPersonal === "undefined") {
+if (typeof mapaEstadosPersonal === 'undefined') {
   var mapaEstadosPersonal = {}; // { cedula: { id_estado, fecha_presentacion, fecha_reincorporacion, dias_falto, observacion } }
 }
-if (typeof filasDesbloqueadasSoloEstado === "undefined") {
+if (typeof filasDesbloqueadasSoloEstado === 'undefined') {
   var filasDesbloqueadasSoloEstado = {}; // { cedula: true/false } -> Controla el botón "Editar Estado"
 }
 
@@ -48,26 +48,11 @@ function inicializarControlOperacional(data) {
 }
 
 function renderizarPanelOperacional(personal) {
-  const tbodyControl = document.getElementById(
-    "table-body-control-operacional",
-  );
+  const tbodyControl = document.getElementById("table-body-control-operacional");
   if (!tbodyControl) return;
   tbodyControl.innerHTML = "";
 
-  const mesesEspanol = [
-    "ENE",
-    "FEB",
-    "MAR",
-    "ABR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AGO",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DIC",
-  ];
+  const mesesEspanol = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
   const ahora = new Date();
 
   personal.forEach((p) => {
@@ -86,16 +71,11 @@ function renderizarPanelOperacional(personal) {
     let estadoActual = registro.id_estado;
     let diasFalto = 0;
 
-    // --- REGLA 7: CONSIDERACIÓN ESPECIAL PARA FALTOS ---
+    // --- CONSIDERACIÓN ESPECIAL PARA FALTOS ---
     if (estadoActual !== "DISPONIBLE" && registro.fecha_reincorporacion) {
-      const stringFechaFinalVerificar = String(
-        registro.fecha_reincorporacion,
-      ).trim();
+      const stringFechaFinalVerificar = String(registro.fecha_reincorporacion).trim();
 
-      if (
-        stringFechaFinalVerificar !== "" &&
-        stringFechaFinalVerificar !== "-"
-      ) {
+      if (stringFechaFinalVerificar !== "" && stringFechaFinalVerificar !== "-") {
         const partes = stringFechaFinalVerificar.split("-"); // DD-MMM-YYYY
         if (partes.length === 3) {
           const diaF = parseInt(partes[0]);
@@ -106,17 +86,11 @@ function renderizarPanelOperacional(personal) {
             const fechaLimiteFalto = new Date(anioF, mesF, diaF + 1, 9, 0, 0);
 
             if (ahora >= fechaLimiteFalto) {
-              const d1 = new Date(
-                ahora.getFullYear(),
-                ahora.getMonth(),
-                ahora.getDate(),
-              );
+              const d1 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
               const d2 = new Date(anioF, mesF, diaF + 1);
 
               const diferenciaTiempo = d1.getTime() - d2.getTime();
-              const diasDiferencia = Math.floor(
-                diferenciaTiempo / (1000 * 60 * 60 * 24),
-              );
+              const diasDiferencia = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24));
 
               diasFalto = diasDiferencia + 1;
 
@@ -130,10 +104,9 @@ function renderizarPanelOperacional(personal) {
       }
     }
 
-    let diasCalculados =
-      estadoActual === "FALTO" ? diasFalto : parseInt(registro.dias_falto) || 0;
+    let diasCalculados = estadoActual === "FALTO" ? diasFalto : parseInt(registro.dias_falto) || 0;
 
-    // --- REGLA 3 Y 5: EVALUACIÓN TEMPORAL DE COMPROBACIÓN DE FECHAS ---
+    // --- EVALUACIÓN TEMPORAL DE COMPROBACIÓN DE FECHAS ---
     let dentroDelPeriodo = false;
     if (registro.fecha_presentacion && registro.fecha_reincorporacion) {
       const strP1 = String(registro.fecha_presentacion).trim();
@@ -148,22 +121,8 @@ function renderizarPanelOperacional(personal) {
           const m2 = mesesEspanol.indexOf(p2[1].toUpperCase());
 
           if (m1 !== -1 && m2 !== -1) {
-            const fInicio = new Date(
-              parseInt(p1[2]),
-              m1,
-              parseInt(p1[0]),
-              0,
-              0,
-              0,
-            );
-            const fFin = new Date(
-              parseInt(p2[2]),
-              m2,
-              parseInt(p2[0]),
-              23,
-              59,
-              59,
-            );
+            const fInicio = new Date(parseInt(p1[2]), m1, parseInt(p1[0]), 0, 0, 0);
+            const fFin = new Date(parseInt(p2[2]), m2, parseInt(p2[0]), 23, 59, 59);
 
             if (ahora >= fInicio && ahora <= fFin) {
               dentroDelPeriodo = true;
@@ -180,7 +139,7 @@ function renderizarPanelOperacional(personal) {
     let inputsFechasDeshabilitados = false;
     let campoObservacionDeshabilitado = "";
 
-    // Lógica inteligente operativa por estado (Sin importar el Rol del usuario logueado)
+    // Lógica dinámica operativa por estado (Habilitado para todos los operadores)
     if (estadoActual !== "DISPONIBLE") {
       if (!filasDesbloqueadasSoloEstado[p.cedula]) {
         selectEstadoDeshabilitado = true;
@@ -195,15 +154,7 @@ function renderizarPanelOperacional(personal) {
           if (partesP2.length === 3) {
             const mesF = mesesEspanol.indexOf(partesP2[1].toUpperCase());
             if (mesF !== -1) {
-              // SE COMPRUEBA UTILIZANDO 'ahora' EN LUGAR DEL ANTERIOR 'now' INCORRECTO
-              const fFin = new Date(
-                parseInt(partesP2[2]),
-                mesF,
-                parseInt(partesP2[0]),
-                23,
-                59,
-                59,
-              );
+              const fFin = new Date(parseInt(partesP2[2]), mesF, parseInt(partesP2[0]), 23, 59, 59);
               if (ahora > fFin) {
                 selectEstadoDeshabilitado = false;
               }
@@ -217,36 +168,23 @@ function renderizarPanelOperacional(personal) {
     if (estadoActual === "FALTO") tr.className = "row-funcionario-falto";
 
     let optionsSelect = estadosDisponibles
-      .map(
-        (est) =>
-          `<option value="${est}" ${est === estadoActual ? "selected" : ""}>${est}</option>`,
-      )
+      .map((est) => `<option value="${est}" ${est === estadoActual ? "selected" : ""}>${est}</option>`)
       .join("");
 
     let stringFechaInicio = "";
-    if (
-      registro.fecha_presentacion &&
-      String(registro.fecha_presentacion).trim() !== "-"
-    ) {
+    if (registro.fecha_presentacion && String(registro.fecha_presentacion).trim() !== "-") {
       const partes = String(registro.fecha_presentacion).split("-");
       if (partes.length === 3) {
-        const mesNum = String(
-          mesesEspanol.indexOf(partes[1].toUpperCase()) + 1,
-        ).padStart(2, "0");
+        const mesNum = String(mesesEspanol.indexOf(partes[1].toUpperCase()) + 1).padStart(2, "0");
         stringFechaInicio = `${partes[2]}-${mesNum}-${partes[0]}`;
       }
     }
 
     let stringFechaFinal = "";
-    if (
-      registro.fecha_reincorporacion &&
-      String(registro.fecha_reincorporacion).trim() !== "-"
-    ) {
+    if (registro.fecha_reincorporacion && String(registro.fecha_reincorporacion).trim() !== "-") {
       const partes = String(registro.fecha_reincorporacion).split("-");
       if (partes.length === 3) {
-        const mesNum = String(
-          mesesEspanol.indexOf(partes[1].toUpperCase()) + 1,
-        ).padStart(2, "0");
+        const mesNum = String(mesesEspanol.indexOf(partes[1].toUpperCase()) + 1).padStart(2, "0");
         stringFechaFinal = `${partes[2]}-${mesNum}-${partes[0]}`;
       }
     }
@@ -273,7 +211,7 @@ function renderizarPanelOperacional(personal) {
             <td>${p.grado}</td>
             <td>${p.apellidos_nombres}</td>
             <td>
-                <select class="select-table-embed" onchange="cambiarEstadoOperacional('${p.cedula}', this.value, '${estadoActual}')" style="padding:6px; border-radius:8px; width:100%;" ${selectEstadoDeshabilitated ? "disabled" : ""}>
+                <select class="select-table-embed" onchange="cambiarEstadoOperacional('${p.cedula}', this.value, '${estadoActual}')" style="padding:6px; border-radius:8px; width:100%;" ${selectEstadoDeshabilitado ? "disabled" : ""}>
                     ${optionsSelect}
                 </select>
             </td>
@@ -299,14 +237,10 @@ function renderizarPanelOperacional(personal) {
 
 // --- AUDITORÍA DIRECTA E INSTANTÁNEA EN BITÁCORA ---
 async function solicitarEdicionEstado(cedula, estadoAnterior) {
-  const observacionBitacora = prompt(
-    `Para auditar el cambio de "Editar Estado", ingrese la AUTORIZACIÓN ADMINISTRATIVA u Observación:`,
-  );
+  const observacionBitacora = prompt(`Para auditar el cambio de "Editar Estado", ingrese la AUTORIZACIÓN ADMINISTRATIVA u Observación:`);
 
   if (observacionBitacora === null || observacionBitacora.trim() === "") {
-    alert(
-      `Operación cancelada. Es obligatorio ingresar una autorización administrativa para auditar.`,
-    );
+    alert(`Operación cancelada. Es obligatorio ingresar una autorización administrativa para auditar.`);
     return;
   }
 
@@ -338,9 +272,7 @@ async function solicitarEdicionEstado(cedula, estadoAnterior) {
 
   if (typeof sendData === "function") {
     sendData(payloadAuditoriaDirecta, () => {
-      console.log(
-        `✔ Auditoría directa registrada en la nube para la CC: ${cedula}`,
-      );
+      console.log(`✔ Auditoría directa registrada en la nube para la CC: ${cedula}`);
       if (window.datosPersonalGlobal) {
         renderizarPanelOperacional(window.datosPersonalGlobal);
       }
@@ -361,20 +293,7 @@ function cerrarEdicionEstado(cedula) {
 
 function cambiarFechaRango(cedula, tipo, valorFecha) {
   if (!valorFecha) return;
-  const mesesEspanol = [
-    "ENE",
-    "FEB",
-    "MAR",
-    "ABR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AGO",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DIC",
-  ];
+  const mesesEspanol = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
   const partes = valorFecha.split("-");
   const fechaFormateada = `${partes[2]}-${mesesEspanol[parseInt(partes[1]) - 1]}-${partes[0]}`;
 
@@ -402,25 +321,14 @@ function cambiarFechaRango(cedula, tipo, valorFecha) {
     const p2 = String(registro.fecha_reincorporacion).split("-");
 
     if (p1.length === 3 && p2.length === 3) {
-      const d1 = new Date(
-        parseInt(p1[2]),
-        mesesEspanol.indexOf(p1[1].toUpperCase()),
-        parseInt(p1[0]),
-      );
-      const d2 = new Date(
-        parseInt(p2[2]),
-        mesesEspanol.indexOf(p2[1].toUpperCase()),
-        parseInt(p2[0]),
-      );
+      const d1 = new Date(parseInt(p1[2]), mesesEspanol.indexOf(p1[1].toUpperCase()), parseInt(p1[0]));
+      const d2 = new Date(parseInt(p2[2]), mesesEspanol.indexOf(p2[1].toUpperCase()), parseInt(p2[0]));
 
       const diferenciaTiempo = d2.getTime() - d1.getTime();
       if (diferenciaTiempo >= 0) {
-        registro.dias_falto =
-          Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24)) + 1;
+        registro.dias_falto = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24)) + 1;
       } else {
-        alert(
-          "Error: La fecha de finalización no puede ser menor a la de inicio.",
-        );
+        alert("Error: La fecha de finalización no puede ser menor a la de inicio.");
         registro.fecha_reincorporacion = "";
         registro.dias_falto = 0;
       }
@@ -457,9 +365,7 @@ function cambiarEstadoOperacional(cedula, nuevoEstado, estadoAnterior) {
   } else {
     registro.id_estado = nuevoEstado;
     filasDesbloqueadasSoloEstado[cedula] = false;
-    alert(
-      `Se ha cambiado la condición a [${nuevoEstado}]. Complete o verifique las fechas del período y la observación.`,
-    );
+    alert(`Se ha cambiado la condición a [${nuevoEstado}]. Complete o verifique las fechas del período y la observación.`);
   }
 
   if (window.datosPersonalGlobal)
@@ -483,9 +389,7 @@ function calcularYRenderizarMatrices(personal) {
     const est = reg ? reg.id_estado : estadosDisponibles[0];
     if (conteoEstados[est] !== undefined) conteoEstados[est]++;
 
-    const gradoLimpio = p.grado
-      ? String(p.grado).trim().toUpperCase()
-      : "SIN GRADO";
+    const gradoLimpio = p.grado ? String(p.grado).trim().toUpperCase() : "SIN GRADO";
 
     if (!conteoCruzado[gradoLimpio]) {
       conteoCruzado[gradoLimpio] = {};
@@ -560,16 +464,12 @@ function calcularYRenderizarMatrices(personal) {
     if (sumaEstadosVerificacion === totalPersonal) {
       badge.className = "validation-badge success";
       badge.textContent = `✔ Sincronizado: ${sumaEstadosVerificacion} / ${totalPersonal}`;
-      const btnGuardar = document.getElementById(
-        "btn-guardar-control-operacional",
-      );
+      const btnGuardar = document.getElementById("btn-guardar-control-operacional");
       if (btnGuardar) btnGuardar.disabled = false;
     } else {
       badge.className = "validation-badge danger";
       badge.textContent = `⚠ Error: ${sumaEstadosVerificacion} de ${totalPersonal}`;
-      const btnGuardar = document.getElementById(
-        "btn-guardar-control-operacional",
-      );
+      const btnGuardar = document.getElementById("btn-guardar-control-operacional");
       if (btnGuardar) btnGuardar.disabled = true;
     }
   }
@@ -599,8 +499,7 @@ async function guardarControlOperacional() {
         audit_realizado: r.audit_estado_nuevo ? true : false,
         audit_anterior: r.audit_estado_anterior || r.id_estado,
         audit_nuevo: r.audit_estado_nuevo || r.id_estado,
-        audit_observacion:
-          r.observacion_auditoria || "ACTUALIZACIÓN SISTEMÁTICA EN LÍNEA",
+        audit_observacion: r.observacion_auditoria || "ACTUALIZACIÓN SISTEMÁTICA EN LÍNEA",
       });
     });
   }
@@ -629,10 +528,7 @@ async function guardarControlOperacional() {
   }
 }
 
-function desplegarModalPersonalPorEstado(
-  estadoSeleccionado,
-  listaPersonalCompleto,
-) {
+function desplegarModalPersonalPorEstado(estadoSeleccionado, listaPersonalCompleto) {
   const modal = document.getElementById("modal-desglose-operacional");
   const titulo = document.getElementById("modal-titulo-estado");
   const tbodyModal = document.getElementById("table-body-modal-desglose");
@@ -642,19 +538,13 @@ function desplegarModalPersonalPorEstado(
 
   const personalFiltrado = listaPersonalCompleto.filter((p) => {
     const registro = mapaEstadosPersonal[p.cedula];
-    const estadoActualMilitar = registro
-      ? registro.id_estado
-      : estadosDisponibles[0];
-    return (
-      String(estadoActualMilitar).trim().toUpperCase() ===
-      String(estadoSeleccionado).trim().toUpperCase()
-    );
+    const estadoActualMilitar = registro ? registro.id_estado : estadosDisponibles[0];
+    return String(estadoActualMilitar).trim().toUpperCase() === String(estadoSeleccionado).trim().toUpperCase();
   });
 
   if (personalFiltrado.length === 0) return;
 
-  const esDiferenteADisponible =
-    String(estadoSeleccionado).trim().toUpperCase() !== "DISPONIBLE";
+  const esDiferenteADisponible = String(estadoSeleccionado).trim().toUpperCase() !== "DISPONIBLE";
 
   if (esDiferenteADisponible) {
     theadModal.innerHTML = `
@@ -722,30 +612,18 @@ function cerrarModalDesglose() {
 
 function filtrarTablaParteDiario(textoBusqueda) {
   const query = String(textoBusqueda).trim().toLowerCase();
-  const tbodyControl = document.getElementById(
-    "table-body-control-operacional",
-  );
+  const tbodyControl = document.getElementById("table-body-control-operacional");
   if (!tbodyControl) return;
 
   const filas = tbodyControl.getElementsByTagName("tr");
 
   for (let i = 0; i < filas.length; i++) {
     const fila = filas[i];
-    const celdaCedula = fila.cells[0]
-      ? fila.cells[0].textContent.toLowerCase()
-      : "";
-    const celdaGrado = fila.cells[1]
-      ? fila.cells[1].textContent.toLowerCase()
-      : "";
-    const celdaNombres = fila.cells[2]
-      ? fila.cells[2].textContent.toLowerCase()
-      : "";
+    const celdaCedula = fila.cells[0] ? fila.cells[0].textContent.toLowerCase() : "";
+    const celdaGrado = fila.cells[1] ? fila.cells[1].textContent.toLowerCase() : "";
+    const celdaNombres = fila.cells[2] ? fila.cells[2].textContent.toLowerCase() : "";
 
-    if (
-      celdaCedula.includes(query) ||
-      celdaGrado.includes(query) ||
-      celdaNombres.includes(query)
-    ) {
+    if (celdaCedula.includes(query) || celdaGrado.includes(query) || celdaNombres.includes(query)) {
       fila.style.display = "";
     } else {
       fila.style.display = "none";
