@@ -306,29 +306,33 @@ async function loadAllData() {
       });
     }
 
-    // Sincronización Segura del archivo personal.js (Se unificó la llamada doble)
+    // ============================================================
+    // SOLUCIÓN: FORZAR RENDERIZADO Y SINCRONIZACIÓN DE AGREGADOS
+    // ============================================================
     if (typeof renderPersonalTable === "function") {
       renderPersonalTable(data.personal);
       if (typeof poblarDesplegablesPersonal === "function") {
-        poblarDesplegablesPersonal(data); 
+        poblarDesplegablesPersonal(); 
       }
     }
-    if (typeof actualizarMatrizSalvoconductosYPersonalExterna === "function") {
-  actualizarMatrizSalvoconductosYPersonalExterna(data);
-}
 
-    // --- INYECCIÓN DE ENLACE CRÍTICA PARA GENERAR SALVOCONDUCTOS ---
+    // Llamada crítica al módulo de personal agregado pasándole todo el objeto JSON de la nube
+    if (typeof actualizarMatrizSalvoconductosYPersonalExterna === "function") {
+      actualizarMatrizSalvoconductosYPersonalExterna(data);
+    }
+
+    // Re-vincular de forma segura las autoridades aprobadoras en salvoconductos
     if (typeof poblarDesplegablesSalvoconducto === "function") {
       poblarDesplegablesSalvoconducto(data);
     }
 
-    // Inyección de Control Estadístico Operacional
+    // Inyección de Control Estadístico Operacional (Parte Diario)
     if (typeof inicializarControlOperacional === "function") {
       inicializarControlOperacional(data);
     }
   
   } catch (error) {
-    console.error("Error cargando la base de datos general:", error);
+    console.error("Error cargando la base de datos:", error);
   } finally {
     if (document.getElementById("loading-text")) {
       document.getElementById("loading-text").style.display = "none";
@@ -657,6 +661,25 @@ function resetFormArmCalibre() {
   document.getElementById("armcal-id").value = "";
 }
 
+function resetFormUsuarios() {
+  isEditingUsr = false; // <-- ESTA LÍNEA ES CRÍTICA PARA VOLVER A PERMITIR CREACIONES
+  const formTitle = document.getElementById("form-title-usr");
+  const btnSave = document.getElementById("btn-save-usr");
+  const btnCancel = document.getElementById("btn-cancel-usr");
+  const selectRolForm = document.getElementById("usr-tipo");
+  
+  if (formTitle) formTitle.innerText = "Registrar Usuario";
+  if (btnSave) btnSave.innerText = "Guardar Usuario";
+  if (btnCancel) btnCancel.style.display = "none";
+  
+  const formUsrElement = document.getElementById("form-usuarios");
+  if (formUsrElement) formUsrElement.reset();
+  
+  // Forzar que el select recupere sus opciones completas tras limpiar
+  if (cuentaUsuarioActivoSesion) {
+    aplicarRestriccionesDePerfil(cuentaUsuarioActivoSesion.tipo_usuario);
+  }
+}
 async function deleteItem(id, type) {
   if (confirm(`¿Eliminar de ${type}?`))
     sendData({ action: "delete", id: id, target: type }, () => {});
