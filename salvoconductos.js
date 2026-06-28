@@ -766,7 +766,7 @@ function ejecutarDescargaPDFMilitar(registros) {
                 width: 210mm;
                 /* SE CAMBIA altura fija por min-height controlado y padding seguro */
                 min-height: 295.5mm; 
-                padding-top: 15mm;
+                padding-top: 10mm;
                 padding-bottom: 5mm;
                 margin: 0 auto;
                 box-sizing: border-box;
