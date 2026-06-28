@@ -33,15 +33,15 @@ function poblarDesplegablesSalvoconducto(data) {
       selectLugar.innerHTML += `<option value="${l.lugar}">${l.lugar}</option>`;
   });
 
-// 3. Población de Autoridades Aprobadoras (Filtro por Rol - Combinando Planta y Agregado Activo)
+  // 3. Población de Autoridades Aprobadoras (Filtro por Rol - Combinando Planta y Agregado Activo)
   selectAprobador.innerHTML =
     '<option value="">-- Seleccione Autoridad Militar Facultada --</option>';
-  
+
   // Unificar listas para evaluar autorizadores facultados
   const listaPoolPersonalTotal = [...(data.personal || [])];
-  
+
   if (data.personal_agregado) {
-    data.personal_agregado.forEach(pa => {
+    data.personal_agregado.forEach((pa) => {
       if (String(pa.estado).toUpperCase() === "ACTIVO") {
         listaPoolPersonalTotal.push(pa);
       }
@@ -226,7 +226,9 @@ function inicializarEventosImpresionMúltiple() {
   const selectAll = document.getElementById("salvo-select-all");
   const checkboxes = document.querySelectorAll(".salvo-row-checkbox");
   const btnImprimir = document.getElementById("btn-imprimir-salvoconductos");
+  const btnDescargar = document.getElementById("btn-descargar-salvoconductos");
 
+  // 1. Control del Checkbox Maestro (Seleccionar Todos)
   if (selectAll) {
     selectAll.checked = false;
     selectAll.onchange = function () {
@@ -235,6 +237,7 @@ function inicializarEventosImpresionMúltiple() {
     };
   }
 
+  // 2. Control de los Checkboxes Individuales
   checkboxes.forEach((cb) => {
     cb.onchange = function () {
       if (!this.checked) selectAll.checked = false;
@@ -242,6 +245,7 @@ function inicializarEventosImpresionMúltiple() {
     };
   });
 
+  // 3. Evento para el Botón de Imprimir
   if (btnImprimir) {
     btnImprimir.onclick = function () {
       const seleccionados = [];
@@ -262,6 +266,31 @@ function inicializarEventosImpresionMúltiple() {
       ejecutarImpresionFormatoOficial(seleccionados);
     };
   }
+
+  // 4. Evento para el Botón de Descargar PDF (Mantenido dentro de la función)
+  if (btnDescargar) {
+    btnDescargar.onclick = function () {
+      const seleccionados = [];
+      document.querySelectorAll(".salvo-row-checkbox:checked").forEach((cb) => {
+        const item = salvoconductosEmitidosLista.find(
+          (s) => String(s.id) === String(cb.dataset.id),
+        );
+        if (item) seleccionados.push(item);
+      });
+
+      if (seleccionados.length === 0) {
+        alert(
+          "⚠ Por favor, seleccione al menos un salvoconducto mediante la opción de selección para proceder con la descarga.",
+        );
+        return;
+      }
+
+      // Invoca la descarga física del archivo
+      ejecutarDescargaPDFMilitar(seleccionados);
+    };
+  }
+
+  // Actualizar el contador global al inicializar
   actualizarContadorSeleccionados();
 }
 
@@ -459,12 +488,15 @@ function ejecutarImpresionFormatoOficial(registros) {
           ? r.marca
           : "-";
 
-   // === CORRECCIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA EXTRAYENDO DE LA BASE DE DATOS ===
+      // === CORRECCIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA EXTRAYENDO DE LA BASE DE DATOS ===
       let firmaBloqueFormateado = r.aprobado_por; // Respaldo por defecto
       let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"'; // Respaldo por defecto
 
       // Unificar cachés locales para la búsqueda del autorizador en impresión
-      const poolAutorizadoresImpresion = [...salvoCachePersonal, ...datosPersonalAgregadoGlobal];
+      const poolAutorizadoresImpresion = [
+        ...salvoCachePersonal,
+        ...datosPersonalAgregadoGlobal,
+      ];
 
       // Buscar la ficha completa del aprobador utilizando su rango y nombre
       const autorizador = poolAutorizadoresImpresion.find(
@@ -472,7 +504,7 @@ function ejecutarImpresionFormatoOficial(registros) {
           `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() ===
           String(r.aprobado_por).trim().toUpperCase(),
       );
-      
+
       if (autorizador) {
         // Formatear nombres: la base de datos viene como "APELLIDO1 APELLIDO2 NOMBRE1 NOMBRE2"
         // Extraemos el primer nombre (índice 2) y los dos apellidos (índices 0 y 1)
@@ -593,7 +625,6 @@ function ejecutarImpresionFormatoOficial(registros) {
       window.onload = function() {
         setTimeout(function() {
           window.print();
-          window.close();
         }, 300);
       };
     </script>
@@ -708,4 +739,302 @@ async function registrarDevolucionAnticipada(idSalvoconducto) {
       );
     }
   }
+}
+function ejecutarDescargaPDFMilitar(registros) {
+  // 1. Cabecera HTML y Estilos CSS idénticos al formato oficial de impresión
+  let htmlContenido = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Descarga de Salvoconductos - FAE</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background: #ffffff;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .hoja-a4 {
+                width: 210mm;
+                height: 297mm; /* Fijado a la altura estricta del lienzo A4 */
+                padding-top: 10mm;
+                padding-bottom: 10mm;
+                margin: 0 auto;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                background: #ffffff;
+                page-break-after: always;
+            }
+            .hoja-a4:last-child {
+                page-break-after: avoid !important;
+            }
+            .salvoconducto-container {
+                width: 190mm;
+                height: 70mm;
+                margin-bottom: 14mm;
+                border: 1px solid #000000;
+                box-sizing: border-box;
+                display: flex;
+                position: relative;
+                background: #ffffff;
+                overflow: hidden;
+                padding: 1px;
+            }
+            .salvoconducto-container:nth-child(3n) {
+                margin-bottom: 0;
+            }
+            .panel-izquierdo {
+                width: 94.5mm;
+                height: 68.9mm;
+                border: 3px solid #000000;
+                padding: 6px 8px;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                position: relative;
+                z-index: 5;
+            }
+            .panel-derecho {
+                width: 94.5mm;
+                height: 68.9mm;
+                border: 3px solid #000000;
+                padding: 8px 10px;
+                box-sizing: border-box;
+                display: flex;
+                margin-left: 1px;
+                flex-direction: column;
+                justify-content: space-between;
+                position: relative;
+                z-index: 5;
+            }
+            .marca-agua-fae {
+                position: absolute;
+                top: 50%;
+                left: 45%;
+                transform: translate(-50%, -50%);
+                width: 30mm;
+                height: 30mm;
+                opacity: 0.22;
+                z-index: 1;
+                pointer-events: none;
+            }
+            .header-titulo {
+                text-align: center;
+                font-size: 15px;
+                font-weight: bold;
+                line-height: 1.2;
+                text-transform: uppercase;
+                margin-bottom: 2px;
+            }
+            .meta-label-block {
+                font-size: 9px;
+                text-transform: uppercase;
+                margin-top: 1px;
+                margin-bottom: 2px;
+                font-weight: normal;
+            }
+            .meta-value-text {
+                font-size: 10px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .grid-datos-armas {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1px 6px;
+                margin-top: 1px;
+                margin-left: 5px;
+                font-weight: 400;
+            }
+            .texto-legal-sub {
+                font-size: 11px;
+                margin: 5px 0;
+                text-align: justify;
+                line-height: 1.4;
+                font-weight: 400;
+            }
+            .texto-legal-footer {
+                font-size: 11px;
+                margin: 8px 0 2px;
+                text-align: left;
+                font-weight: normal;
+            }
+            .pie-firma-autoridad {
+                text-align: center;
+                font-size: 11px;
+                line-height: 1.1;
+                margin-top: auto;
+                padding-top: 0.7px;
+            }
+            .linea-portador {
+                width: 70%;
+                margin: 0 auto 2px;
+                border-bottom: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+  `;
+
+  // 2. Procesar los registros en grupos de 3 por hoja
+  for (let i = 0; i < registros.length; i += 3) {
+    htmlContenido += `<div class="hoja-a4">`;
+
+    for (let j = i; j < i + 3 && j < registros.length; j++) {
+      const r = registros[j];
+
+      const armaFisica = salvoCacheArmamentoReal.find(
+        (a) => String(a.serie).trim().toUpperCase() === String(r.serie).trim().toUpperCase()
+      );
+      const marcaCorrecta = armaFisica
+        ? armaFisica.marca || "SIN MARCA"
+        : r.marca && r.marca !== "undefined"
+          ? r.marca
+          : "-";
+
+      // === CLONACIÓN DE TU LÓGICA OFICIAL DE IMPRESIÓN ===
+      let firmaBloqueFormateado = r.aprobado_por; 
+      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"'; 
+
+      // Unificar cachés locales para la búsqueda del autorizador idéntico a tu impresión
+      const poolAutorizadoresPDF = [
+        ...salvoCachePersonal,
+        ...datosPersonalAgregadoGlobal,
+      ];
+
+      // Buscar la ficha completa del aprobador utilizando su rango y nombre tal cual lo guardas
+      const autorizador = poolAutorizadoresPDF.find(
+        (p) => `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() === String(r.aprobado_por).trim().toUpperCase()
+      );
+
+      if (autorizador) {
+        // Formatear nombres: la base de datos viene como "APELLIDO1 APELLIDO2 NOMBRE1"
+        const tokens = autorizador.apellidos_nombres.trim().split(/\s+/);
+        let nombreFirma = autorizador.apellidos_nombres;
+
+        if (tokens.length >= 3) {
+          const ap1 = tokens[0];
+          const ap2 = tokens[1];
+          const nom1 = tokens[2];
+          nombreFirma = `${nom1} ${ap1} ${ap2}`;
+        }
+
+        // Abreviar la Especialidad de forma estandarizada
+        let espAbr = autorizador.specialidad || autorizador.especialidad ? (autorizador.specialidad || autorizador.especialidad).trim().toUpperCase() : "";
+        if (espAbr.includes("TÉCNICO") || espAbr.includes("TECNICO") || espAbr.includes("ARMAMENTO")) {
+          espAbr = "TÉC.";
+        } else if (espAbr.includes("ESPECIALISTA")) {
+          espAbr = "ESP.";
+        } else if (espAbr.includes("PILOTO")) {
+          espAbr = "PLTO.";
+        } else if (espAbr.length > 0) {
+          espAbr = espAbr.substring(0, 3) + ".";
+        }
+
+        // Construcción simétrica: GRADO + ESP_ABRV + AVC. + 1er NOMBRE + 2 APELLIDOS
+        firmaBloqueFormateado = `${autorizador.grado} ${espAbr} AVC. ${nombreFirma}`;
+
+        // Cargar dinámicamente la función militar exacta de la base de datos (Garantiza el cambio de cargo)
+        if (autorizador.funcion) {
+          funcionCargoAutoridad = String(autorizador.funcion).trim().toUpperCase();
+        }
+      }
+
+      htmlContenido += `
+        <div class="salvoconducto-container">
+          <div class="panel-izquierdo">
+            <img class="marca-agua-fae" src="imagenes/sello_fae.svg" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/29/Escudo_de_la_Fuerza_A%C3%A9rea_Ecuatoriana.png';">
+            
+            <div class="header-titulo">
+              FUERZA AEREA ECUATORIANA<br>
+              <span style="font-size: 13px; font-weight:normal;">Salvoconducto para Portar Arma</span>
+            </div>
+
+            <div style="margin-top: 1px; margin-left:5px;">
+              <div class="meta-value-text">${r.apellidos_nombres}</div>
+              <div class="meta-label-block">Grado, Apellidos y Nombres</div>
+            </div>
+
+            <div class="grid-datos-armas">
+              <div>
+                <div class="meta-value-text">${r.cedula}</div>
+                <div class="meta-label-block">Cédula</div>
+                
+                <div class="meta-value-text" style="margin-top: 1px;">${r.serie}</div>
+                <div class="meta-label-block">Serie</div>
+                
+                <div class="meta-value-text" style="margin-top: 1px;">${r.calibre}</div>
+                <div class="meta-label-block">Calibre</div>
+                
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_inicio}</div>
+                <div class="meta-label-block">Fecha Emisión</div>
+              </div>
+              
+              <div style="margin-left: 40px;">
+                <div class="meta-value-text">${r.tipo_arma}</div>
+                <div class="meta-label-block">Tipo de Arma</div>
+                
+                <div class="meta-value-text" style="margin-top: 1px;">${marcaCorrecta}</div>
+                <div class="meta-label-block">Marca</div>
+                
+                <div class="meta-value-text" style="margin-top: 1px;">${r.cantidad_municion}</div>
+                <div class="meta-label-block">Cantidad Munición</div>
+                
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_fin}</div>
+                <div class="meta-label-block">Fecha Caducidad</div>
+              </div>
+            </div>
+
+            <div class="pie-firma-autoridad">
+              <div class="linea-portador"></div>
+              <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight:normal">${firmaBloqueFormateado}</div>
+              <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight: bold">${funcionCargoAutoridad}</div>
+            </div>
+          </div>
+
+          <div class="panel-derecho">
+            <p class="texto-legal-sub">
+              EL PORTADOR DE LA PRESENTE CREDENCIAL ESTÁ AUTORIZADO POR EL RESPONSABLE PUNTO DE DESPLIEGUE "CERRO MONTECRISTI", A PORTAR EL ARMA DETALLADA PARA EL CUMPLIMIENTO DE SU MISIÓN OFICIAL DENTRO DE LA PROVINCIA DE MANABÍ. EN TAL VIRTUD, SE SOLICITA A TODA AUTORIDAD CIVIL, MILITAR Y POLICIAL SU COLABORACIÓN PARA EL DESEMPEÑO DE LA COMISIÓN.
+            </p>
+            
+            <p class="texto-legal-footer">
+              ESTE DOCUMENTO SERÁ VÁLIDO PREVIA PRESENTACIÓN DE LA TARJETA MILITAR ORIGINAL.
+            </p>
+
+            <div style="text-align: center; margin-top: auto; font-size: 11px; font-weight: bold; text-transform: uppercase;">
+              <div class="linea-portador"></div>
+              <h2 style="font-size:12px; margin:0;">EL PORTADOR</h2>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    htmlContenido += `</div>`;
+  }
+
+  htmlContenido += `</body></html>`;
+
+  // 3. Opciones de configuración milimétrica para html2pdf
+  const opcionesConfiguracion = {
+    margin:       0,
+    filename:     `Salvoconductos_Emitidos_${registros[0].cedula}.pdf`,
+    image:        { type: 'jpeg', quality: 1.0 },
+    html2canvas:  { 
+      scale: 4, 
+      useCORS: true, 
+      logging: false,
+      letterRendering: true,
+      antiAliasing: true
+    },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compressPDF: true },
+    pagebreak:    { mode: ['css', 'legacy'] }
+  };
+
+  html2pdf().from(htmlContenido).set(opcionesConfiguracion).save();
 }
