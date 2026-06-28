@@ -318,7 +318,7 @@ function actualizarMatrizSalvoconductosYPersonalExterna(data) {
          ${
            esActivo
              ? `<button type="button" class="btn-delete btn-concluir-pa" style="padding:4px 8px; font-size:11px; margin:0; background:#e67e22;"><i class="fa-solid fa-power-off"></i> Concluir</button>`
-             : `<button type="button" class="btn-submit btn-activar-pa" style="padding:4px 8px; font-size:11px; margin:0; background:#2980b9;"><i class="fa-solid fa-user-check"></i> Reincorporar</button>`
+             : `<button type="button" class="btn-edit btn-activar-pa" style="padding:4px 8px; font-size:11px; margin:0; background:#2980b9; width:auto !important;"><i class="fa-solid fa-user-check"></i> Reincorporar</button>`
          }
          <button type="button" class="btn-delete btn-delete-pa" style="padding:4px 8px; font-size:11px; margin:0 0 0 4px;"><i class="fa-solid fa-trash"></i> Eliminar</button>
       </td>

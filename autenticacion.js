@@ -147,18 +147,75 @@ function inicializarMóduloAutenticacionFAE() {
   });
 }
 function aplicarRestriccionesDePerfil(perfil) {
-  // SE ELIMINAN LAS RESTRICCIONES VISUALES DE MÓDULOS Y COLUMNAS
-  // Todos los usuarios tienen acceso a ver el menú lateral completo y las acciones de seguridad
-
-  // Poblar el formulario de usuarios con todas las opciones disponibles para todos
   const selectRolForm = document.getElementById("usr-tipo");
+  
+  // 1. Repoblar select con matriz de roles reducida
   if (selectRolForm) {
     selectRolForm.innerHTML = `
       <option value="">-- Seleccione un Rol de Acceso --</option>
-      <option value="ADMINISTRADOR">ADMINISTRADOR (Acceso Total)</option>
-      <option value="ADMINISTRATIVO">ADMINISTRATIVO (Acceso Total)</option>
-      <option value="COMANDANTE">COMANDANTE (Acceso Total)</option>
+      <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+      <option value="OPERADOR">OPERADOR</option>
     `;
+  }
+
+  // 2. Capturar elementos de navegación y contenidos de pestañas (SPA)
+  const tabsNavegacion = document.querySelectorAll(".menu-tab");
+  const contenidosPestañas = document.querySelectorAll(".tab-content");
+  const rolLimpio = String(perfil).trim().toUpperCase();
+
+  if (rolLimpio === "OPERADOR") {
+    // --- RESTRICCIÓN ESTRICTA PARA EL ROL OPERADOR ---
+    tabsNavegacion.forEach((tab) => {
+      const moduloAsociado = tab.dataset.module;
+
+      // Habilitar ÚNICAMENTE: registro_personal, salvoconductos y parte_diario
+      if (
+        moduloAsociado === "registro_personal" ||
+        moduloAsociado === "salvoconductos" ||
+        moduloAsociado === "parte_diario"
+      ) {
+        tab.style.display = "flex"; // Visible en barra lateral
+      } else {
+        tab.style.display = "none"; // Ocultar el resto de botones de inventarios/configuraciones
+      }
+    });
+
+    // Desactivar en frío del DOM cualquier pestaña activa no autorizada (Evita la carga por defecto de Munición)
+    contenidosPestañas.forEach((content) => {
+      const sectionId = content.id;
+      if (
+        sectionId !== "module-registro_personal" &&
+        sectionId !== "module-salvoconductos" &&
+        sectionId !== "module-parte_diario"
+      ) {
+        content.classList.remove("active");
+        content.classList.add("hidden");
+      }
+    });
+
+    // Redirección forzada por seguridad al sub-módulo autorizado por defecto
+    localStorage.setItem("lastMilitarModule", "parte_diario");
+    
+    // Quitar estados activos viejos de los botones y activar el de Parte Diario
+    tabsNavegacion.forEach(t => t.classList.remove("active"));
+    const tabParteDiario = document.querySelector('.menu-tab[data-module="parte_diario"]');
+    const moduloParteDiario = document.getElementById("module-parte_diario");
+    
+    if (tabParteDiario && moduloParteDiario) {
+      tabParteDiario.classList.add("active");
+      moduloParteDiario.classList.remove("hidden");
+      moduloParteDiario.classList.add("active");
+      
+      // Actualizar el encabezado de módulo del header general
+      const titleHeader = document.getElementById("current-module-title");
+      if (titleHeader) titleHeader.innerText = "Sección de Parte Diario";
+    }
+
+  } else {
+    // --- ACCESO TOTAL PARA EL ROL ADMINISTRADOR ---
+    tabsNavegacion.forEach((tab) => {
+      tab.style.display = "flex";
+    });
   }
 }
 function toggleVisibilidadPassword() {
