@@ -741,13 +741,18 @@ async function registrarDevolucionAnticipada(idSalvoconducto) {
   }
 }
 function ejecutarDescargaPDFMilitar(registros) {
-  // 1. Cabecera HTML y Estilos CSS idénticos al formato oficial de impresión
+  // 1. Cabecera HTML y Estilos CSS optimizados sin altos rígidos desbordantes
   let htmlContenido = `
     <!DOCTYPE html>
     <html>
     <head>
         <title>Descarga de Salvoconductos - FAE</title>
         <style>
+            @page {
+                size: A4 vertical;
+                margin: 0;
+            }
+
             body {
                 margin: 0;
                 padding: 0;
@@ -756,11 +761,13 @@ function ejecutarDescargaPDFMilitar(registros) {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+
             .hoja-a4 {
                 width: 210mm;
-                height: 297mm; /* Fijado a la altura estricta del lienzo A4 */
-                padding-top: 10mm;
-                padding-bottom: 10mm;
+                /* SE CAMBIA altura fija por min-height controlado y padding seguro */
+                min-height: 295.5mm; 
+                padding-top: 15mm;
+                padding-bottom: 5mm;
                 margin: 0 auto;
                 box-sizing: border-box;
                 display: flex;
@@ -770,13 +777,15 @@ function ejecutarDescargaPDFMilitar(registros) {
                 background: #ffffff;
                 page-break-after: always;
             }
+
             .hoja-a4:last-child {
-                page-break-after: avoid !important;
+                page-break-after: avoid !important; /* Evita que la última hoja intente saltar a una en blanco */
             }
+
             .salvoconducto-container {
                 width: 190mm;
-                height: 70mm;
-                margin-bottom: 14mm;
+                height: 68mm; /* Ajustado milimétricamente a 68mm para dar respiro al lienzo digital */
+                margin-bottom: 12mm; /* Separación balanceada y segura */
                 border: 1px solid #000000;
                 box-sizing: border-box;
                 display: flex;
@@ -785,14 +794,17 @@ function ejecutarDescargaPDFMilitar(registros) {
                 overflow: hidden;
                 padding: 1px;
             }
+
+            .salvoconducto-container:last-child,
             .salvoconducto-container:nth-child(3n) {
-                margin-bottom: 0;
+                margin-bottom: 0 !important; /* Fuerza a que el último elemento no empuje espacio sobrante */
             }
+
             .panel-izquierdo {
                 width: 94.5mm;
-                height: 68.9mm;
+                height: 66.9mm; /* Ajustado proporcionalmente */
                 border: 3px solid #000000;
-                padding: 6px 8px;
+                padding: 5px 8px;
                 box-sizing: border-box;
                 display: flex;
                 flex-direction: column;
@@ -800,11 +812,12 @@ function ejecutarDescargaPDFMilitar(registros) {
                 position: relative;
                 z-index: 5;
             }
+
             .panel-derecho {
                 width: 94.5mm;
-                height: 68.9mm;
+                height: 66.9mm; /* Ajustado proporcionalmente */
                 border: 3px solid #000000;
-                padding: 8px 10px;
+                padding: 7px 10px;
                 box-sizing: border-box;
                 display: flex;
                 margin-left: 1px;
@@ -813,6 +826,7 @@ function ejecutarDescargaPDFMilitar(registros) {
                 position: relative;
                 z-index: 5;
             }
+
             .marca-agua-fae {
                 position: absolute;
                 top: 50%;
@@ -824,6 +838,7 @@ function ejecutarDescargaPDFMilitar(registros) {
                 z-index: 1;
                 pointer-events: none;
             }
+
             .header-titulo {
                 text-align: center;
                 font-size: 15px;
@@ -832,6 +847,7 @@ function ejecutarDescargaPDFMilitar(registros) {
                 text-transform: uppercase;
                 margin-bottom: 2px;
             }
+
             .meta-label-block {
                 font-size: 9px;
                 text-transform: uppercase;
@@ -839,11 +855,13 @@ function ejecutarDescargaPDFMilitar(registros) {
                 margin-bottom: 2px;
                 font-weight: normal;
             }
+
             .meta-value-text {
                 font-size: 10px;
                 font-weight: bold;
                 text-transform: uppercase;
             }
+
             .grid-datos-armas {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -852,19 +870,22 @@ function ejecutarDescargaPDFMilitar(registros) {
                 margin-left: 5px;
                 font-weight: 400;
             }
+
             .texto-legal-sub {
                 font-size: 11px;
-                margin: 5px 0;
+                margin: 4px 0;
                 text-align: justify;
-                line-height: 1.4;
+                line-height: 1.35;
                 font-weight: 400;
             }
+
             .texto-legal-footer {
                 font-size: 11px;
-                margin: 8px 0 2px;
+                margin: 6px 0 2px;
                 text-align: left;
                 font-weight: normal;
             }
+
             .pie-firma-autoridad {
                 text-align: center;
                 font-size: 11px;
@@ -872,6 +893,7 @@ function ejecutarDescargaPDFMilitar(registros) {
                 margin-top: auto;
                 padding-top: 0.7px;
             }
+
             .linea-portador {
                 width: 70%;
                 margin: 0 auto 2px;
@@ -898,23 +920,19 @@ function ejecutarDescargaPDFMilitar(registros) {
           ? r.marca
           : "-";
 
-      // === CLONACIÓN DE TU LÓGICA OFICIAL DE IMPRESIÓN ===
       let firmaBloqueFormateado = r.aprobado_por; 
       let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"'; 
 
-      // Unificar cachés locales para la búsqueda del autorizador idéntico a tu impresión
       const poolAutorizadoresPDF = [
         ...salvoCachePersonal,
         ...datosPersonalAgregadoGlobal,
       ];
 
-      // Buscar la ficha completa del aprobador utilizando su rango y nombre tal cual lo guardas
       const autorizador = poolAutorizadoresPDF.find(
         (p) => `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() === String(r.aprobado_por).trim().toUpperCase()
       );
 
       if (autorizador) {
-        // Formatear nombres: la base de datos viene como "APELLIDO1 APELLIDO2 NOMBRE1"
         const tokens = autorizador.apellidos_nombres.trim().split(/\s+/);
         let nombreFirma = autorizador.apellidos_nombres;
 
@@ -925,7 +943,6 @@ function ejecutarDescargaPDFMilitar(registros) {
           nombreFirma = `${nom1} ${ap1} ${ap2}`;
         }
 
-        // Abreviar la Especialidad de forma estandarizada
         let espAbr = autorizador.specialidad || autorizador.especialidad ? (autorizador.specialidad || autorizador.especialidad).trim().toUpperCase() : "";
         if (espAbr.includes("TÉCNICO") || espAbr.includes("TECNICO") || espAbr.includes("ARMAMENTO")) {
           espAbr = "TÉC.";
@@ -937,10 +954,8 @@ function ejecutarDescargaPDFMilitar(registros) {
           espAbr = espAbr.substring(0, 3) + ".";
         }
 
-        // Construcción simétrica: GRADO + ESP_ABRV + AVC. + 1er NOMBRE + 2 APELLIDOS
         firmaBloqueFormateado = `${autorizador.grado} ${espAbr} AVC. ${nombreFirma}`;
 
-        // Cargar dinámicamente la función militar exacta de la base de datos (Garantiza el cambio de cargo)
         if (autorizador.funcion) {
           funcionCargoAutoridad = String(autorizador.funcion).trim().toUpperCase();
         }
@@ -950,63 +965,49 @@ function ejecutarDescargaPDFMilitar(registros) {
         <div class="salvoconducto-container">
           <div class="panel-izquierdo">
             <img class="marca-agua-fae" src="imagenes/sello_fae.svg" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/29/Escudo_de_la_Fuerza_A%C3%A9rea_Ecuatoriana.png';">
-            
             <div class="header-titulo">
               FUERZA AEREA ECUATORIANA<br>
               <span style="font-size: 13px; font-weight:normal;">Salvoconducto para Portar Arma</span>
             </div>
-
             <div style="margin-top: 1px; margin-left:5px;">
               <div class="meta-value-text">${r.apellidos_nombres}</div>
               <div class="meta-label-block">Grado, Apellidos y Nombres</div>
             </div>
-
             <div class="grid-datos-armas">
               <div>
                 <div class="meta-value-text">${r.cedula}</div>
                 <div class="meta-label-block">Cédula</div>
-                
                 <div class="meta-value-text" style="margin-top: 1px;">${r.serie}</div>
                 <div class="meta-label-block">Serie</div>
-                
                 <div class="meta-value-text" style="margin-top: 1px;">${r.calibre}</div>
                 <div class="meta-label-block">Calibre</div>
-                
                 <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_inicio}</div>
                 <div class="meta-label-block">Fecha Emisión</div>
               </div>
-              
               <div style="margin-left: 40px;">
                 <div class="meta-value-text">${r.tipo_arma}</div>
                 <div class="meta-label-block">Tipo de Arma</div>
-                
                 <div class="meta-value-text" style="margin-top: 1px;">${marcaCorrecta}</div>
                 <div class="meta-label-block">Marca</div>
-                
                 <div class="meta-value-text" style="margin-top: 1px;">${r.cantidad_municion}</div>
                 <div class="meta-label-block">Cantidad Munición</div>
-                
                 <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_fin}</div>
                 <div class="meta-label-block">Fecha Caducidad</div>
               </div>
             </div>
-
             <div class="pie-firma-autoridad">
               <div class="linea-portador"></div>
               <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight:normal">${firmaBloqueFormateado}</div>
               <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight: bold">${funcionCargoAutoridad}</div>
             </div>
           </div>
-
           <div class="panel-derecho">
             <p class="texto-legal-sub">
               EL PORTADOR DE LA PRESENTE CREDENCIAL ESTÁ AUTORIZADO POR EL RESPONSABLE PUNTO DE DESPLIEGUE "CERRO MONTECRISTI", A PORTAR EL ARMA DETALLADA PARA EL CUMPLIMIENTO DE SU MISIÓN OFICIAL DENTRO DE LA PROVINCIA DE MANABÍ. EN TAL VIRTUD, SE SOLICITA A TODA AUTORIDAD CIVIL, MILITAR Y POLICIAL SU COLABORACIÓN PARA EL DESEMPEÑO DE LA COMISIÓN.
             </p>
-            
             <p class="texto-legal-footer">
               ESTE DOCUMENTO SERÁ VÁLIDO PREVIA PRESENTACIÓN DE LA TARJETA MILITAR ORIGINAL.
             </p>
-
             <div style="text-align: center; margin-top: auto; font-size: 11px; font-weight: bold; text-transform: uppercase;">
               <div class="linea-portador"></div>
               <h2 style="font-size:12px; margin:0;">EL PORTADOR</h2>
@@ -1020,7 +1021,6 @@ function ejecutarDescargaPDFMilitar(registros) {
 
   htmlContenido += `</body></html>`;
 
-  // 3. Opciones de configuración milimétrica para html2pdf
   const opcionesConfiguracion = {
     margin:       0,
     filename:     `Salvoconductos_Emitidos_${registros[0].cedula}.pdf`,

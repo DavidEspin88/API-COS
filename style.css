@@ -770,11 +770,17 @@ tr.row-funcionario-falto td {
 }
 
 .matriz-salvo-acciones-flex {
-    display: flex; 
-    align-items: center; 
-    gap: 15px;
+display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
 }
-
+@media (max-width: 768px) {
+    .matriz-salvo-acciones-flex button {
+        width: 100% !important; /* Los botones toman el ancho completo en celulares para no desbordar */
+        justify-content: center;
+    }
+}
 .contador-seleccionados-label {
     font-weight: 600; 
     color: var(--accent-color); 
