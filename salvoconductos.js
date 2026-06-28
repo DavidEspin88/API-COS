@@ -5,7 +5,15 @@ let salvoCacheMunicionStock = [];
 let salvoconductosEmitidosLista = [];
 
 function poblarDesplegablesSalvoconducto(data) {
-  salvoCachePersonal = data.personal || [];
+ salvoCachePersonal = [...(data.personal || [])];
+
+ if (data.personal_agregado) {
+    data.personal_agregado.forEach((pa) => {
+      if (String(pa.estado).toUpperCase() === "ACTIVO") {
+        salvoCachePersonal.push(pa); // Se siembran en la caché principal
+      }
+    });
+  }
   salvoCacheCalibres = data.armamento_calibre || [];
   salvoCacheArmamentoReal = data.armamento || [];
   salvoCacheMunicionStock = data.municion || [];
@@ -37,18 +45,7 @@ function poblarDesplegablesSalvoconducto(data) {
   selectAprobador.innerHTML =
     '<option value="">-- Seleccione Autoridad Militar Facultada --</option>';
 
-  // Unificar listas para evaluar autorizadores facultados
-  const listaPoolPersonalTotal = [...(data.personal || [])];
-
-  if (data.personal_agregado) {
-    data.personal_agregado.forEach((pa) => {
-      if (String(pa.estado).toUpperCase() === "ACTIVO") {
-        listaPoolPersonalTotal.push(pa);
-      }
-    });
-  }
-
-  listaPoolPersonalTotal.forEach((p) => {
+  salvoCachePersonal.forEach((p) => {
     const cargoLimpio = String(p.funcion).trim().toUpperCase();
     if (
       cargoLimpio === 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"' ||
