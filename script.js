@@ -87,7 +87,7 @@ const btnSaveFunco = document.getElementById("btn-save-funco");
 const formLug = document.getElementById("form-lugar");
 const tableBodyLug = document.getElementById("table-body-lugar");
 const btnCancelLug = document.getElementById("btn-cancel-lug");
-const formTitleLug = document.getElementById("form-title-lugar");
+const formTitleLug = document.getElementById("form-title-lug");
 const btnSaveLug = document.getElementById("btn-save-lug");
 
 // Selectores Especialidad
@@ -610,24 +610,28 @@ function setupEditUsr(id, correo, tipo, nombres, pass) {
 function resetFormMunicion() {
   isEditingMun = false;
   formTitleMun.innerText = "Ingresar Munición";
+  btnSaveMun.innerText = "Guardar Munición";
   btnCancelMun.style.display = "none";
   formMun.reset();
 }
 function resetFormArmamento() {
   isEditingArm = false;
   formTitleArm.innerText = "Ingresar Armamento";
+  btnSaveArm.innerText = "Guardar Armamento";
   btnCancelArm.style.display = "none";
   formArm.reset();
 }
 function resetFormGrado() {
   isEditingGra = false;
   formTitleGra.innerText = "Ingresar Grado";
+  btnSaveGra.innerText = "Guardar Grado";
   btnCancelGra.style.display = "none";
   formGra.reset();
 }
 function resetFormFuncion() {
   isEditingFunco = false;
   formTitleFunco.innerText = "Ingresar Función";
+  btnSaveFunco.innerText = "Guardar Función";
   btnCancelFunco.style.display = "none";
   formFunco.reset();
   document.getElementById("funco-id").value = "";
@@ -635,6 +639,7 @@ function resetFormFuncion() {
 function resetFormLugar() {
   isEditingLug = false;
   if (formTitleLug) formTitleLug.innerText = "Ingresar Lugar";
+  btnSaveLug.innerText = "Guardar Lugar";
   btnCancelLug.style.display = "none";
   formLug.reset();
   document.getElementById("lug-id").value = "";
@@ -642,6 +647,7 @@ function resetFormLugar() {
 function resetFormEspecialidad() {
   isEditingEsp = false;
   formTitleEsp.innerText = "Ingresar Especialidad";
+  btnSaveEsp.innerText = "Guardar Especialidad";
   btnCancelEsp.style.display = "none";
   formEsp.reset();
   document.getElementById("esp-id").value = "";
@@ -649,6 +655,7 @@ function resetFormEspecialidad() {
 function resetFormEstado() {
   isEditingEst = false;
   formTitleEst.innerText = "Ingresar Estado";
+  btnSaveEst.innerText = "Guardar Estado";
   btnCancelEst.style.display = "none";
   formEst.reset();
   document.getElementById("est-id").value = "";
@@ -656,6 +663,7 @@ function resetFormEstado() {
 function resetFormArmCalibre() {
   isEditingArmCal = false;
   formTitleArmCal.innerText = "Ingresar Relación Reglamentaria";
+  btnSaveArmCal.innerText = "Guardar Relación";
   btnCancelArmCal.style.display = "none";
   formArmCal.reset();
   document.getElementById("armcal-id").value = "";
@@ -684,5 +692,3 @@ async function deleteItem(id, type) {
   if (confirm(`¿Eliminar de ${type}?`))
     sendData({ action: "delete", id: id, target: type }, () => {});
 }
-
-

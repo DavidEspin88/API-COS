@@ -5,12 +5,12 @@ let salvoCacheMunicionStock = [];
 let salvoconductosEmitidosLista = [];
 
 function poblarDesplegablesSalvoconducto(data) {
- salvoCachePersonal = [...(data.personal || [])];
+  salvoCachePersonal = [...(data.personal || [])];
 
- if (data.personal_agregado) {
+  if (data.personal_agregado) {
     data.personal_agregado.forEach((pa) => {
       if (String(pa.estado).toUpperCase() === "ACTIVO") {
-        salvoCachePersonal.push(pa); // Se siembran en la caché principal
+        salvoCachePersonal.push(pa); 
       }
     });
   }
@@ -34,16 +34,16 @@ function poblarDesplegablesSalvoconducto(data) {
     if (t) selectTipo.innerHTML += `<option value="${t}">${t}</option>`;
   });
 
-  // 2. Población de Lugares / Repartos desde la base de datos (REQUERIMIENTO 3)
+  // 2. Población de Lugares / Repartos
   selectLugar.innerHTML = '<option value="">-- Seleccione Destino --</option>';
   (data.lugar || []).forEach((l) => {
-    if (l.lugar)
-      selectLugar.innerHTML += `<option value="${l.lugar}">${l.lugar}</option>`;
+    const nombreLugar = l.lugar || l.valor_unico || "";
+    if (nombreLugar)
+      selectLugar.innerHTML += `<option value="${nombreLugar}">${nombreLugar}</option>`;
   });
 
-  // 3. Población de Autoridades Aprobadoras (Filtro por Rol - Combinando Planta y Agregado Activo)
-  selectAprobador.innerHTML =
-    '<option value="">-- Seleccione Autoridad Militar Facultada --</option>';
+  // 3. Población de Autoridades Aprobadoras
+  selectAprobador.innerHTML = '<option value="">-- Seleccione Autoridad Militar Facultada --</option>';
 
   salvoCachePersonal.forEach((p) => {
     const cargoLimpio = String(p.funcion).trim().toUpperCase();
@@ -55,7 +55,6 @@ function poblarDesplegablesSalvoconducto(data) {
     }
   });
 
-  // Calcular las existencias y dibujar paneles
   calcularYRenderizarExistenciasDisponibles();
   renderizarTablaSalvoconductos();
 }
@@ -69,7 +68,6 @@ function calcularYRenderizarExistenciasDisponibles() {
   tbodyArmas.innerHTML = "";
   tbodyMun.innerHTML = "";
 
-  // A. Consolidación y conteo de Armamento
   let resumenArmas = {};
   salvoCacheArmamentoReal.forEach((a) => {
     const tipo = String(a.tipo).trim().toUpperCase();
@@ -77,7 +75,6 @@ function calcularYRenderizarExistenciasDisponibles() {
     resumenArmas[tipo].total += parseInt(a.cantidad_armamento) || 0;
   });
 
-  // B. Consolidación y conteo de Munición
   let resumenMun = {};
   salvoCacheMunicionStock.forEach((m) => {
     const calibre = String(m.calibre).trim().toUpperCase();
@@ -85,19 +82,17 @@ function calcularYRenderizarExistenciasDisponibles() {
     resumenMun[calibre].total += parseInt(m.cantidad) || 0;
   });
 
-  // C. Cruzar contra Salvoconductos activos ("CUSTODIA")
   salvoconductosEmitidosLista.forEach((s) => {
     if (s.estado === "CUSTODIA") {
       const tipoArma = String(s.tipo_arma).trim().toUpperCase();
       const calibre = String(s.calibre).trim().toUpperCase();
       const cantMun = parseInt(s.cantidad_municion) || 0;
 
-      if (resumenArmas[tipoArma]) resumenArmas[tipoArma].asignados += 1; // 1 Fusil/Arma por documento físico de serie
+      if (resumenArmas[tipoArma]) resumenArmas[tipoArma].asignados += 1; 
       if (resumenMun[calibre]) resumenMun[calibre].entregado += cantMun;
     }
   });
 
-  // D. Dibujar Tabla Resumen Armas
   Object.keys(resumenArmas).forEach((tipo) => {
     const total = resumenArmas[tipo].total;
     const asignados = resumenArmas[tipo].asignados;
@@ -105,7 +100,6 @@ function calcularYRenderizarExistenciasDisponibles() {
     tbodyArmas.innerHTML += `<tr><td><strong>${tipo}</strong></td><td>${total}</td><td>${asignados}</td><td style="font-weight:bold; color:${disponible > 0 ? "#18bc9c" : "#e74c3c"}">${disponible}</td></tr>`;
   });
 
-  // E. Dibujar Tabla Resumen Munición
   Object.keys(resumenMun).forEach((calibre) => {
     const total = resumenMun[calibre].total;
     const entregado = resumenMun[calibre].entregado;
@@ -122,14 +116,11 @@ function filtrarSeriesPorTipo(tipoArma) {
   selectSerie.innerHTML = '<option value="">-- Seleccione Serie --</option>';
 
   const armasFiltradas = salvoCacheArmamentoReal.filter(
-    (a) =>
-      String(a.tipo).trim().toUpperCase() === String(tipoArma).toUpperCase(),
+    (a) => String(a.tipo).trim().toUpperCase() === String(tipoArma).toUpperCase(),
   );
   armasFiltradas.forEach((arma) => {
     const estaPrestada = salvoconductosEmitidosLista.some(
-      (s) =>
-        String(s.serie).trim().toUpperCase() ===
-          String(arma.serie).trim().toUpperCase() && s.estado === "CUSTODIA",
+      (s) => String(s.serie).trim().toUpperCase() === String(arma.serie).trim().toUpperCase() && s.estado === "CUSTODIA",
     );
     if (!estaPrestada)
       selectSerie.innerHTML += `<option value="${arma.serie}">${arma.serie}</option>`;
@@ -138,20 +129,14 @@ function filtrarSeriesPorTipo(tipoArma) {
 
 function vincularDetallesArma(serieSeleccionada) {
   const arma = salvoCacheArmamentoReal.find(
-    (a) =>
-      String(a.serie).trim().toUpperCase() ===
-      String(serieSeleccionada).trim().toUpperCase(),
+    (a) => String(a.serie).trim().toUpperCase() === String(serieSeleccionada).trim().toUpperCase(),
   );
   if (arma) {
     document.getElementById("salvo-marca").value = arma.marca || "SIN MARCA";
     const relacion = salvoCacheCalibres.find(
-      (ac) =>
-        String(ac.tipo_armamento).trim().toUpperCase() ===
-        String(arma.tipo).trim().toUpperCase(),
+      (ac) => String(ac.tipo_armamento).trim().toUpperCase() === String(arma.tipo).trim().toUpperCase(),
     );
-    document.getElementById("salvo-calibre").value = relacion
-      ? relacion.calibre_reglamentario
-      : "-";
+    document.getElementById("salvo-calibre").value = relacion ? relacion.calibre_reglamentario : "-";
   }
 }
 
@@ -160,9 +145,7 @@ function buscarCedulaSalvoconducto(cedulaDigitada) {
   if (!inputInfo) return;
   let cc = cedulaDigitada.trim();
   if (cc.length === 9) cc = "0" + cc;
-  const tripulante = salvoCachePersonal.find(
-    (p) => String(p.cedula).trim() === cc,
-  );
+  const tripulante = salvoCachePersonal.find((p) => String(p.cedula).trim() === cc);
   if (tripulante) {
     inputInfo.value = `${tripulante.grado} ${tripulante.apellidos_nombres}`;
     inputInfo.style.border = "2px solid #1abc9c";
@@ -172,44 +155,140 @@ function buscarCedulaSalvoconducto(cedulaDigitada) {
   }
 }
 
+// Variable global para mantener el texto de búsqueda activo
+let filtroBusquedaActual = "";
+
 function renderizarTablaSalvoconductos() {
   const tbody = document.getElementById("table-body-salvoconductos-activos");
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  if (
-    !salvoconductosEmitidosLista ||
-    salvoconductosEmitidosLista.length === 0
-  ) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#7f8c8d; padding:15px;">No hay salvoconductos registrados</td></tr>`;
+  if (!salvoconductosEmitidosLista || salvoconductosEmitidosLista.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#7f8c8d; padding:15px;">No hay salvoconductos registrados</td></tr>`;
     return;
   }
 
-  salvoconductosEmitidosLista.forEach((s) => {
-    const tr = document.createElement("tr");
-    const esActivo = s.estado === "CUSTODIA";
+  // 1. APLICAR FILTRO DE BÚSQUEDA MULTI-CRITERIO
+  let listaFiltrada = [...salvoconductosEmitidosLista];
+  if (filtroBusquedaActual) {
+    listaFiltrada = listaFiltrada.filter((s) => {
+      const cedula = String(s.cedula || "").toLowerCase();
+      const apellidoNombre = String(s.apellidos_nombres || "").toLowerCase();
+      const serie = String(s.serie || "").toLowerCase();
+      const marca = String(s.marca || "").toLowerCase();
+      
+      return cedula.includes(filtroBusquedaActual) || 
+             apellidoNombre.includes(filtroBusquedaActual) || 
+             serie.includes(filtroBusquedaActual) || 
+             marca.includes(filtroBusquedaActual);
+    });
+  }
 
+  // === ANALIZADOR MULTI-FORMATO SEGURO DE FECHA Y HORA DE GOOGLE SHEETS ===
+  const separarFechaYHora = (stringFechaOriginal) => {
+    if (!stringFechaOriginal) return { soloFecha: "Sin Fecha", hora: "--:--" };
+    
+    try {
+      const cadenaStr = String(stringFechaOriginal).trim();
+      
+      // Caso 1: Si viene en formato ISO de Google (Ej: "2026-06-25T14:35:00.000Z")
+      if (cadenaStr.includes('T')) {
+        const partesISO = cadenaStr.split('T');
+        const f = partesISO[0].split('-');
+        let soloFecha = partesISO[0];
+
+        
+        if (f.length === 3) {
+          const mesesNombres = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+          const nombreMes = mesesNombres[parseInt(f[1], 10) - 1] || "JUN";
+          
+          soloFecha = `${f[2]}/${nombreMes}/${f[0]}`;
+        }
+        
+        const subHora = partesISO[1].split(':');
+        const hora = subHora.length >= 2 ? `${subHora[0]}:${subHora[1]}` : "00:00";
+        return { soloFecha, hora };
+      }
+      
+      // Caso 2: Si viene separado por espacios como indicas (Ej: "25/JUN/2026 14:35:22")
+      const partesEspacio = cadenaStr.split(/\s+/);
+      if (partesEspacio.length >= 2) {
+        const soloFecha = partesEspacio[0];
+        const subHora = partesEspacio[1].split(':');
+        const hora = subHora.length >= 2 ? `${subHora[0]}:${subHora[1]}` : "00:00";
+        return { soloFecha, hora };
+      }
+      
+      return { soloFecha: cadenaStr, hora: "--:--" };
+    } catch (err) {
+      return { soloFecha: String(stringFechaOriginal), hora: "--:--" };
+    }
+  };
+
+  // 2. ORDENAMIENTO COMPUESTO: FECHA REAL DESCENDENTE
+  listaFiltrada.sort((a, b) => {
+    const parsearFechaAms = (strFechaFull) => {
+      if (!strFechaFull) return 0;
+      const { soloFecha } = separarFechaYHora(strFechaFull);
+      const partes = soloFecha.split('/');
+      if (partes.length === 3) {
+        const meses = { "ENE": "01", "FEB": "02", "MAR": "03", "ABR": "04", "MAY": "05", "JUN": "06", "JUL": "07", "AGO": "08", "SEP": "09", "OCT": "10", "NOV": "11", "DIC": "12" };
+        let mes = partes[1].toUpperCase();
+        if (meses[mes]) mes = meses[mes];
+        return new Date(`${partes[2]}-${mes}-${partes[0]}`).getTime();
+      }
+      return new Date(soloFecha).getTime() || 0;
+    };
+
+    const fechaA = parsearFechaAms(a.fecha);
+    const fechaB = parsearFechaAms(b.fecha);
+
+    if (fechaB !== fechaA) return fechaB - fechaA; 
+    return parseInt(b.id) - parseInt(a.id); 
+  });
+
+  if (listaFiltrada.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#e74c3c; padding:15px;">No se encontraron registros que coincidan con la búsqueda</td></tr>`;
+    return;
+  }
+
+  // 3. RENDERIZADO CON ENCABEZADOS DE FECHA INTERMEDIOS
+  let ultimaFechaAgrupada = "";
+
+  listaFiltrada.forEach((s) => {
+    const esActivo = s.estado === "CUSTODIA";
+    const { soloFecha, hora } = separarFechaYHora(s.fecha);
+
+    if (soloFecha !== ultimaFechaAgrupada) {
+      ultimaFechaAgrupada = soloFecha;
+      const filaEncabezado = document.createElement("tr");
+      filaEncabezado.className = "fila-grupo-fecha";
+      filaEncabezado.innerHTML = `
+        <td colspan="10" style="background: #2c3e50; color: #ffffff; font-weight: bold; text-align: left; padding: 8px 15px; font-size: 12px; letter-spacing: 0.5px;">
+          <i class="fa-solid fa-calendar-days"></i> SALVOCONDUCTOS GENERADOS EL: ${soloFecha.toUpperCase()}
+        </td>
+      `;
+      tbody.appendChild(filaEncabezado);
+    }
+
+    const tr = document.createElement("tr");
     tr.innerHTML = `
         <td style="text-align:center; display: flex; align-items: center; justify-content: center; gap: 10px; height: 100%;">
-            <input type="checkbox" class="salvo-row-checkbox" data-id="${s.id}"
-                style="cursor: pointer; transform: scale(1.2); margin: 0;">
+            <input type="checkbox" class="salvo-row-checkbox" data-id="${s.id}" style="cursor: pointer; transform: scale(1.2); margin: 0;">
         </td>
-        <td><small>${s.fecha}</small></td>
+        <td><strong>${soloFecha}</strong>${hora !== "--:--" ? `<br><small style="color:#2c3e50; font-weight:bold;"><i class="fa-regular fa-clock"></i> ${hora} HS</small>` : ""}</td>
         <td>${s.cedula}</td>
         <td style="text-align:left;">${s.apellidos_nombres}</td>
         <td><strong>${s.tipo_arma}</strong> <br><small>${s.serie}</small></td>
         <td>${s.cantidad_municion} <br><small>${s.calibre}</small></td>
         <td><strong>${s.lugar}</strong></td>
         <td><small>${s.fecha_inicio} al ${s.fecha_fin}</small></td>
-        <td><span class="badge-ord" style="background:${esActivo ? " #e67e22" : "#7f8c8d"}; font-size:11px;">${s.estado}</span>
-        </td>
+        <td><span class="badge-ord" style="background:${esActivo ? "#e67e22" : "#7f8c8d"}; font-size:11px;">${s.estado}</span></td>
         <td>
             ${
               esActivo
-                ? `<button type="button" class="btn-submit" style="background:#27ae60; padding:4px 8px; font-size:11px;"
-                onclick="registrarDevolucionAnticipada('${s.id}')">Devolución</button>`
-                : `<span
-                style="color:#27ae60; font-weight:bold;">✔ En Armerillo</span>`
+                ? `<button type="button" class="btn-submit" style="background:#27ae60; padding:4px 8px; font-size:11px;" onclick="registrarDevolucionAnticipada('${s.id}')">Devolución</button>`
+                : `<span style="color:#27ae60; font-weight:bold;">✔ En Armerillo</span>`
             }
         </td>
     `;
@@ -219,89 +298,193 @@ function renderizarTablaSalvoconductos() {
   inicializarEventosImpresionMúltiple();
 }
 
-function inicializarEventosImpresionMúltiple() {
-  const selectAll = document.getElementById("salvo-select-all");
-  const checkboxes = document.querySelectorAll(".salvo-row-checkbox");
-  const btnImprimir = document.getElementById("btn-imprimir-salvoconductos");
-  const btnDescargar = document.getElementById("btn-descargar-salvoconductos");
-
-  // 1. Control del Checkbox Maestro (Seleccionar Todos)
-  if (selectAll) {
-    selectAll.checked = false;
-    selectAll.onchange = function () {
-      checkboxes.forEach((cb) => (cb.checked = selectAll.checked));
-      actualizarContadorSeleccionados();
-    };
-  }
-
-  // 2. Control de los Checkboxes Individuales
-  checkboxes.forEach((cb) => {
-    cb.onchange = function () {
-      if (!this.checked) selectAll.checked = false;
-      actualizarContadorSeleccionados();
-    };
-  });
-
-  // 3. Evento para el Botón de Imprimir
-  if (btnImprimir) {
-    btnImprimir.onclick = function () {
-      const seleccionados = [];
-      document.querySelectorAll(".salvo-row-checkbox:checked").forEach((cb) => {
-        const item = salvoconductosEmitidosLista.find(
-          (s) => String(s.id) === String(cb.dataset.id),
-        );
-        if (item) seleccionados.push(item);
-      });
-
-      if (seleccionados.length === 0) {
-        alert(
-          "⚠ Por favor, seleccione al menos un salvoconducto mediante la opción de selección para proceder con la impresión.",
-        );
-        return;
-      }
-
-      ejecutarImpresionFormatoOficial(seleccionados);
-    };
-  }
-
-  // 4. Evento para el Botón de Descargar PDF (Mantenido dentro de la función)
-  if (btnDescargar) {
-    btnDescargar.onclick = function () {
-      const seleccionados = [];
-      document.querySelectorAll(".salvo-row-checkbox:checked").forEach((cb) => {
-        const item = salvoconductosEmitidosLista.find(
-          (s) => String(s.id) === String(cb.dataset.id),
-        );
-        if (item) seleccionados.push(item);
-      });
-
-      if (seleccionados.length === 0) {
-        alert(
-          "⚠ Por favor, seleccione al menos un salvoconducto mediante la opción de selección para proceder con la descarga.",
-        );
-        return;
-      }
-
-      // Invoca la descarga física del archivo
-      ejecutarDescargaPDFMilitar(seleccionados);
-    };
-  }
-
-  // Actualizar el contador global al inicializar
-  actualizarContadorSeleccionados();
-}
-
 function actualizarContadorSeleccionados() {
   const count = document.querySelectorAll(".salvo-row-checkbox:checked").length;
   const indicador = document.getElementById("salvo-contador-seleccionados");
   if (indicador) indicador.innerText = `Seleccionados: ${count}`;
 }
 
+// ============================================================
+// INICIALIZACIÓN DE EVENTOS DE IMPRESIÓN Y DESCARGA MÚLTIPLE
+// Engancha: checkbox maestro, checkboxes de fila, contador,
+// botón IMPRIMIR y botón DESCARGAR PDF
+// ============================================================
+function inicializarEventosImpresionMúltiple() {
+  // --- 1. Checkbox maestro (seleccionar / deseleccionar todos) ---
+  const checkboxMaestro = document.getElementById("salvo-select-all");
+  if (checkboxMaestro) {
+    // Clonar para eliminar listeners previos acumulados en renders anteriores
+    const checkboxMaestroNuevo = checkboxMaestro.cloneNode(true);
+    checkboxMaestro.parentNode.replaceChild(checkboxMaestroNuevo, checkboxMaestro);
+
+    checkboxMaestroNuevo.addEventListener("change", function () {
+      const checkboxes = document.querySelectorAll(".salvo-row-checkbox");
+      checkboxes.forEach((cb) => { cb.checked = this.checked; });
+      actualizarContadorSeleccionados();
+    });
+  }
+
+  // --- 2. Checkboxes individuales de cada fila ---
+  document.querySelectorAll(".salvo-row-checkbox").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      actualizarContadorSeleccionados();
+      // Si se desmarca uno, desmarcar el maestro
+      const maestroActual = document.getElementById("salvo-select-all");
+      if (maestroActual && !cb.checked) maestroActual.checked = false;
+    });
+  });
+
+  // --- 3. Botón IMPRIMIR SALVOCONDUCTOS ---
+  const btnImprimir = document.getElementById("btn-imprimir-salvoconductos");
+  if (btnImprimir) {
+    const btnImprimirNuevo = btnImprimir.cloneNode(true);
+    btnImprimir.parentNode.replaceChild(btnImprimirNuevo, btnImprimir);
+
+    btnImprimirNuevo.addEventListener("click", () => {
+      const seleccionados = obtenerRegistrosSeleccionados();
+      if (seleccionados.length === 0) {
+        alert("⚠ Debe seleccionar al menos un salvoconducto para imprimir.");
+        return;
+      }
+      ejecutarImpresionFormatoOficial(seleccionados);
+    });
+  }
+
+  // --- 4. Botón DESCARGAR PDF ---
+  const btnDescargar = document.getElementById("btn-descargar-salvoconductos");
+  if (btnDescargar) {
+    const btnDescargarNuevo = btnDescargar.cloneNode(true);
+    btnDescargar.parentNode.replaceChild(btnDescargarNuevo, btnDescargar);
+
+    btnDescargarNuevo.addEventListener("click", () => {
+      const seleccionados = obtenerRegistrosSeleccionados();
+      if (seleccionados.length === 0) {
+        alert("⚠ Debe seleccionar al menos un salvoconducto para descargar.");
+        return;
+      }
+      ejecutarDescargaPDFMilitar(seleccionados);
+    });
+  }
+}
+
+// Obtiene los objetos de salvoconducto que tienen su checkbox marcado
+function obtenerRegistrosSeleccionados() {
+  const checkboxesMarcados = document.querySelectorAll(".salvo-row-checkbox:checked");
+  const idsSeleccionados = new Set();
+  checkboxesMarcados.forEach((cb) => {
+    const id = cb.getAttribute("data-id");
+    if (id) idsSeleccionados.add(String(id));
+  });
+  return salvoconductosEmitidosLista.filter((s) => idsSeleccionados.has(String(s.id)));
+}
+
+// === CORRECCIÓN CRÍTICA DE CARGA INICIAL (DOM CONTENT LOADED SANITIZADO) ===
+document.addEventListener("DOMContentLoaded", () => {
+  // 1. Forzar ocultamiento de los bloques que se encimaban al cargar la app por primera vez
+  const moduloSalvoconductos = document.getElementById("module-salvoconductos");
+  const moduloParteDiario = document.getElementById("module-parte_diario");
+  const moduloPersonal = document.getElementById("module-registro_personal");
+
+  // Asegura que al abrir por primera vez la app no arranquen encimados en pantalla
+  if (moduloParteDiario) moduloParteDiario.classList.add("hidden");
+  if (moduloPersonal) moduloPersonal.classList.add("hidden");
+
+  // El modal y formulario conservan sus oyentes perfectamente
+  const modalSalvo = document.getElementById("modal-emision-salvoconducto");
+  const btnAbrirModal = document.getElementById("btn-abrir-nuevo-salvo");
+  const btnCerrarModal = document.getElementById("btn-cerrar-modal-salvo");
+  const formSalvoconducto = document.getElementById("form-salvoconducto");
+
+  if (btnAbrirModal && modalSalvo) {
+    btnAbrirModal.addEventListener("click", () => {
+      formSalvoconducto.reset();
+      document.getElementById("salvo-info-militar").value = "";
+      modalSalvo.classList.remove("hidden");
+    });
+  }
+
+  if (btnCerrarModal && modalSalvo) {
+    btnCerrarModal.addEventListener("click", () => {
+      modalSalvo.classList.add("hidden");
+      filtroBusquedaActual = "";
+    });
+  }
+
+  if (modalSalvo) {
+    modalSalvo.addEventListener("click", (e) => {
+      if (e.target === modalSalvo) modalSalvo.classList.add("hidden");
+    });
+  }
+
+  if (formSalvoconducto) {
+    formSalvoconducto.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const infoMilitar = document.getElementById("salvo-info-militar").value;
+      const calibre = document.getElementById("salvo-calibre").value;
+      const cantMunSolicitada = parseInt(document.getElementById("salvo-cant-mun").value) || 0;
+
+      if (!infoMilitar) {
+        alert("❌ Error: Cédula no válida.");
+        return;
+      }
+
+      const loteMunicion = salvoCacheMunicionStock.find(
+        (m) => String(m.calibre).trim().toUpperCase() === String(calibre).trim().toUpperCase()
+      );
+      const stockDisponible = loteMunicion ? parseInt(loteMunicion.cantidad) : 0;
+
+      if (cantMunSolicitada > stockDisponible) {
+        alert(`❌ Abortado: Stock insuficiente en polvorín. Almacenado: ${stockDisponible}.`);
+        return;
+      }
+
+      const payload = {
+        target: "salvoconductos",
+        action: "create",
+        cedula: document.getElementById("salvo-cedula").value,
+        apellidos_nombres: infoMilitar,
+        tipo_arma: document.getElementById("salvo-tipo-arma").value,
+        serie: document.getElementById("salvo-serie").value,
+        marca: document.getElementById("salvo-marca").value,
+        calibre: calibre,
+        cantidad_municion: cantMunSolicitada,
+        lugar: document.getElementById("salvo-lugar").value,
+        fecha_inicio: document.getElementById("salvo-fecha-inicio").value,
+        fecha_fin: document.getElementById("salvo-fecha-fin").value,
+        aprobado_por: document.getElementById("salvo-aprobador").value,
+      };
+
+      if (typeof sendData === "function") {
+        sendData(payload, () => {
+          formSalvoconducto.reset();
+          document.getElementById("salvo-info-militar").value = "";
+          if (modalSalvo) modalSalvo.classList.add("hidden");
+        });
+      }
+    });
+  }
+});
+
+async function registrarDevolucionAnticipada(idSalvoconducto) {
+  if (
+    confirm(
+      "¿Confirmar la entrega y reincorporación del material bélico al stock de la Unidad?",
+    )
+  ) {
+    if (typeof sendData === "function") {
+      sendData(
+        { target: "salvoconductos", action: "update", id: idSalvoconducto },
+        () => { },
+      );
+    }
+  }
+}
+
 function ejecutarImpresionFormatoOficial(registros) {
   const ventanaImpresion = window.open("", "_blank");
-
   let htmlContenido = `
-    <!DOCTYPE html>
+    
+  <!DOCTYPE html>
 <html>
 
 <head>
@@ -355,7 +538,8 @@ function ejecutarImpresionFormatoOficial(registros) {
             margin-bottom: 0;
         }
 
-        .panel-izquierdo {
+        .panel-izquierdo,
+        .panel-derecho {
             width: 94.5mm;
             height: 68.9mm;
             border: 3px solid #000000;
@@ -369,17 +553,8 @@ function ejecutarImpresionFormatoOficial(registros) {
         }
 
         .panel-derecho {
-            width: 94.5mm;
-            height: 68.9mm;
-            border: 3px solid #000000;
             padding: 8px 10px;
-            box-sizing: border-box;
-            display: flex;
-            margin-left:1px;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            z-index: 5;
+            margin-left: 1px;
         }
 
         .marca-agua-fae {
@@ -422,7 +597,7 @@ function ejecutarImpresionFormatoOficial(registros) {
             grid-template-columns: 1fr 1fr;
             gap: 1px 6px;
             margin-top: 1px;
-            margin-left:5px;
+            margin-left: 5px;
             font-weight: 400;
         }
 
@@ -469,11 +644,8 @@ function ejecutarImpresionFormatoOficial(registros) {
 
   for (let i = 0; i < registros.length; i += 3) {
     htmlContenido += `<div class="hoja-a4">`;
-
     for (let j = i; j < i + 3 && j < registros.length; j++) {
       const r = registros[j];
-
-      // === CORRECCIÓN 1: RESOLVER MARCA REAL MEDIANTE COMPARACIÓN ROBUSTA DE SERIE ===
       const armaFisica = salvoCacheArmamentoReal.find(
         (a) =>
           String(a.serie).trim().toUpperCase() ===
@@ -485,17 +657,13 @@ function ejecutarImpresionFormatoOficial(registros) {
           ? r.marca
           : "-";
 
-      // === CORRECCIÓN 2: FORMATEAR EXTRACTO DE FIRMA AUTORIZADA EXTRAYENDO DE LA BASE DE DATOS ===
-      let firmaBloqueFormateado = r.aprobado_por; // Respaldo por defecto
-      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"'; // Respaldo por defecto
+      let firmaBloqueFormateado = r.aprobado_por;
+      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"';
 
-      // Unificar cachés locales para la búsqueda del autorizador en impresión
       const poolAutorizadoresImpresion = [
         ...salvoCachePersonal,
-        ...datosPersonalAgregadoGlobal,
+        ...(window.datosPersonalAgregadoGlobal || []),
       ];
-
-      // Buscar la ficha completa del aprobador utilizando su rango y nombre
       const autorizador = poolAutorizadoresImpresion.find(
         (p) =>
           `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() ===
@@ -503,19 +671,11 @@ function ejecutarImpresionFormatoOficial(registros) {
       );
 
       if (autorizador) {
-        // Formatear nombres: la base de datos viene como "APELLIDO1 APELLIDO2 NOMBRE1 NOMBRE2"
-        // Extraemos el primer nombre (índice 2) y los dos apellidos (índices 0 y 1)
         const tokens = autorizador.apellidos_nombres.trim().split(/\s+/);
         let nombreFirma = autorizador.apellidos_nombres;
+        if (tokens.length >= 3)
+          nombreFirma = `${tokens[2]} ${tokens[0]} ${tokens[1]}`;
 
-        if (tokens.length >= 3) {
-          const ap1 = tokens[0];
-          const ap2 = tokens[1];
-          const nom1 = tokens[2];
-          nombreFirma = `${nom1} ${ap1} ${ap2}`;
-        }
-
-        // Abreviar la Especialidad de forma estandarizada e institucional FAE
         let espAbr = autorizador.especialidad
           ? autorizador.especialidad.trim().toUpperCase()
           : "";
@@ -523,110 +683,68 @@ function ejecutarImpresionFormatoOficial(registros) {
           espAbr.includes("TÉCNICO") ||
           espAbr.includes("TECNICO") ||
           espAbr.includes("ARMAMENTO")
-        ) {
+        )
           espAbr = "TÉC.";
-        } else if (espAbr.includes("ESPECIALISTA")) {
-          espAbr = "ESP.";
-        } else if (espAbr.includes("PILOTO")) {
-          espAbr = "PLTO.";
-        } else if (espAbr.length > 0) {
-          espAbr = espAbr.substring(0, 3) + ".";
-        }
+        else if (espAbr.includes("ESPECIALISTA")) espAbr = "ESP.";
+        else if (espAbr.includes("PILOTO")) espAbr = "PLTO.";
+        else if (espAbr.length > 0) espAbr = espAbr.substring(0, 3) + ".";
 
-        // Construcción simétrica solicitada: GRADO + ESP_ABRV + AVC. + 1er NOMBRE + 2 APELLIDOS
         firmaBloqueFormateado = `${autorizador.grado} ${espAbr} AVC. ${nombreFirma}`;
-
-        // Cargar dinámicamente la función militar de la base de datos (Comandante u Oficial de Semana)
-        if (autorizador.funcion) {
+        if (autorizador.funcion)
           funcionCargoAutoridad = String(autorizador.funcion)
             .trim()
             .toUpperCase();
-        }
       }
 
       htmlContenido += `
         <div class="salvoconducto-container">
           <div class="panel-izquierdo">
             <img class="marca-agua-fae" src="imagenes/sello_fae.svg" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/29/Escudo_de_la_Fuerza_A%C3%A9rea_Ecuatoriana.png';">
-            
-            <div class="header-titulo">
-              FUERZA AEREA ECUATORIANA<br>
-              <span style="font-size: 13px; font-weight:normal;">Salvoconducto para Portar Arma</span>
-            </div>
-
+            <div class="header-titulo">FUERZA AEREA ECUATORIANA<br><span style="font-size: 13px; font-weight:normal;">Salvoconducto para Portar Arma</span></div>
             <div style="margin-top: 1px; margin-left:5px;">
               <div class="meta-value-text">${r.apellidos_nombres}</div>
               <div class="meta-label-block">Grado, Apellidos y Nombres</div>
             </div>
-
             <div class="grid-datos-armas">
               <div>
-                <div class="meta-value-text">${r.cedula}</div>
-                <div class="meta-label-block">Cédula</div>
-                
-                <div class="meta-value-text" style="margin-top: 1px;">${r.serie}</div>
-                <div class="meta-label-block">Serie</div>
-                
-                <div class="meta-value-text" style="margin-top: 1px;">${r.calibre}</div>
-                <div class="meta-label-block">Calibre</div>
-                
-                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_inicio}</div>
-                <div class="meta-label-block">Fecha Emisión</div>
+                <div class="meta-value-text">${r.cedula}</div><div class="meta-label-block">Cédula</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.serie}</div><div class="meta-label-block">Serie</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.calibre}</div><div class="meta-label-block">Calibre</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_inicio}</div><div class="meta-label-block">Fecha Emisión</div>
               </div>
-              
               <div style="margin-left: 40px;">
-                <div class="meta-value-text">${r.tipo_arma}</div>
-                <div class="meta-label-block">Tipo de Arma</div>
-                
-                <div class="meta-value-text" style="margin-top: 1px;">${marcaCorrecta}</div>
-                <div class="meta-label-block">Marca</div>
-                
-                <div class="meta-value-text" style="margin-top: 1px;">${r.cantidad_municion}</div>
-                <div class="meta-label-block">Cantidad Munición</div>
-                
-                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_fin}</div>
-                <div class="meta-label-block">Fecha Caducidad</div>
+                <div class="meta-value-text">${r.tipo_arma}</div><div class="meta-label-block">Tipo de Arma</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${marcaCorrecta}</div><div class="meta-label-block">Marca</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.cantidad_municion}</div><div class="meta-label-block">Cantidad Munición</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_fin}</div><div class="meta-label-block">Fecha Caducidad</div>
               </div>
             </div>
-
             <div class="pie-firma-autoridad">
               <div class="linea-portador"></div>
               <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight:normal">${firmaBloqueFormateado}</div>
               <div class="meta-value-text" style="margin-top: 2px; font-size: 11px; font-weight: bold">${funcionCargoAutoridad}</div>
             </div>
           </div>
-
           <div class="panel-derecho">
-            <p class="texto-legal-sub">
-              EL PORTADOR DE LA PRESENTE CREDENCIAL ESTÁ AUTORIZADO POR EL RESPONSABLE PUNTO DE DESPLIEGUE "CERRO MONTECRISTI", A PORTAR EL ARMA DETALLADA PARA EL CUMPLIMIENTO DE SU MISIÓN OFICIAL DENTRO DE LA PROVINCIA DE MANABÍ. EN TAL VIRTUD, SE SOLICITA A TODA AUTORIDAD CIVIL, MILITAR Y POLICIAL SU COLABORACIÓN PARA EL DESEMPEÑO DE LA COMISIÓN.
-            </p>
-            
-            <p class="texto-legal-footer">
-              ESTE DOCUMENTO SERÁ VÁLIDO PREVIA PRESENTACIÓN DE LA TARJETA MILITAR ORIGINAL.
-            </p>
-
+            <p class="texto-legal-sub">EL PORTADOR DE LA PRESENTE CREDENCIAL ESTÁ AUTORIZADO POR EL RESPONSABLE PUNTO DE DESPLIEGUE "CERRO MONTECRISTI", A PORTAR EL ARMA DETALLADA PARA EL CUMPLIMIENTO DE SU MISIÓN OFICIAL DENTRO DE LA PROVINCIA DE MANABÍ. EN TAL VIRTUD, SE SOLICITA A TODA AUTORIDAD CIVIL, MILITAR Y POLICIAL SU COLABORACIÓN PARA EL DESEMPEÑO DE LA COMISIÓN.</p>
+            <p class="texto-legal-footer">ESTE DOCUMENTO SERÁ VÁLIDO PREVIA PRESENTACIÓN DE LA TARJETA MILITAR ORIGINAL.</p>
             <div style="text-align: center; margin-top: auto; font-size: 11px; font-weight: bold; text-transform: uppercase;">
-              <div class="linea-portador"></div>
-              <h2 style="font-size:12px; margin:0;">EL PORTADOR</h2>
+              <div class="linea-portador"></div><h2 style="font-size:12px; margin:0;">EL PORTADOR</h2>
             </div>
           </div>
         </div>
       `;
     }
-
     htmlContenido += `</div>`;
   }
 
   htmlContenido += `
     <script>
       window.onload = function() {
-        setTimeout(function() {
-          window.print();
-        }, 300);
+        setTimeout(function() { window.print(); }, 300);
       };
     </script>
-    </body>
-    </html>
+    </body></html>
   `;
 
   ventanaImpresion.document.open();
@@ -634,282 +752,178 @@ function ejecutarImpresionFormatoOficial(registros) {
   ventanaImpresion.document.close();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const modalSalvo = document.getElementById("modal-emision-salvoconducto");
-  const btnAbrirModal = document.getElementById("btn-abrir-nuevo-salvo");
-  const btnCerrarModal = document.getElementById("btn-cerrar-modal-salvo");
-  const formSalvoconducto = document.getElementById("form-salvoconducto");
-
-  // 1. Manejo de aperturas y cierres del Modal
-  if (btnAbrirModal && modalSalvo) {
-    btnAbrirModal.addEventListener("click", () => {
-      // ACCESO CONCEDIDO A TODOS LOS USUARIOS SIN RESTRICCIONES
-      formSalvoconducto.reset();
-      document.getElementById("salvo-info-militar").value = "";
-      modalSalvo.classList.remove("hidden");
-    });
-  }
-
-  if (btnCerrarModal && modalSalvo) {
-    btnCerrarModal.addEventListener("click", () => {
-      modalSalvo.classList.add("hidden");
-    });
-  }
-
-  // Cerrar si hace clic en el fondo translúcido exterior
-  if (modalSalvo) {
-    modalSalvo.addEventListener("click", (e) => {
-      if (e.target === modalSalvo) {
-        modalSalvo.classList.add("hidden");
-      }
-    });
-  }
-
-  // 2. Interceptor del Formulario de Envío
-  if (formSalvoconducto) {
-    formSalvoconducto.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const infoMilitar = document.getElementById("salvo-info-militar").value;
-      const calibre = document.getElementById("salvo-calibre").value;
-      const cantMunSolicitada =
-        parseInt(document.getElementById("salvo-cant-mun").value) || 0;
-
-      if (!infoMilitar) {
-        alert("❌ Error: Cédula no válida.");
-        return;
-      }
-
-      const loteMunicion = salvoCacheMunicionStock.find(
-        (m) =>
-          String(m.calibre).trim().toUpperCase() ===
-          String(calibre).trim().toUpperCase(),
-      );
-      const stockDisponible = loteMunicion
-        ? parseInt(loteMunicion.cantidad)
-        : 0;
-
-      if (cantMunSolicitada > stockDisponible) {
-        alert(
-          `❌ Abortado: Stock insuficiente en polvorín. Almacenado: ${stockDisponible}.`,
-        );
-        return;
-      }
-
-      const payload = {
-        target: "salvoconductos",
-        action: "create",
-        cedula: document.getElementById("salvo-cedula").value,
-        apellidos_nombres: infoMilitar,
-        tipo_arma: document.getElementById("salvo-tipo-arma").value,
-        serie: document.getElementById("salvo-serie").value,
-        marca: document.getElementById("salvo-marca").value,
-        calibre: calibre,
-        cantidad_municion: cantMunSolicitada,
-        lugar: document.getElementById("salvo-lugar").value,
-        fecha_inicio: document.getElementById("salvo-fecha-inicio").value,
-        fecha_fin: document.getElementById("salvo-fecha-fin").value,
-        aprobado_por: document.getElementById("salvo-aprobador").value,
-      };
-
-      if (typeof sendData === "function") {
-        sendData(payload, () => {
-          formSalvoconducto.reset();
-          document.getElementById("salvo-info-militar").value = "";
-          // REGLA DE OPTIMIZACIÓN: Ocultar modal automáticamente tras guardar con éxito
-          if (modalSalvo) modalSalvo.classList.add("hidden");
-        });
-      }
-    });
-  }
-});
-
-async function registrarDevolucionAnticipada(idSalvoconducto) {
-  if (
-    confirm(
-      "¿Confirmar la entrega y reincorporación del material bélico al stock de la Unidad?",
-    )
-  ) {
-    if (typeof sendData === "function") {
-      sendData(
-        { target: "salvoconductos", action: "update", id: idSalvoconducto },
-        () => {},
-      );
-    }
-  }
-}
 function ejecutarDescargaPDFMilitar(registros) {
-  // 1. Cabecera HTML y Estilos CSS optimizados sin altos rígidos desbordantes
   let htmlContenido = `
     <!DOCTYPE html>
     <html>
-    <head>
-        <title>Descarga de Salvoconductos - FAE</title>
-        <style>
-            @page {
-                size: A4 vertical;
-                margin: 0;
-            }
 
-            body {
-                margin: 0;
-                padding: 0;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                background: #ffffff;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+<head>
+    <title>Descarga de Salvoconductos - FAE</title>
+    <style>
+        @page {
+            size: A4 vertical;
+            margin: 0;
+        }
 
-            .hoja-a4 {
-                width: 210mm;
-                /* SE CAMBIA altura fija por min-height controlado y padding seguro */
-                min-height: 295.5mm; 
-                padding-top: 10mm;
-                padding-bottom: 5mm;
-                margin: 0 auto;
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                position: relative;
-                background: #ffffff;
-                page-break-after: always;
-            }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #ffffff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
 
-            .hoja-a4:last-child {
-                page-break-after: avoid !important; /* Evita que la última hoja intente saltar a una en blanco */
-            }
+        .hoja-a4 {
+            width: 210mm;
+            min-height: 295.5mm;
+            padding-top: 10mm;
+            padding-bottom: 5mm;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            background: #ffffff;
+            page-break-after: always;
+        }
 
-            .salvoconducto-container {
-                width: 190mm;
-                height: 68mm; /* Ajustado milimétricamente a 68mm para dar respiro al lienzo digital */
-                margin-bottom: 12mm; /* Separación balanceada y segura */
-                border: 1px solid #000000;
-                box-sizing: border-box;
-                display: flex;
-                position: relative;
-                background: #ffffff;
-                overflow: hidden;
-                padding: 1px;
-            }
+        .hoja-a4:last-child {
+            page-break-after: avoid !important;
+        }
 
-            .salvoconducto-container:last-child,
-            .salvoconducto-container:nth-child(3n) {
-                margin-bottom: 0 !important; /* Fuerza a que el último elemento no empuje espacio sobrante */
-            }
+        .salvoconducto-container {
+            width: 190mm;
+            height: 68mm;
+            margin-bottom: 12mm;
+            border: 1px solid #000000;
+            box-sizing: border-box;
+            display: flex;
+            position: relative;
+            background: #ffffff;
+            overflow: hidden;
+            padding: 1px;
+        }
 
-            .panel-izquierdo {
-                width: 94.5mm;
-                height: 66.9mm; /* Ajustado proporcionalmente */
-                border: 3px solid #000000;
-                padding: 5px 8px;
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                position: relative;
-                z-index: 5;
-            }
+        .salvoconducto-container:last-child,
+        .salvoconducto-container:nth-child(3n) {
+            margin-bottom: 0 !important;
+        }
 
-            .panel-derecho {
-                width: 94.5mm;
-                height: 66.9mm; /* Ajustado proporcionalmente */
-                border: 3px solid #000000;
-                padding: 7px 10px;
-                box-sizing: border-box;
-                display: flex;
-                margin-left: 1px;
-                flex-direction: column;
-                justify-content: space-between;
-                position: relative;
-                z-index: 5;
-            }
+        .panel-izquierdo {
+            width: 94.5mm;
+            height: 66.9mm;
+            border: 3px solid #000000;
+            padding: 5px 8px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 5;
+        }
 
-            .marca-agua-fae {
-                position: absolute;
-                top: 50%;
-                left: 45%;
-                transform: translate(-50%, -50%);
-                width: 30mm;
-                height: 30mm;
-                opacity: 0.22;
-                z-index: 1;
-                pointer-events: none;
-            }
+        .panel-derecho {
+            width: 94.5mm;
+            height: 66.9mm;
+            border: 3px solid #000000;
+            padding: 7px 10px;
+            box-sizing: border-box;
+            display: flex;
+            margin-left: 1px;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 5;
+        }
 
-            .header-titulo {
-                text-align: center;
-                font-size: 15px;
-                font-weight: bold;
-                line-height: 1.2;
-                text-transform: uppercase;
-                margin-bottom: 2px;
-            }
+        .marca-agua-fae {
+            position: absolute;
+            top: 50%;
+            left: 45%;
+            transform: translate(-50%, -50%);
+            width: 30mm;
+            height: 30mm;
+            opacity: 0.22;
+            z-index: 1;
+            pointer-events: none;
+        }
 
-            .meta-label-block {
-                font-size: 9px;
-                text-transform: uppercase;
-                margin-top: 1px;
-                margin-bottom: 2px;
-                font-weight: normal;
-            }
+        .header-titulo {
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            line-height: 1.2;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
 
-            .meta-value-text {
-                font-size: 10px;
-                font-weight: bold;
-                text-transform: uppercase;
-            }
+        .meta-label-block {
+            font-size: 9px;
+            text-transform: uppercase;
+            margin-top: 1px;
+            margin-bottom: 2px;
+            font-weight: normal;
+        }
 
-            .grid-datos-armas {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1px 6px;
-                margin-top: 1px;
-                margin-left: 5px;
-                font-weight: 400;
-            }
+        .meta-value-text {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
 
-            .texto-legal-sub {
-                font-size: 11px;
-                margin: 4px 0;
-                text-align: justify;
-                line-height: 1.35;
-                font-weight: 400;
-            }
+        .grid-datos-armas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px 6px;
+            margin-top: 1px;
+            margin-left: 5px;
+            font-weight: 400;
+        }
 
-            .texto-legal-footer {
-                font-size: 11px;
-                margin: 6px 0 2px;
-                text-align: left;
-                font-weight: normal;
-            }
+        .texto-legal-sub {
+            font-size: 11px;
+            margin: 4px 0;
+            text-align: justify;
+            line-height: 1.35;
+            font-weight: 400;
+        }
 
-            .pie-firma-autoridad {
-                text-align: center;
-                font-size: 11px;
-                line-height: 1.1;
-                margin-top: auto;
-                padding-top: 0.7px;
-            }
+        .texto-legal-footer {
+            font-size: 11px;
+            margin: 6px 0 2px;
+            text-align: left;
+            font-weight: normal;
+        }
 
-            .linea-portador {
-                width: 70%;
-                margin: 0 auto 2px;
-                border-bottom: 1px solid #000;
-            }
-        </style>
-    </head>
-    <body>
+        .pie-firma-autoridad {
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.1;
+            margin-top: auto;
+            padding-top: 0.7px;
+        }
+
+        .linea-portador {
+            width: 70%;
+            margin: 0 auto 2px;
+            border-bottom: 1px solid #000;
+        }
+    </style>
+</head>
+
+<body>
   `;
 
-  // 2. Procesar los registros en grupos de 3 por hoja
   for (let i = 0; i < registros.length; i += 3) {
     htmlContenido += `<div class="hoja-a4">`;
-
     for (let j = i; j < i + 3 && j < registros.length; j++) {
       const r = registros[j];
-
       const armaFisica = salvoCacheArmamentoReal.find(
-        (a) => String(a.serie).trim().toUpperCase() === String(r.serie).trim().toUpperCase()
+        (a) =>
+          String(a.serie).trim().toUpperCase() ===
+          String(r.serie).trim().toUpperCase(),
       );
       const marcaCorrecta = armaFisica
         ? armaFisica.marca || "SIN MARCA"
@@ -917,79 +931,69 @@ function ejecutarDescargaPDFMilitar(registros) {
           ? r.marca
           : "-";
 
-      let firmaBloqueFormateado = r.aprobado_por; 
-      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"'; 
+      let firmaBloqueFormateado = r.aprobado_por;
+      let funcionCargoAutoridad = 'COMANDANTE DEL ESCUADRÓN VIGALGO "BUITRE"';
 
       const poolAutorizadoresPDF = [
         ...salvoCachePersonal,
-        ...datosPersonalAgregadoGlobal,
+        ...(window.datosPersonalAgregadoGlobal || []),
       ];
-
       const autorizador = poolAutorizadoresPDF.find(
-        (p) => `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() === String(r.aprobado_por).trim().toUpperCase()
+        (p) =>
+          `${p.grado} ${p.apellidos_nombres}`.trim().toUpperCase() ===
+          String(r.aprobado_por).trim().toUpperCase(),
       );
 
       if (autorizador) {
         const tokens = autorizador.apellidos_nombres.trim().split(/\s+/);
         let nombreFirma = autorizador.apellidos_nombres;
+        if (tokens.length >= 3)
+          nombreFirma = `${tokens[2]} ${tokens[0]} ${tokens[1]}`;
 
-        if (tokens.length >= 3) {
-          const ap1 = tokens[0];
-          const ap2 = tokens[1];
-          const nom1 = tokens[2];
-          nombreFirma = `${nom1} ${ap1} ${ap2}`;
-        }
-
-        let espAbr = autorizador.specialidad || autorizador.especialidad ? (autorizador.specialidad || autorizador.especialidad).trim().toUpperCase() : "";
-        if (espAbr.includes("TÉCNICO") || espAbr.includes("TECNICO") || espAbr.includes("ARMAMENTO")) {
+        let espAbr =
+          autorizador.especialidad
+            ? autorizador.especialidad
+              .trim()
+              .toUpperCase()
+            : "";
+        if (
+          espAbr.includes("TÉCNICO") ||
+          espAbr.includes("TECNICO") ||
+          espAbr.includes("ARMAMENTO")
+        )
           espAbr = "TÉC.";
-        } else if (espAbr.includes("ESPECIALISTA")) {
-          espAbr = "ESP.";
-        } else if (espAbr.includes("PILOTO")) {
-          espAbr = "PLTO.";
-        } else if (espAbr.length > 0) {
-          espAbr = espAbr.substring(0, 3) + ".";
-        }
+        else if (espAbr.includes("ESPECIALISTA")) espAbr = "ESP.";
+        else if (espAbr.includes("PILOTO")) espAbr = "PLTO.";
+        else if (espAbr.length > 0) espAbr = espAbr.substring(0, 3) + ".";
 
         firmaBloqueFormateado = `${autorizador.grado} ${espAbr} AVC. ${nombreFirma}`;
-
-        if (autorizador.funcion) {
-          funcionCargoAutoridad = String(autorizador.funcion).trim().toUpperCase();
-        }
+        if (autorizador.funcion)
+          funcionCargoAutoridad = String(autorizador.funcion)
+            .trim()
+            .toUpperCase();
       }
 
       htmlContenido += `
         <div class="salvoconducto-container">
           <div class="panel-izquierdo">
             <img class="marca-agua-fae" src="imagenes/sello_fae.svg" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/29/Escudo_de_la_Fuerza_A%C3%A9rea_Ecuatoriana.png';">
-            <div class="header-titulo">
-              FUERZA AEREA ECUATORIANA<br>
-              <span style="font-size: 13px; font-weight:normal;">Salvoconducto para Portar Arma</span>
-            </div>
+            <div class="header-titulo">FUERZA AEREA ECUATORIANA<br><span style="font-size: 13px; font-weight:normal;">Salvoconducto para Portar Arma</span></div>
             <div style="margin-top: 1px; margin-left:5px;">
               <div class="meta-value-text">${r.apellidos_nombres}</div>
               <div class="meta-label-block">Grado, Apellidos y Nombres</div>
             </div>
             <div class="grid-datos-armas">
               <div>
-                <div class="meta-value-text">${r.cedula}</div>
-                <div class="meta-label-block">Cédula</div>
-                <div class="meta-value-text" style="margin-top: 1px;">${r.serie}</div>
-                <div class="meta-label-block">Serie</div>
-                <div class="meta-value-text" style="margin-top: 1px;">${r.calibre}</div>
-                <div class="meta-label-block">Calibre</div>
-                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_inicio}</div>
-                <div class="meta-label-block">Fecha Emisión</div>
+                <div class="meta-value-text">${r.cedula}</div><div class="meta-label-block">Cédula</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.serie}</div><div class="meta-label-block">Serie</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.calibre}</div><div class="meta-label-block">Calibre</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_inicio}</div><div class="meta-label-block">Fecha Emisión</div>
               </div>
               <div style="margin-left: 40px;">
-                <div class="meta-value-text">${r.tipo_arma}</div>
-                <div class="meta-label-block">Tipo de Arma</div>
-                <div class="meta-value-text" style="margin-top: 1px;">${marcaCorrecta}</div>
-                <div class="meta-label-block">Marca</div>
-                <div class="meta-value-text" style="margin-top: 1px;">${r.cantidad_municion}</div>
-                <div class="meta-label-block">Cantidad Munición</div>
-                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_fin}</div>
-                <div class="meta-label-block">Fecha Caducidad</div>
+                <div class="meta-value-text">${r.tipo_arma}</div><div class="meta-label-block">Tipo de Arma</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${marcaCorrecta}</div><div class="meta-label-block">Marca</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.cantidad_municion}</div><div class="meta-label-block">Cantidad Munición</div>
+                <div class="meta-value-text" style="margin-top: 1px;">${r.fecha_fin}</div><div class="meta-label-block">Fecha Caducidad</div>
               </div>
             </div>
             <div class="pie-firma-autoridad">
@@ -999,15 +1003,10 @@ function ejecutarDescargaPDFMilitar(registros) {
             </div>
           </div>
           <div class="panel-derecho">
-            <p class="texto-legal-sub">
-              EL PORTADOR DE LA PRESENTE CREDENCIAL ESTÁ AUTORIZADO POR EL RESPONSABLE PUNTO DE DESPLIEGUE "CERRO MONTECRISTI", A PORTAR EL ARMA DETALLADA PARA EL CUMPLIMIENTO DE SU MISIÓN OFICIAL DENTRO DE LA PROVINCIA DE MANABÍ. EN TAL VIRTUD, SE SOLICITA A TODA AUTORIDAD CIVIL, MILITAR Y POLICIAL SU COLABORACIÓN PARA EL DESEMPEÑO DE LA COMISIÓN.
-            </p>
-            <p class="texto-legal-footer">
-              ESTE DOCUMENTO SERÁ VÁLIDO PREVIA PRESENTACIÓN DE LA TARJETA MILITAR ORIGINAL.
-            </p>
+            <p class="texto-legal-sub">EL PORTADOR DE LA PRESENTE CREDENCIAL ESTÁ AUTORIZADO POR EL RESPONSABLE PUNTO DE DESPLIEGUE "CERRO MONTECRISTI", A PORTAR EL ARMA DETALLADA PARA EL CUMPLIMIENTO DE SU MISIÓN OFICIAL DENTRO DE LA PROVINCIA DE MANABÍ. EN TAL VIRTUD, SE SOLICITA A TODA AUTORIDAD CIVIL, MILITAR Y POLICIAL SU COLABORACIÓN PARA EL DESEMPEÑO DE LA COMISIÓN.</p>
+            <p class="texto-legal-footer">ESTE DOCUMENTO SERÁ VÁLIDO PREVIA PRESENTACIÓN DE LA TARJETA MILITAR ORIGINAL.</p>
             <div style="text-align: center; margin-top: auto; font-size: 11px; font-weight: bold; text-transform: uppercase;">
-              <div class="linea-portador"></div>
-              <h2 style="font-size:12px; margin:0;">EL PORTADOR</h2>
+              <div class="linea-portador"></div><h2 style="font-size:12px; margin:0;">EL PORTADOR</h2>
             </div>
           </div>
         </div>
@@ -1019,19 +1018,94 @@ function ejecutarDescargaPDFMilitar(registros) {
   htmlContenido += `</body></html>`;
 
   const opcionesConfiguracion = {
-    margin:       0,
-    filename:     `Salvoconductos_Emitidos_${registros[0].cedula}.pdf`,
-    image:        { type: 'jpeg', quality: 1.0 },
-    html2canvas:  { 
-      scale: 4, 
-      useCORS: true, 
+    margin: 0,
+    filename: `Salvoconductos_Emitidos_${registros[0].cedula}.pdf`,
+    image: { type: "jpeg", quality: 1.0 },
+    html2canvas: {
+      scale: 4,
+      useCORS: true,
       logging: false,
       letterRendering: true,
-      antiAliasing: true
+      antiAliasing: true,
     },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compressPDF: true },
-    pagebreak:    { mode: ['css', 'legacy'] }
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+      compressPDF: true,
+    },
+    pagebreak: { mode: ["css", "legacy"] },
   };
 
   html2pdf().from(htmlContenido).set(opcionesConfiguracion).save();
 }
+
+function inicializarBuscadorMatrizSalvoconductos() {
+  const contenedorAcciones = document.querySelector(
+    ".matriz-salvo-acciones-flex",
+  );
+  if (!contenedorAcciones) return;
+
+  if (document.getElementById("salvo-input-buscador")) return;
+
+  const divBusqueda = document.createElement("div");
+  divBusqueda.style.display = "flex";
+  divBusqueda.style.alignItems = "center";
+  divBusqueda.style.gap = "10px";
+  divBusqueda.style.marginRight = "auto";
+
+  divBusqueda.innerHTML = `
+    <div style="position: relative; display: flex; align-items: center;">
+      <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: #7f8c8d;"></i>
+      <input type="text" id="salvo-input-buscador" placeholder="Buscar cédula, apellido, serie o marca..." 
+             style="padding: 6px 10px 6px 32px; width: 280px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+    </div>
+    <span id="salvo-badge-historial" style="background: #34495e; color: #fff; padding: 5px 10px; font-size: 11px; font-weight: bold; border-radius: 4px; display: none; align-items: center; gap: 5px;">
+      <i class="fa-solid fa-clock-history"></i> <span id="salvo-texto-historial">Usos: 0</span>
+    </span>
+  `;
+
+  contenedorAcciones.insertBefore(divBusqueda, contenedorAcciones.firstChild);
+
+  const inputBuscador = document.getElementById("salvo-input-buscador");
+  const badgeHistorial = document.getElementById("salvo-badge-historial");
+  const textoHistorial = document.getElementById("salvo-texto-historial");
+
+  inputBuscador.addEventListener("input", function () {
+    filtroBusquedaActual = this.value.trim().toLowerCase();
+
+    if (filtroBusquedaActual.length >= 2) {
+      let contadorUsos = 0;
+
+      salvoconductosEmitidosLista.forEach((s) => {
+        const cedula = String(s.cedula || "").toLowerCase();
+        const nombre = String(s.apellidos_nombres || "").toLowerCase();
+        const serie = String(s.serie || "").toLowerCase();
+        const marca = String(s.marca || "").toLowerCase();
+
+        if (
+          cedula.includes(filtroBusquedaActual) ||
+          nombre.includes(filtroBusquedaActual) ||
+          serie.includes(filtroBusquedaActual) ||
+          marca.includes(filtroBusquedaActual)
+        ) {
+          contadorUsos++;
+        }
+      });
+
+      badgeHistorial.style.display = "inline-flex";
+      textoHistorial.innerText = `Frecuencia / Registros en Matriz: ${contadorUsos} veces`;
+    } else {
+      badgeHistorial.style.display = "none";
+    }
+
+    renderizarTablaSalvoconductos();
+  });
+}
+
+// Inyectar el buscador de forma automática cada vez que los datos de Sheets se carguen
+const originalPoblarDesplegables = poblarDesplegablesSalvoconducto;
+poblarDesplegablesSalvoconducto = function (data) {
+  originalPoblarDesplegables(data);
+  setTimeout(inicializarBuscadorMatrizSalvoconductos, 200);
+};

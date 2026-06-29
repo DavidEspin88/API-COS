@@ -616,9 +616,7 @@ async function guardarControlOperacional() {
   if (window.datosPersonalGlobal) {
     // Generar el payload usando la lista unificada
     const personalCombinado = [];
-    if (window.datosPersonalGlobal) {
-      window.datosPersonalGlobal.forEach((p) => personalCombinado.push(p));
-    }
+    window.datosPersonalGlobal.forEach((p) => personalCombinado.push(p));
     if (
       typeof datosPersonalAgregadoGlobal !== "undefined" &&
       datosPersonalAgregadoGlobal

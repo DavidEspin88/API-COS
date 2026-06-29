@@ -87,7 +87,7 @@ function inicializarMóduloAutenticacionFAE() {
         }
         if (btnSubmit) {
           btnSubmit.disabled = false;
-          if (btnText) btnText.textContent = "Iniciar Sesión";
+          if (btnText) btnText.textContent = "Ingresar al Sistema";
           if (btnSpinner) btnSpinner.classList.add("hidden");
         }
         return;
@@ -104,7 +104,7 @@ function inicializarMóduloAutenticacionFAE() {
         }
         if (btnSubmit) {
           btnSubmit.disabled = false;
-          if (btnText) btnText.textContent = "Iniciar Sesión";
+          if (btnText) btnText.textContent = "Ingresar al Sistema";
           if (btnSpinner) btnSpinner.classList.add("hidden");
         }
         return;
@@ -180,17 +180,10 @@ function aplicarRestriccionesDePerfil(perfil) {
       }
     });
 
-    // Desactivar en frío del DOM cualquier pestaña activa no autorizada (Evita la carga por defecto de Munición)
+    // Ocultar TODAS las secciones primero (limpieza total del estado previo)
     contenidosPestañas.forEach((content) => {
-      const sectionId = content.id;
-      if (
-        sectionId !== "module-registro_personal" &&
-        sectionId !== "module-salvoconductos" &&
-        sectionId !== "module-parte_diario"
-      ) {
-        content.classList.remove("active");
-        content.classList.add("hidden");
-      }
+      content.classList.remove("active");
+      content.classList.add("hidden");
     });
 
     // Redirección forzada por seguridad al sub-módulo autorizado por defecto
@@ -216,6 +209,29 @@ function aplicarRestriccionesDePerfil(perfil) {
     tabsNavegacion.forEach((tab) => {
       tab.style.display = "flex";
     });
+    // Determinar el módulo inicial: respetar el último visitado o ir a municion por defecto
+    const ultimoModuloAdmin = localStorage.getItem("lastMilitarModule");
+    const moduloInicialAdmin = (ultimoModuloAdmin && ultimoModuloAdmin !== "parte_diario")
+      ? ultimoModuloAdmin
+      : "municion";
+
+    // Ocultar todas las secciones y mostrar solo la correcta
+    contenidosPestañas.forEach((content) => {
+      content.classList.remove("active");
+      content.classList.add("hidden");
+    });
+    tabsNavegacion.forEach(t => t.classList.remove("active"));
+
+    const targetContent = document.getElementById(`module-${moduloInicialAdmin}`);
+    const targetTab = document.querySelector(`.menu-tab[data-module="${moduloInicialAdmin}"]`);
+    if (targetContent && targetTab) {
+      targetContent.classList.remove("hidden");
+      targetContent.classList.add("active");
+      targetTab.classList.add("active");
+      localStorage.setItem("lastMilitarModule", moduloInicialAdmin);
+      const titleHeader = document.getElementById("current-module-title");
+      if (titleHeader) titleHeader.innerText = "Sección de " + targetTab.textContent.replace(/[^\w\s\/\.ñÑáéíóúÁÉÍÓÚ]/g, "").trim();
+    }
   }
 }
 function toggleVisibilidadPassword() {

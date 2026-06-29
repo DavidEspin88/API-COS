@@ -153,7 +153,6 @@ if (formPer) {
         resetFormPersonal();
         const modalPer = document.getElementById("modal-registro-personal");
         if (modalPer) modalPer.classList.add("hidden");
-        loadAllData();
       });
     }
   });
@@ -192,7 +191,7 @@ function poblarDesplegablesPersonal() {
   if (window.funcionesCargadas) {
     window.funcionesCargadas.forEach((item) => {
       const opt = document.createElement("option");
-      const nombreFuncion = item.function || item.funcion || "";
+      const nombreFuncion = item.funcion || item["function"] || item.valor_unico || "";
       opt.value = nombreFuncion;
       opt.textContent = nombreFuncion;
       selectFuncion.appendChild(opt);
@@ -440,7 +439,7 @@ function setupEditPer(
   nombreContacto,
 ) {
   isEditingPer = true;
-  formTitlePer.innerText = "Modificar Datos de Personal";
+  formTitlePer.innerHTML = `<i class="fa-solid fa-user-gear"></i> Modificar Datos de Personal`;
   btnSavePer.innerText = "Actualizar Registro";
   btnCancelPer.style.display = "block";
 
@@ -493,7 +492,8 @@ function setupEditPer(
 
 function resetFormPersonal() {
   isEditingPer = false;
-  formTitlePer.innerText = "Registrar Nuevo Personal Militar";
+  formTitlePer.innerHTML = `<i class="fa-solid fa-user-gear"></i> Registrar Nuevo Personal Militar`;
+  btnSavePer.innerText = "Guardar Registro";
   btnCancelPer.style.display = "none";
   const cedulaInput = document.getElementById("per-cedula");
   cedulaInput.readOnly = false;
